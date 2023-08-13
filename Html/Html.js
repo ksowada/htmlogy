@@ -235,10 +235,12 @@ class Html {
 		this.doming = false
 	}
 	/**
+	 * @param parentObj
+	 * @param arg
+	 * @param htmlNamespace
 	 * @private
 	 */
 	createEl(parentObj,arg,htmlNamespace) {
-
 		// if (arg.html==='svg') { // auto build svg namespace
 		// 	this.htmlNamespace = 'http://www.w3.org/2000/svg'
 		// }
