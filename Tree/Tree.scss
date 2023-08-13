@@ -1,0 +1,59 @@
+// TODO lvl dependend strength of info => visualize
+.tree {
+	overflow-x:	auto; /* scrollbar depends on browser */
+	overflow-y:	auto;
+	max-height: 30vh;
+}
+.tree-row {
+	grid-template-columns: minmax(310px, 1fr) minmax(310px,	1fr);
+}
+.root { /* only concerns elements below root class (first ul) */
+    padding-inline-start: 0vw;
+    width: fit-content; /* reset to max size of items */
+    li {
+        list-style: none;
+        min-height: var(--ui-height-text);
+    }
+    .node-value {
+        display: inline;
+        cursor: pointer;
+    }
+    .unsel > .node-value {
+        color: var(--col-back-accent)
+    }
+    .sel > .node-value {
+        color: var(--col-back);
+        background-color: var(--col-fore);
+    }
+    .edit > .node-value {
+        background-color: lighten(red, 30);
+    }
+    .hide {
+        display: none;
+    }
+    .show {
+        display: block;
+    }
+    li ul {
+        margin-left:1em;
+        padding-left:0vw;
+    }
+    i {
+        margin-right:0.5em;
+    }
+    .node {
+        border: 1px #ccc solid;
+    }
+    input, input:focus {
+        background-color: lighten(blue, 30 );        
+        padding: 0px;
+        margin: 0px;
+        border: 0px;
+    }
+    .icon-between {
+        width: 1vw;
+    }
+    .collapse-btn {
+        cursor:pointer;
+    }
+}

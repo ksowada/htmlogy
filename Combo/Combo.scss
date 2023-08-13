@@ -1,0 +1,41 @@
+.default {
+    background-color: blue;
+}
+.combo {
+    display:flex;
+}
+.dropdown {
+    position: relative;
+}
+.combo-div {
+    display: flex;
+}
+.combo-input {
+    width: 30vw;
+    padding-left: 3vw;
+}
+.compo-input-overlay {
+    border: none;
+    background-color: aqua;
+}
+.combo-hidden {
+    position:absolute; /** when no relative position given, may use margin to position */
+    margin-top: var(--ui-height);
+    width: calc(30vw + var(--ui-height)); /* include btn-open in width, and want have optional scrollbars inside */
+    overflow-x: clip;
+    overflow-y: auto;
+    max-height: 20vh;
+    background-color: var(--col-back-accent);
+	box-shadow: 0vw 0vw 3vw 1vw var(--col-back);
+    display: grid;
+}
+.combo-item {
+    height: var(--ui-height);
+    padding-left: 3vw;
+    display: grid;
+    align-items: center;
+}
+.combo-item:hover {
+	color: var(--col-fore);
+    background-color: var(--col-back);
+}

@@ -1,0 +1,46 @@
+
+@import './../../App/Design/Proportions/Proportions.scss';
+.btns {
+	margin: var(--ui-gap);
+	display: flex;
+	flex-wrap: wrap;
+	width: fit-content;
+	margin-left: auto;
+	margin-right: auto;
+}
+.btns > .btn {
+	margin:var(--ui-min-gap);
+	align-self: center;
+}
+.btn {
+	min-height: var(--ui-height);
+	// display: grid; // not in use when button standalone inline
+	place-items:center;
+	color: var(--col-fore-primary);
+	cursor:	pointer;
+	// box-shadow: 0 0 1vw 1vw inset #0005;
+	@include border(var(--col-back-accent),var(--col-back-accent),#0005);
+}
+.active	{
+	border:	3px	solid gray;
+}
+.btn-primary, .mouseup {
+	background-color: var(--col-back-primary);
+}
+.btn-secondary, .mouseup {
+	background-color: var(--col-back-secondary);
+}
+.disabled {
+	cursor:	default;
+	background-color: var(--col-back);
+}
+.mouseup {
+	// background-color: unset;
+	box-shadow:	0vw	0vw	0vw	0vw	var(--col-back-accent);
+	transition:	background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+}
+.mousedown {
+	background-color: var(--col-fore);
+	box-shadow:	0vw	0vw	3vw	1vw	var(--col-back-accent);
+	transition:	background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+}
