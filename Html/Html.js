@@ -1,3 +1,4 @@
+import {html} from 'htm/preact'
 import Arr from '../../Arr/Arr.js'
 import Bit from '../../Bit/Bit.js'
 import Int from '../../Int/Int.js'
@@ -143,6 +144,9 @@ class Html {
 	 * @param {object} arg.container optional container
 	 * @param {string} arg.container.html container, div if unused
 	 * @param {string} arg.container.htmlNS html Namespace, f.e. svg Element
+	 * @param {string} arg.h template syntax, see htm from https://github.com/developit/htm/tree/master
+	 * - you may deliver a string, valid html or optionally with missing end tag
+	 * - for template syntax, use import {html} from 'htm/preact'
 	 * @param {string} arg.html htmlTagName, div if unused, SVG supported, it adds namespace automatically
 	 * @param {string} arg.htmlNS html Namespace, f.e. svg Element
 	 * @param {string|Array} arg.css row of CSSClass (str space-separated or arr of classes)
@@ -184,9 +188,38 @@ class Html {
 
 		// find matching HTMLElement to operate
 		arg.el = Html.getEl(arg.parent)
+
+		// html-mode
 		if (!arg.html) arg.html = 'div' // if html not given create a div
 		arg.html = arg.html.toLowerCase()
 
+		// h-mode will overwrite .html and add to .atts and .val
+		if (arg.h) {
+			// eslint-disable-next-line init-declarations
+			let hVal // use copy to keep the original
+			if (Str.valid(arg.h)) {
+				// add eventually missing endtag
+				const hText = El.addEndTag(arg.h)
+				// let hText = arg.h.trim()
+				// let hTag = El.tag(hText) //first space  or closing bracket
+				// let hTagEnd = El.tagClosing(hTag) //
+				// if (!hText.toLowerCase().endsWith(hTagEnd)) hText += hTagEnd
+
+				hVal = html([hText])
+			} else {
+				hVal = Object.assign(arg.h)
+			}
+
+			// type contains tag
+			arg.html = hVal.type
+
+			// props contains attributes
+			const hPropsVal = Object.assign(hVal.props)
+			if (!arg.val) arg.val = ''
+			if (hPropsVal.children) arg.val = hPropsVal.children + arg.val // join val from htm and props
+			Obj.omit(hPropsVal,'children') // omit no regular attributes
+			arg.atts = Object.assign(hPropsVal,arg.atts)
+		}
 		const htmlNamespaceParent = ObjObj.childsHasDefined(arg,['parent','obj'],'htmlParent','htmlNamespace')
 		if (htmlNamespaceParent) { // inherit namespace from parent
 			this.htmlNamespace = htmlNamespaceParent
@@ -464,11 +497,11 @@ class Html {
 	// TODO add test
 	add(arg) {
 		Obj.put(arg,['parent','obj'],this)
-		const html = new Html(arg)
+		const htmlObj = new Html(arg)
 
 		// add as child, when .name is given
-		if (Str.valid(arg.name)) this[arg.name] = html
-		return html
+		if (Str.valid(arg.name)) this[arg.name] = htmlObj
+		return htmlObj
 	}
 	/**
 	 * add introduce child and form array, if called multiple times it extend the array, automatically sets parent with this and construct it
@@ -478,14 +511,14 @@ class Html {
 	 */
 	addArr(arg) {
 		Obj.put(arg,['parent','obj'],this)
-		const html = new Html(arg)
+		const htmlObj = new Html(arg)
 
 		// add as child, when .name is given
 		if (Str.valid(arg.name)) {
 			if (this[arg.name]==undefined) this[arg.name] = []
-			this[arg.name].push(html)
+			this[arg.name].push(htmlObj)
 		}
-		return html
+		return htmlObj
 	}
 	/**
 	 * get id from DOM, and write it to .my.atts (only if defined) and .my.id
@@ -874,8 +907,8 @@ class Html {
 		if (evtParentsEl[evtParentsEl.length-1]===null) return undefined // avoid null
 		return evtParentsEl[evtParentsEl.length-1]
 	}
-	static getElByNameFirst(html) {
-		const els = document.getElementsByTagName(html)
+	static getElByNameFirst(htmlObj) {
+		const els = document.getElementsByTagName(htmlObj)
 		return els.item(0)
 	}
 	static removeAttributes(el) {

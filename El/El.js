@@ -106,5 +106,70 @@ class El {
 		ret.height = htmlEl.clientHeight // div > a > img
 		return ret
 	}
+	/**
+	 * reads the tag of a HTML/XML element
+	 * @param {string} text valid HTML/XML string
+	 * @returns {string} the tag of the element
+	 */
+	static tag(text) {
+		let textInt = text.trimStart()
+		const posStart = 1
+		const posEnd = Str.indexOfFirst(textInt,[' ','>','/'])
+		return textInt.substring(posStart,posEnd).toLowerCase()
+	}
+	/**
+	 * create text of closing HTML/XML element with lowercase characters
+	 * @param {string} tag HTML/XML Tag name
+	 * @returns {string} text of closing HTML/XML element
+	 */
+	static tagClosing(tag) {
+		return '</' + tag.toLowerCase()+ '>'
+	}
+	/**
+	 * add a ending tag, if missing
+	 * @param {string} text HTML/XML string
+	 * @returns {string} HTML/XML string with ending tag
+	 */
+	static addEndTag(text) {
+		let hText = text.trim()
+		let hTag = El.tag(hText)
+		let hTagEnd = El.tagClosing(hTag) //
+		if (!hText.toLowerCase().endsWith(hTagEnd)) hText += hTagEnd
+		return hText
+	}
+	/**
+	 * omit the end tag if given
+	 * @param {string} text HTML/XML string to omit end tag
+	 * @returns {string} HTML/XML string without ending tag
+	 */
+	static omitEndTag(text) {
+		let hText = text.trim()
+		let hTag = El.tag(text)
+		let hTagEnd = El.tagClosing(hTag) //
+		if (text.toLowerCase().endsWith(hTagEnd)) hText = Str.omitEnd(hText,hTagEnd.length)
+		return hText
+	}
+
+	// from https://stackoverflow.com/questions/2474605/how-to-convert-a-htmlelement-to-a-string
+
+	/**
+	 * convert DOM element to string
+	 * @param {Element} who a DOM element
+	 * @param {boolean} deep when set, then return also childs
+	 * @returns {string} text of the DOM element
+	 */
+	static getHTML(who,deep) {
+		if(!who || !who.tagName) return ''
+		// eslint-disable-next-line init-declarations
+		var txt,ax,el= document.createElement('div')
+		el.appendChild(who.cloneNode(false))
+		txt= el.innerHTML
+		if(deep) {
+			ax= txt.indexOf('>')+1
+			txt= txt.substring(0,ax)+who.innerHTML+ txt.substring(ax)
+		}
+		el= null
+		return txt
+	}
 }
 export default El
