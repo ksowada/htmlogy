@@ -24,7 +24,8 @@ class El {
 		return this.el.classList.value
 	}
 	get styles() {
-		return this.el.style.cssText
+		if (this.el.style) return this.el.style.cssText
+		return ''
 	}
 	get id() {
 		return this.el.id

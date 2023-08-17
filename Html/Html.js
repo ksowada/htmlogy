@@ -143,7 +143,7 @@ class Html {
 	 * @param {object} arg.container optional container
 	 * @param {string} arg.container.html container, div if unused
 	 * @param {string} arg.container.htmlNS html Namespace, f.e. svg Element
-	 * @param {string} arg.html htmlTagName, div if unused
+	 * @param {string} arg.html htmlTagName, div if unused, SVG supported, it adds namespace automatically
 	 * @param {string} arg.htmlNS html Namespace, f.e. svg Element
 	 * @param {string|Array} arg.css row of CSSClass (str space-separated or arr of classes)
 	 * @param {object} arg.styles extra inline styles, like background-color
@@ -192,7 +192,7 @@ class Html {
 			this.htmlNamespace = htmlNamespaceParent
 		}
 		if (arg.html==='svg') { // auto build svg namespace
-			this.htmlNamespace = 'http://www.w3.org/2000/svg'
+			this.htmlNamespace = 'http://www.w3.org/2000/svg' // will also inherit to child elements
 		}
 
 		// if (arg.htmlNS) { // manual given namespace
@@ -207,17 +207,9 @@ class Html {
 		// TODO use new Html for Container creation
 		if (arg.container) {
 			if (!arg.container.html) arg.container.html = 'div' // if html not given create a div
-			// if (arg.container.htmlNS) {
-			// 	this.top.el = document.createElementNS(arg.container.htmlNS,arg.container.html)
-			// } else {
-			// 	/** if container in use its {HTMLElement} is attached in this, parallal to my.el */
-			// 	this.top.el = document.createElement(arg.container.html)
-			// }
-
 			if (arg.container.html==='svg') { // auto build svg namespace
-				arg.container.htmlNamespace = 'http://www.w3.org/2000/svg'
+				arg.container.htmlNamespace = 'http://www.w3.org/2000/svg' // will also inherit to child elements
 			}
-
 			this.createEl(this.top,arg.container,arg.container.htmlNamespace)
 			this.top.el.appendChild(this.my.el)
 			if (arg.el) arg.el.appendChild(this.top.el)
@@ -234,18 +226,17 @@ class Html {
 		this.domed = true
 		this.doming = false
 	}
+	// eslint-disable-next-line jsdoc/require-param
 	/**
 	 * @private
 	 */
 	createEl(parentObj,arg,htmlNamespace) {
-
-		// if (arg.html==='svg') { // auto build svg namespace
-		// 	this.htmlNamespace = 'http://www.w3.org/2000/svg'
-		// }
 		if (arg.htmlNS) { // manual given namespace
 			parentObj.el = document.createElementNS(arg.htmlNS,arg.html)
 		} else if (htmlNamespace) { // auto or inherit namespace
-			parentObj.el = document.createElementNS(arg.htmlNS,htmlNamespace)
+			parentObj.el = document.createElementNS(htmlNamespace,arg.html)
+		} else if (arg.atts && arg.atts.xmlns) { // auto or inherit namespace
+			parentObj.el = document.createElementNS(arg.atts.xmlns,arg.html)
 		} else { // usual tag without namespace
 			parentObj.el = document.createElement(arg.html)
 		}
