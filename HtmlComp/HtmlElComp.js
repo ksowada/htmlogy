@@ -40,7 +40,7 @@ class HtmlElComp extends HtmlComp {
 		const obj = Html.mergeDatas.apply(null,arguments)
 		super.domCreate(obj)
 		if (this.container) { // TODO fix overlap with Html.container
-			const containerProps = Html.mergeDatas({html:'div'},Obj.giveKey(this,'container'))
+			const containerProps = Html.mergeDatas({html:'div'},Obj.get(this,'container'))
 			/**
 			 * use it as parent for underlying html elements,
 			 * - will be overwritten each time
@@ -55,7 +55,7 @@ class HtmlElComp extends HtmlComp {
 			this.div = this.containerObj.my.el // TODO call top.el
 		} else if (!this.div) this.div = Html.getEl(this.parent)
 		if (this.heading && this.heading.val) {
-			const headingProps = Html.mergeDatas({html:'h2'},Obj.giveKey(this,'heading'))
+			const headingProps = Html.mergeDatas({html:'h2'},Obj.get(this,'heading'))
 			/**
 			 * optional heading independend in container or parent
 			 * - will be overwritten each time
