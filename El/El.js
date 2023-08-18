@@ -83,7 +83,7 @@ class El {
 		})
 		return str
 	}
-	textContent(el,separator=' ') {
+	static textContent(el,separator=' ') {
 		let str = ''
 		el.childNodes.forEach((node,ix) => {
 			if (node.nodeType === 3) { // as in test Node.TEXT_NODE is not defined so use int
