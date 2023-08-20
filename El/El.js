@@ -38,7 +38,7 @@ class El {
 	 * @returns {string} textContent of the element without subelements, or when input the value
 	 */
 	get val() {
-		let str = El.textContentNode(this.el)
+		let str = El.textContent(this.el)
 		if (this.el.value) {
 			if (str.length>0) str+= ' ' // sperator if other value present
 			str += this.el.value // for input value
@@ -72,16 +72,6 @@ class El {
 			return undefined
 		}
 		return output
-	}
-	static textContentNode(el,separator=' ') {
-		let str = ''
-		el.childNodes.forEach((node,ix) => {
-			if (node.nodeType === 3) { // as in test Node.TEXT_NODE is not defined so use int
-				str += node.nodeValue
-				if (ix < el.childNodes.length-1) str += separator
-			}
-		})
-		return str
 	}
 	static textContent(el,separator=' ') {
 		let str = ''
@@ -155,18 +145,24 @@ class El {
 	/**
 	 * convert DOM element to string
 	 * @param {Element} who a DOM element
-	 * @param {boolean} deep when set, then return also childs
+	 * @param {string} mode 
+	 * - when 'deep', return also childs
+	 * - when 'text', return text contents
 	 * @returns {string} text of the DOM element
 	 */
-	static getHTML(who,deep) {
+	static getHTML(who,mode) {
 		if(!who || !who.tagName) return ''
 		// eslint-disable-next-line init-declarations
 		var txt,ax,el= document.createElement('div')
 		el.appendChild(who.cloneNode(false))
 		txt= el.innerHTML
-		if(deep) {
+		if(mode==='deep') {
 			ax= txt.indexOf('>')+1
 			txt= txt.substring(0,ax)+who.innerHTML+ txt.substring(ax)
+		}
+		if(mode==='text') {
+			ax= txt.indexOf('>')+1
+			txt= txt.substring(0,ax)+El.textContent(who)+ txt.substring(ax)
 		}
 		el= null
 		return txt
