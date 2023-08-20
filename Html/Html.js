@@ -261,6 +261,9 @@ class Html {
 	}
 	// eslint-disable-next-line jsdoc/require-param
 	/**
+	 * @param parentObj
+	 * @param arg
+	 * @param htmlNamespace
 	 * @private
 	 */
 	createEl(parentObj,arg,htmlNamespace) {
