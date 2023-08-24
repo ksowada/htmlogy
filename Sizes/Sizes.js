@@ -2,7 +2,7 @@
  * @class
  * for Image,Video or other elements to resize
  */
-class ImgControl {
+class Sizes {
 	/**
 	 * read original Elements dimension, in px
 	 * @param {HTMLElement} htmlEl a Element that may represent a image or video or something else
@@ -30,11 +30,11 @@ class ImgControl {
 		// window.getComputedStyle(htmlEl.parent)
 		const paddingStr = window.getComputedStyle(htmlEl.parentElement).padding
 		const paddingPx = Math.round(paddingStr.substring(0,paddingStr.length-2)) // ignore pixel decimals : easiness
-		console.debug('ImgControl:center:padding:'+paddingPx)
+		console.debug('Sizes:center:padding:'+paddingPx)
 
 		const clientCorr = {width:clientWidth - 2*paddingPx,height:clientHeight - 2*paddingPx}
 
-		const wished = ImgControl.matchBoundsKeepProp(clientCorr,img)
+		const wished = Sizes.matchBoundsKeepProp(clientCorr,img)
 
 		const marginLeft = (clientCorr.width-wished.width)/2
 		const marginTop = (clientCorr.height-wished.height)/2
@@ -51,7 +51,7 @@ class ImgControl {
 		// window.getComputedStyle(htmlEl.parent)
 		const paddingStr = window.getComputedStyle(htmlEl.parentElement).padding
 		const paddingPx = Math.round(paddingStr.substring(0,paddingStr.length-2)) // ignore pixel decimals : easiness
-		console.log('ImgControl:setQuadByParent:padding:'+paddingPx)
+		console.log('Sizes:setQuadByParent:padding:'+paddingPx)
 		const clientWidthCorr = clientWidth - 2*paddingPx
 		const clientHeightCorr = clientHeight - 2*paddingPx
 		const imgWidth = htmlEl.naturalWidth
@@ -221,7 +221,7 @@ class ImgControl {
 		holeRect.left = holeEl.offsetLeft
 		holeRect.width = holeEl.clientWidth
 		holeRect.height = holeEl.clientHeight
-		ImgControl.place(ballEl,holeRect)
+		Sizes.place(ballEl,holeRect)
 	}
 	static setWidthSameAs(destEl,srcEl) {
 		const widthToSet = srcEl.clientWidth
@@ -237,10 +237,10 @@ class ImgControl {
 	 */
 	static place(htmlEl,rect) {
 		htmlEl.style.setProperty('position','absolute')
-		htmlEl.style.setProperty('top',ImgControl.in_px_int(rect.top))
-		htmlEl.style.setProperty('left',ImgControl.in_px_int(rect.left))
-		htmlEl.style.setProperty('width',ImgControl.in_px_int(rect.width))
-		htmlEl.style.setProperty('height',ImgControl.in_px_int(rect.height))
+		htmlEl.style.setProperty('top',Sizes.in_px_int(rect.top))
+		htmlEl.style.setProperty('left',Sizes.in_px_int(rect.left))
+		htmlEl.style.setProperty('width',Sizes.in_px_int(rect.width))
+		htmlEl.style.setProperty('height',Sizes.in_px_int(rect.height))
 	}
 	/**
 	 * return a valid string with px-suffix for use in CSS or similar
@@ -251,4 +251,4 @@ class ImgControl {
 		return Math.round(px)+'px'
 	}
 }
-export default ImgControl
+export default Sizes
