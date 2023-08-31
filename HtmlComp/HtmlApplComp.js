@@ -39,11 +39,6 @@ class HtmlApplComp {
 		// load external build datetime file for internal purpose
 		// FetchFile.fetch('build.datetime.json',this.onLoadDateTime.bind(this))
 	}
-	/**
-	 * creates div for component, load obj in this, call at begin of dom()
-	 * @param {object} arg object for Html-create
-	 * @param {any} arg.el will be attached
-	 */
 	// TODO rename domCreate to dom
 	domCreate() {
 		// care for body

@@ -203,6 +203,19 @@ class Elem {
 		return (matchCnt==arguments.length-1) // 1 match less as items
 	}
 	/**
+	 * change property of an element
+	 * @param {Element} el DOM-element to change
+	 * @param {string} prop a property of the element to change
+	 * @param {any} value value to set
+	 * @returns {boolean} true, if changed something; false, if already equals the value
+	 */
+	static change(el,prop,value) {
+		const original = el[prop]
+		if (original===value) return false
+		el[prop] = value
+		return true
+	}
+	/**
 	 * find element by tag name and additional atts and change element according to edit
 	 * @param {object} search object with certain arguments
 	 * @param {string} search.html HTMLElement to search
