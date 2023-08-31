@@ -540,223 +540,19 @@ class Html {
 		return id
 	}
 	/**
-	 * compare may compare 2 or more element
-	 * use getEl internally
-	 * @param {object[]} objs must have at least 1 argument to comply and then accept unity and return true,
-	 * use same parameter as @see {@link this.Elem}
-	 * @returns {boolean} true, when all arguments are the same Element, or anything is undefined
-	 * - undefined, when one address cannot be detected by getEl
-	 * - false, when 1 or more of valid arguments are different
-	 */
-	// eslint-disable-next-line no-unused-vars
-	static equalEl(objs) {
-		if (arguments.length==0) return undefined
-		// if (arguments[0]==undefined) return // when not defined
-		if (arguments.length==1) return true
-		let argIx = 0
-		let matchCnt = 0
-		// let undefinedCnt = 0
-		let el1 = Html.getEl(arguments[0])
-		if (el1==undefined) return // not valid adress given so forget output
-		// if (arguments[0]==undefined) undefinedCnt++ // if not given, no problem will not influence equalness
-		for (argIx = 1; argIx < arguments.length; argIx++) {
-			// if (arguments[argIx]==undefined) undefinedCnt++
-			let el2 = Html.getEl(arguments[argIx])
-			if (el2==undefined) return // not valid adress given so forget output
-			if (el1.isSameNode(el2)) matchCnt++
-			el1 = el2 // prepare next iteration
-		}
-		return (matchCnt==arguments.length-1) // 1 match less as items
-	}
-	// TODO no more working, as change is no more static
-	/**
-	 * find element by tag name and additional atts and change element according to edit
-	 * @param {object} search object with certain arguments
-	 * @param {string} search.html HTMLElement to search
-	 * @param {object} search.atts a obj of HTMLAttribute (all atts must be found)
-	 * @param {object} edit Object to change HTMLElement
-	 * @param {object} el HTMLElement to attach created, and start point for search, if not found
-	 * @param {boolean} create set to create a new Html
-	 * @returns {Html} if created, otherwise undefined
-	 * @throws {Error} if search.html is not found
-	 */
-	static findActions(search,edit,el,create) { // TODO optional create, use it also for find
-		if (!search.html) throw new Error('html not given but needed')
-		const foundEls = Html.getChilds(el,search.html)
-		let changeCnt = 0
-		for (let ix = 0; ix < foundEls.length; ix++) {
-			const foundEl = foundEls[ix]
-			let found_atts = 0
-			const search_attsArr = Object.keys(search.atts)
-			for (const attKey in search_attsArr) {
-				if (Object.hasOwnProperty.call(search_attsArr,attKey)) {
-					// const element = search_attsArr[attKey]; // TODO only use attKey?
-					const foundElAtt = foundEl.getAttribute(attKey)
-					if (foundElAtt!==null && foundElAtt==search.atts[attKey]) found_atts++
-				}
-			}
-			if (found_atts==search_attsArr.length) {
-				Html.change({html:foundEl},edit) // TODO shall change el, but static change is deleted
-				changeCnt++
-			}
-		}
-		if (changeCnt>1) console.info('multiple elements changed, expected 1, found:'+changeCnt)
-		if (create && changeCnt==0) return new Html({parent:{el},...search,...edit})
-		return undefined
-	}
-	/**
-	 * clean subnodes and text contents from given parent, but leave parent element
-	 * @param {object} arg supply at least parent
-	 * @param {HTMLElement} arg.parent.el Element to append
-	 * @param {string} arg.parent.id id of HTMLElement, optional to el
-	 * @param {Html} arg.parent.obj optional to el and id of HTMLElement
-	 */
-	static removeChilds(arg) {
-		const el = Html.getEl(arg)
-		if (el==undefined) return
-		el.innerHTML = ''
-	}
-	/**
-	 * set some textContent given by Parameter, do overwrite
-	 * if el is input set str to value, do not overwrite if no change is detected
-	 * @param {HTMLElement} el an Element to modify
-	 * @param {string} str text to set textContent, if undefined change nothing
-	 * @returns {boolean} true if content has changed
-	 */
-	static textContentSet(el,str) {
-		if (!Str.valid(str)) return undefined
-		const isInput = (el.localName==='input')
-		if (isInput) {
-			if (el.value!==str) {
-				el.value = str
-				return true
-			}
-		} else {
-			if (el.textContent!==str) {
-				el.textContent = str
-				return true
-			}
-		}
-		return false
-	}
-	/**
 	 * set some textContent given by Parameter, do overwrite
 	 * @param {string} str text to set textContent, if undefined change nothing
 	 * @returns {boolean} true if content has changed
 	 */
 	textContentSet(str) {
-		return Html.textContentSet(this.my.el,str)
-	}
-	/**
-	 * add some textContent given by Parameter, do not overwrite
-	 * if el is input add str to value
-	 * @param {HTMLElement} el an Element to modify
-	 * @param {string} str text to add adjacent to textContent, if undefined change nothing
-	 */
-	static textContentAdd(el,str) {
-		if (!Str.valid1(str)) return
-		const isInput = (el.localName==='input')
-		const oldContent = (isInput)?el.value:el.textContent
-		if (isInput) {
-			el.value = oldContent + str
-		} else {
-			el.textContent = oldContent + str
-		}
+		return Elem.textContentSet(this.my.el,str)
 	}
 	/**
 	 * add some textContent given by Parameter, do not overwrite
 	 * @param {string} str text to add adjacent to textContent, if undefined change nothing
 	 */
 	textContentAdd(str) {
-		Html.textContentAdd(this.my.el,str)
-	}
-	/**
-	 * get 1st level children of HTMLElement
-	 * @param {HTMLElement} el is undefined than []
-	 * @param {string} tag is undefined than all children
-	 * @returns {HTMLElement[]} any children of DOM.Node children with tag name as array
-	 * - when no children than []
-	 */
-	static getChilds(el,tag) {
-		const childs = []
-		if (el==undefined) return childs
-		const childNodes = el.childNodes
-		if (childNodes==undefined) return childs
-		childNodes.forEach(e => {
-			const eType = Vars.typeHier(e) // may be more specialiced of Element
-			if (eType.includes('HTMLElement')) {
-				if (tag==undefined || e.localName==tag) childs.push(e)
-			}
-		})
-		return childs
-	}
-	/**
-	 * get textValue of first child, if given
-	 * @param {Element} el element to search in
-	 * @param {string} tag tagname f.e. div
-	 * @returns {string} textValue if given, else undefined
-	 */
-	static getChildsFirstVal(el,tag) {
-		const els = el.getElementsByTagName(tag)
-		const eli = els.item(0)
-		if (eli==undefined) return undefined
-		return eli.textContent
-	}
-	/**
-	 * get all 1st level childs, if not existing add and return a given htmlObj
-	 * - use f.e. to assure a child, if not existing will be added
-	 * @param {HTMLElement[]} el base element in dom whose children get observed
-	 * @param {string} tag optional, tag name which child should comply
-	 * @param {object} htmlObj optional fallback, if no child is found, this will be created and returned
-	 * @returns {HTMLElement[]} array of DOM element
-	 * - if not found in el create new as given in htmlObj
-	 * - with el is undefined than []
-	 * - with tag is undefined than all children
-	 * - when no children than [fallback] or []
-	 */
-	static getChildsAssured(el,tag,htmlObj) {
-		const childs = Html.getChilds(el,tag)
-		if (childs.length==0) {
-			const childHtml = new Html(htmlObj)
-			childs.push(childHtml.my.el)
-		}
-		return childs
-	}
-	// TODO move static functions like  HtmlUtils or EL
-	/**
-	 * set class from List of Element, and delete other used in List
-	 * @param {HTMLElement} el Element to search for class
-	 * @param {string|number|boolean} css choose this class instead of other classes
-	 * - optional ix in cssList
-	 * - when boolean than true represents index 1 and false index 0
-	 * - if undefined remove every item in cssList
-	 * @param {string[]} cssList Array of classes, optional if css given
-	 * @returns {number} cnt of removed in classList
-	 */
-	static classStateSet(el,css,cssList) {
-		if (!Obj.valid(el)) return undefined
-		if (typeof css==='number') { // css must be an index in cssList
-			if (!Arr.valid1(cssList)) return undefined
-			css = cssList[css].trim()
-		} else if (typeof css==='boolean') { // css must be a boolean in cssList
-			if (!Arr.valid1(cssList)) return undefined
-			css = cssList[Bit.toInt(css)].trim()
-		} else if (css==undefined) {
-			css = ''
-		}else{
-			css = css.trim()
-		}
-		let removeCnt = 0
-		if (Arr.valid1(cssList)) {
-			cssList.forEach(e => {
-				if (e.length>0 && el.classList.contains(e)) {
-					el.classList.remove(e)
-					removeCnt++
-				}
-			})
-		}
-		if (Str.valid1(css)) el.classList.add(css)
-		return removeCnt
+		Elem.textContentAdd(this.my.el,str)
 	}
 	/**
 	 * set class from List, and delete other used in List
@@ -767,24 +563,7 @@ class Html {
 	 * @returns {number} cnt of removed in classList
 	 */
 	classStateSet(css,cssList) {
-		return Html.classStateSet(this.my.el,css,cssList)
-	}
-	/**
-	 * get existent classes from List of Element
-	 * @param {HTMLElement} el Element to search for class
-	 * @param {string[]} cssList Array of classes
-	 * @returns {object[]} every item from cssList exist in el with .ix and .name
-	 */
-	static classStateGet(el,cssList) {
-		if (!(cssList instanceof Array)) return []
-		Str.clean1(cssList)
-		const retArr = []
-		for (let i=0; i<cssList.length; i++) {
-			if (el.classList.contains(cssList[i])) {
-				retArr.push({ix:i,name:cssList[i]})
-			}
-		}
-		return retArr
+		return Elem.classStateSet(this.my.el,css,cssList)
 	}
 	/**
 	 * get existent classes from List of Element
@@ -792,7 +571,17 @@ class Html {
 	 * @returns {object[]} every item from cssList exist in el with .ix and .name
 	 */
 	classStateGet(cssList) {
-		return Html.classStateGet(this.my.el,cssList)
+		return Elem.classStateGet(this.my.el,cssList)
+	}
+	/**
+	 * toggle or cycle through classes incrementally
+	 * - if none of cssList is active, set first
+	 * @param {string[]} cssList Array of classes
+	 * @returns {object} with .name and .ix
+	 * @throws error if more than 1 class of cssList active in element
+	 */
+	classStateIncr(cssList) {
+		return Elem.classStateIncr(this.my.el,cssList)
 	}
 	timer(arg,time_ms) {
 		const self = this
@@ -815,125 +604,6 @@ class Html {
 				name
 			))
 		}
-	}
-	/**
-	 * return true if class in Element is given
-	 * @param {HTMLElement} el Element to search for class
-	 * @param {string|string[]} css single item or Array of classes, Array may be modified when cleaning
-	 * @returns {boolean} true if each css is found in Element
-	 */
-	static classStateIs(el,css) {
-		if (css==undefined) return false
-		if (css instanceof Array) {
-			Str.clean1(css)
-			const found = css.filter(e => el.classList.contains(e))
-			return found.length==css.length
-		}
-		return el.classList.contains(css)
-	}
-	/**
-	 * toggle or cycle through classes incrementally
-	 * - if none of cssList is active, set first
-	 * @param {HTMLElement} el Element to search for class
-	 * @param {string[]} cssList Array of classes
-	 * @returns {object} with .name and .ix
-	 * @throws error if more than 1 class of cssList active in element
-	 */
-	static classStateIncr(el,cssList) {
-		const cssActives = Html.classStateGet(el,cssList)
-		if (cssActives.length==0) { // if none of cssList is active, set first
-			Html.classStateSet(el,0,cssList)
-			return {name:cssList[0],ix:0}
-		} else if (cssActives.length==1) {
-			const ix = cssActives[0].ix
-			const ixNext = Int.incr(ix,0,cssList.length-1)
-			Html.classStateSet(el,ixNext,cssList)
-			return {name:cssList[ixNext],ix:ixNext}
-		}
-		throw new Error('more than 1 state active in classList')
-	}
-	/**
-	 * toggle or cycle through classes incrementally
-	 * - if none of cssList is active, set first
-	 * @param {string[]} cssList Array of classes
-	 * @returns {object} with .name and .ix
-	 * @throws error if more than 1 class of cssList active in element
-	 */
-	classStateIncr(cssList) {
-		return Html.classStateIncr(this.my.el,cssList)
-	}
-	/**
-	 * find parent of HTMLElement
-	 * - if no parameter is given return parent of el
-	 * - may set a relative level
-	 * - or use relative level to given parentEl
-	 * - or return parentEl if it is parent, if parentDepth is undefined
-	 * @param {HTMLElement} el
-	 * - if not given return undefined
-	 * @param {HTMLElement} parentEl optional parent from which to iterate
-	 * - but only if el (may from event) is child of parent
-	 * - if parentEl is not parent of el return undefined
-	 * @param {boolean} parentDepth return closest nth-parent
-	 * - if not given and no parentEl given return closest parent
-	 * - 0 return itself (or if parentEl is given return parentEl)
-	 * @returns {HTMLElement} parent to be found
-	 */
-	// TODO use getEl for ease adaption
-	// TODO old identity compare not work
-	static findParent(el,parentEl,parentDepth) {
-		if (!el) return undefined
-		if (parentDepth==undefined && parentEl==undefined) {
-			let parent = el.parentElement
-			if (parent===null) return // ease handling when no parent available by avoiding null to undefined
-			return parent
-		}
-		if (parentDepth==0 && parentEl!==undefined) return el
-		let thisEl = el
-		let evtParentsEl = []
-		evtParentsEl.push(thisEl)
-		let findParentElEn = (parentEl!==undefined)
-		// eslint-disable-next-line no-nested-ternary
-		let findParentDepth = (parentDepth==undefined) ? (parentEl==undefined)?1:0 : parentDepth // find next parent if not given
-		while (findParentElEn || findParentDepth>0) {
-			if (thisEl===null) return undefined // no valid iterated parent any more, than return undefined
-			if (findParentElEn) { // when parentEl is given
-				if (thisEl.isSameNode(parentEl)) {
-					findParentElEn = false
-					if (findParentDepth==0) return thisEl // otherwise next parent is shifted, even if I should return thisEl
-				}
-			} else {
-				findParentDepth--
-			}
-			thisEl = thisEl.parentElement
-			evtParentsEl.push(thisEl)
-		}
-		if (evtParentsEl[evtParentsEl.length-1]===null) return undefined // avoid null
-		return evtParentsEl[evtParentsEl.length-1]
-	}
-	static getElByNameFirst(htmlObj) {
-		const els = document.getElementsByTagName(htmlObj)
-		return els.item(0)
-	}
-	static removeAttributes(el) {
-		while(el.attributes.length > 0) {
-			el.removeAttribute(el.attributes[0].name)
-		}
-	}
-	/**
-	 * automize input reading and back writing after bounding return bounded value
-	 * @param {string} formName name of the form in document
-	 * @param {string} inputName name of the input in form
-	 * @param {number} min required
-	 * @param {number} max required
-	 * @returns {number} bounded value between min and max
-	 * @deprecated unnatural usage and mixin of dom speciality with form and bound
-	 */
-	static getBoundOfInput(formName,inputName,min,max) {
-		var readed = Numbers.getFloatOfText(document[formName][inputName].value)
-		var bounded = Numbers.bound(readed,min,max)
-		// var rounded = Numbers.round(bounded)
-		document[formName][inputName].value = Numbers.getTextOfFloat(bounded)
-		return bounded
 	}
 	/**
 	 * merge for HtmlElements

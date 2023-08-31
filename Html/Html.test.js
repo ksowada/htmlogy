@@ -3,6 +3,7 @@ import expect from 'expect.js'
 import {create_dom} from '../HtmlTest/Html.JSDOM.js'
 import Html from './Html.js'
 import HtmlElComp from '../HtmlComp/HtmlElComp.js'
+import Elem from '../Elem/Elem.js'
 describe('Html',() => {
 	const myId = 'myId'
 	const domContent = '<main id="'+myId+'"></main>' // will be surrounded from html/body etc
@@ -63,9 +64,9 @@ describe('Html',() => {
 		const headEl = document.head // implicitly created
 		const search = {html:'title'}
 		const edit = {val:'test'}
-		Html.findActions(search,edit,headEl,document)
+		Elem.findActions(search,edit,headEl,document)
 		it('was empty el and has now created element',() => {
-			expect(Html.getChildsFirstVal(headEl,'title')).to.eql('test')
+			expect(Elem.getChildsFirstVal(headEl,'title')).to.eql('test')
 		})
 	})
 	describe('constructor only',() => {
@@ -73,7 +74,7 @@ describe('Html',() => {
 		// eslint-disable-next-line no-new
 		new Html({parent:{el},html:'div',val:'test'})
 		it('created tag with val',() => {
-			expect(Html.getChildsFirstVal(el,'div')).to.eql('test')
+			expect(Elem.getChildsFirstVal(el,'div')).to.eql('test')
 		})
 	})
 	describe('use of .domLater',() => {
@@ -82,7 +83,7 @@ describe('Html',() => {
 			// eslint-disable-next-line no-new
 			new Html({parent:{el},html:'div',val:'test',domLater:true})
 			it('created no element in DOM',() => {
-				expect(Html.getChildsFirstVal(el,'div')).to.be(undefined)
+				expect(Elem.getChildsFirstVal(el,'div')).to.be(undefined)
 			})
 		})
 		describe('call dom() later',() => {
@@ -91,7 +92,7 @@ describe('Html',() => {
 			const html = new Html({parent:{el},html:'div',val:'test',domLater:true})
 			html.render()
 			it('created element in DOM',() => {
-				expect(Html.getChildsFirstVal(el,'div')).to.eql('test')
+				expect(Elem.getChildsFirstVal(el,'div')).to.eql('test')
 			})
 		})
 		describe('call dom() later, with some additional arguments',() => {
@@ -99,7 +100,7 @@ describe('Html',() => {
 			const html = new Html({html:'div',val:'test',domLater:true})
 			html.render({parent:{el}})
 			it('created soemthing in DOM',() => {
-				expect(Html.getChildsFirstVal(el,'div')).to.eql('test')
+				expect(Elem.getChildsFirstVal(el,'div')).to.eql('test')
 			})
 		})
 	})
@@ -161,7 +162,7 @@ describe('Html',() => {
 			const createdEl = new Html({parent:{el},html:'div',val:'citrone'})
 			const changed = createdEl.change({val:'cherry'})
 			it('sets value',() => {
-				expect(Html.getChildsFirstVal(el,'div')).to.eql('cherry')
+				expect(Elem.getChildsFirstVal(el,'div')).to.eql('cherry')
 			})
 			it('detect change',() => {
 				expect(changed).to.eql(true)
@@ -172,7 +173,7 @@ describe('Html',() => {
 			const createdEl = new Html({parent:{el},html:'div',val:'citrone'})
 			const changed = createdEl.change({val:'citrone'})
 			it('sets value',() => {
-				expect(Html.getChildsFirstVal(el,'div')).to.eql('citrone')
+				expect(Elem.getChildsFirstVal(el,'div')).to.eql('citrone')
 			})
 			it('detect change',() => {
 				expect(changed).to.eql(false)
@@ -243,7 +244,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'off',val:'citrone'})
 			const cssList = ['on','off']
-			Html.classStateSet(createdEl.my.el,0,cssList)
+			Elem.classStateSet(createdEl.my.el,0,cssList)
 			it('setted new Class',() => {
 				expect(createdEl.my.el.classList.contains('on')).to.eql(true)
 			})
@@ -255,7 +256,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'off',val:'citrone'})
 			const cssList = ['on','off']
-			Html.classStateSet(createdEl.my.el,'on',cssList)
+			Elem.classStateSet(createdEl.my.el,'on',cssList)
 			it('setted new Class',() => {
 				expect(createdEl.my.el.classList.contains('on')).to.eql(true)
 			})
@@ -267,7 +268,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'',val:'citrone'})
 			const cssList = ['mono','']
-			Html.classStateSet(createdEl.my.el,'mono',cssList)
+			Elem.classStateSet(createdEl.my.el,'mono',cssList)
 			it('setted new Class',() => {
 				expect(createdEl.my.el.classList.contains('mono')).to.eql(true)
 			})
@@ -276,7 +277,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'static',val:'citrone'})
 			const cssList = ['uno','']
-			Html.classStateSet(createdEl.my.el,'',cssList)
+			Elem.classStateSet(createdEl.my.el,'',cssList)
 			it('setted new class',() => {
 				expect(createdEl.my.el.classList.contains('uno')).to.eql(false)
 			})
@@ -292,7 +293,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'static',val:'citrone'})
 			const cssList = ['','due']
-			Html.classStateSet(createdEl.my.el,1,cssList)
+			Elem.classStateSet(createdEl.my.el,1,cssList)
 			it('setted new class',() => {
 				expect(createdEl.my.el.classList.contains('due')).to.eql(true)
 			})
@@ -304,7 +305,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			// document.getElementById('a')
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'off',val:'citrone'})
-			Html.classStateSet(createdEl.my.el,'on')
+			Elem.classStateSet(createdEl.my.el,'on')
 			it('setted new Class',() => {
 				expect(createdEl.my.el.classList.contains('on')).to.eql(true)
 			})
@@ -318,7 +319,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'off',val:'citrone'})
 			const cssList = ['on','off']
-			const cssGiven = Html.classStateGet(createdEl.my.el,cssList)
+			const cssGiven = Elem.classStateGet(createdEl.my.el,cssList)
 			it('only item found',() => {
 				expect(cssGiven[0].name).to.eql('off')
 				expect(cssGiven.length).to.eql(1)
@@ -330,7 +331,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'A',val:'citrone'})
 			const cssList = ['A','B']
-			const stateInfo = Html.classStateIncr(createdEl.my.el,cssList)
+			const stateInfo = Elem.classStateIncr(createdEl.my.el,cssList)
 			it('incremented to B',() => {
 				expect(stateInfo.ix).to.eql(1)
 				expect(stateInfo.name).to.eql('B')
@@ -342,7 +343,7 @@ describe('Html',() => {
 			const parentEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: parentEl},html:'div',css:'B',val:'citrone'})
 			const cssList = ['A','B']
-			const stateInfo = Html.classStateIncr(createdEl.my.el,cssList)
+			const stateInfo = Elem.classStateIncr(createdEl.my.el,cssList)
 			it('incremented to A (overflowed)',() => {
 				expect(stateInfo.ix).to.eql(0)
 				expect(stateInfo.name).to.eql('A')
@@ -392,11 +393,11 @@ describe('Html',() => {
 			expect(el).to.be(undefined)
 		})
 		// it('compare Element taken from Html with fresh founded in document',() => {
-		// 	const equalEl = Html.equalEl(createdEl.my.el,document.getElementById('oneId'))
+		// 	const equalEl = Elem.equalEl(createdEl.my.el,document.getElementById('oneId'))
 		// 	expect(equalEl).to.be(true)
 		// })
 		// it('compare Element with id given as string',() => {
-		// 	const equalEl = Html.equalEl(document.getElementById('oneId'),'oneId'))
+		// 	const equalEl = Elem.equalEl(document.getElementById('oneId'),'oneId'))
 		// 	expect(equalEl).to.be(false)
 		// })
 	})
@@ -405,38 +406,38 @@ describe('Html',() => {
 			create_dom(domContent)
 			const testEl = document.getElementById(myId)
 			const createdEl = new Html({parent:{el: testEl},container:{},html:'div',val:'citrone',atts:{id:'oneId'}})
-			const equalEl = Html.equalEl(createdEl.my.el,createdEl)
+			const equalEl = Elem.equalEl(createdEl.my.el,createdEl)
 			expect(equalEl).to.be(true)
 		})
 		it('escalate when adressing could not found Element',() => {
 			const rootEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: rootEl},container:{},html:'div',val:'citrone',atts:{id:'oneId'}})
-			const equalEl = Html.equalEl(createdEl.my,createdEl.containerObj)
+			const equalEl = Elem.equalEl(createdEl.my,createdEl.containerObj)
 			expect(equalEl).to.be(undefined)
 		})
 		it('escalate when adressing could not found Element',() => {
 			const rootEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: rootEl},container:{},html:'div',val:'citrone',atts:{id:'oneId'}})
-			const equalEl = Html.equalEl(createdEl.my,createdEl.containerObj)
+			const equalEl = Elem.equalEl(createdEl.my,createdEl.containerObj)
 			expect(equalEl).to.be(undefined)
 		})
 		it('escalate when 1 item is undefined',() => {
 			const rootEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: rootEl},container:{},html:'div',val:'citrone',atts:{id:'oneId'}})
-			const equalEl = Html.equalEl(createdEl.my,undefined)
+			const equalEl = Elem.equalEl(createdEl.my,undefined)
 			expect(equalEl).to.be(undefined)
 		})
 		it('true when only 1 item is given',() => {
 			const rootEl = create_dom(domContent)
 			const createdEl = new Html({parent:{el: rootEl},container:{},html:'div',val:'citrone',atts:{id:'oneId'}})
-			const equalEl = Html.equalEl(createdEl.my)
+			const equalEl = Elem.equalEl(createdEl.my)
 			expect(equalEl).to.be(true)
 		})
 	})
 	describe('findParent',() => {
 		describe('call with no el given',() => {
 			create_dom(domContent)
-			const retEl = Html.findParent()
+			const retEl = Elem.findParent()
 			it('returns undefined',() => {
 				expect(retEl).to.be(undefined)
 			})
@@ -446,15 +447,15 @@ describe('Html',() => {
 			const testEl = document.getElementById(myId)
 			const createdEl = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
 			const subEl = new Html({parent:{obj: createdEl},html:'div',val:'citrone'})
-			const retEl = Html.findParent(subEl.my.el)
+			const retEl = Elem.findParent(subEl.my.el)
 			it('returns its parent',() => {
-				expect(Html.equalEl(retEl,createdEl)).to.be(true)
+				expect(Elem.equalEl(retEl,createdEl)).to.be(true)
 			})
 		})
 		describe('call with only el when el has no parent',() => {
 			create_dom()
 			const testEl = document.getElementsByTagName('html').item(0)
-			const retEl = Html.findParent(testEl)
+			const retEl = Elem.findParent(testEl)
 			it('returns undefined',() => {
 				expect(retEl).to.be(undefined)
 			})
@@ -465,18 +466,18 @@ describe('Html',() => {
 			const el1 = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
 			const el2 = new Html({parent:{obj: el1},html:'div',val:'citrone'})
 			const el3 = new Html({parent:{obj: el2},html:'div',val:'limette'})
-			const retEl = Html.findParent(el3.my.el,el1.my.el)
+			const retEl = Elem.findParent(el3.my.el,el1.my.el)
 			it('returns the given parent',() => {
-				expect(Html.equalEl(retEl,el1)).to.be(true)
+				expect(Elem.equalEl(retEl,el1)).to.be(true)
 			})
 		})
 		describe('call with parentStop, but parentEl is el',() => {
 			create_dom(domContent)
 			const testEl = document.getElementById(myId)
 			const el1 = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
-			const retEl = Html.findParent(el1.my.el,el1.my.el)
+			const retEl = Elem.findParent(el1.my.el,el1.my.el)
 			it('returns itself',() => {
-				expect(Html.equalEl(retEl,el1)).to.be(true) // TODO not right
+				expect(Elem.equalEl(retEl,el1)).to.be(true) // TODO not right
 			})
 		})
 		describe('call with parentStop, but parentEl is not valid parent of el',() => {
@@ -485,7 +486,7 @@ describe('Html',() => {
 			const el1 = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
 			const el1_1 = new Html({parent:{obj: el1},html:'div',val:'citrone'})
 			const el1_2 = new Html({parent:{obj: el1},html:'div',val:'lemone'})
-			const retEl = Html.findParent(el1_1.my.el,el1_2.my.el)
+			const retEl = Elem.findParent(el1_1.my.el,el1_2.my.el)
 			it('returns undefined, as parentEl is not parent of el ',() => {
 				expect(retEl).to.be(undefined)
 			})
@@ -494,9 +495,9 @@ describe('Html',() => {
 			create_dom(domContent)
 			const testEl = document.getElementById(myId)
 			const createdEl = new Html({parent:{el: testEl},container:{id:'div-lvl-1'},html:'div',val:'grapefruit'})
-			const parentEl = Html.findParent(createdEl.my.el)
+			const parentEl = Elem.findParent(createdEl.my.el)
 			it('returns parent',() => {
-				expect(Html.equalEl(parentEl,createdEl.top.el)).to.be(true)
+				expect(Elem.equalEl(parentEl,createdEl.top.el)).to.be(true)
 			})
 		})
 		describe('call with parentDepth:0',() => {
@@ -505,9 +506,9 @@ describe('Html',() => {
 			const createdEl = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
 			// eslint-disable-next-line no-unused-vars
 			const subEl = new Html({parent:{obj: createdEl},html:'div',val:'citrone'})
-			const retEl = Html.findParent(createdEl.my.el,undefined,0)
+			const retEl = Elem.findParent(createdEl.my.el,undefined,0)
 			it('returns itself',() => {
-				expect(Html.equalEl(retEl,createdEl)).to.be(true)
+				expect(Elem.equalEl(retEl,createdEl)).to.be(true)
 			})
 		})
 		describe('call with parentDepth:1',() => {
@@ -516,9 +517,9 @@ describe('Html',() => {
 			const createdEl = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
 			// eslint-disable-next-line no-unused-vars
 			const subEl = new Html({parent:{obj: createdEl},html:'div',val:'citrone'})
-			const retEl = Html.findParent(createdEl.my.el,undefined,1)
+			const retEl = Elem.findParent(createdEl.my.el,undefined,1)
 			it('returns its grandPa',() => {
-				expect(Html.equalEl(retEl,testEl)).to.be(true)
+				expect(Elem.equalEl(retEl,testEl)).to.be(true)
 			})
 		})
 		describe('call with parentDepth:2',() => {
@@ -526,115 +527,18 @@ describe('Html',() => {
 			const testEl = document.getElementById(myId)
 			const createdEl = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
 			const subEl = new Html({parent:{obj: createdEl},html:'div',val:'citrone'})
-			const retEl = Html.findParent(subEl.my.el,undefined,2)
+			const retEl = Elem.findParent(subEl.my.el,undefined,2)
 			it('returns its grandGrandPa',() => {
-				expect(Html.equalEl(retEl,testEl)).to.be(true)
+				expect(Elem.equalEl(retEl,testEl)).to.be(true)
 			})
 		})
 		describe('call with parentDepth:4 but there is no parent more available',() => {
 			create_dom(domContent)
 			const testEl = document.getElementById(myId)
 			const createdEl = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
-			const retEl = Html.findParent(createdEl.my.el,undefined,4)
+			const retEl = Elem.findParent(createdEl.my.el,undefined,4)
 			it('returns undefined',() => {
 				expect(retEl).to.be(undefined)
-			})
-		})
-	})
-	describe('textContentAdd',() => {
-		describe('add some text at given no textContent',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			Html.textContentAdd(testEl,'🥕')
-			it('returns only added content',() => {
-				expect(testEl.textContent).to.be('🥕')
-			})
-		})
-		describe('add some text at given some initial textContent',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			testEl.textContent = '🐰'
-			Html.textContentAdd(testEl,'🥕')
-			it('returns concated content',() => {
-				expect(testEl.textContent).to.be('🐰🥕')
-			})
-		})
-		describe('add undefined at given some initial textContent',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			testEl.textContent = '🐰'
-			Html.textContentAdd(testEl,undefined)
-			it('returns only original content',() => {
-				expect(testEl.textContent).to.be('🐰')
-			})
-		})
-		describe('add text content at an input with given value',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			const inputEl = new Html({parent:{el: testEl},html:'input',val:'🐟',atts:{'type':'text'}})
-			Html.textContentAdd(inputEl.my.el,'🌊')
-			it('input value becomes concatenated',() => {
-				expect(inputEl.my.el.value).to.be('🐟🌊')
-			})
-		})
-	})
-	describe('textContentSet',() => {
-		describe('set empty string at given textContent',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			testEl.textContent = '🐰'
-			const changed = Html.textContentSet(testEl,'')
-			it('returns true, as changed',() => {
-				expect(changed).to.be(true)
-			})
-			it('content as expected',() => {
-				expect(testEl.textContent).to.be('')
-			})
-		})
-		describe('set empty string at given no textContent',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			const changed = Html.textContentSet(testEl,'')
-			it('returns false, as unchanged',() => {
-				expect(changed).to.be(false)
-			})
-			it('returns new content',() => {
-				expect(testEl.textContent).to.be('')
-			})
-		})
-		describe('set some text at given no textContent',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			Html.textContentSet(testEl,'🥕')
-			it('returns new content',() => {
-				expect(testEl.textContent).to.be('🥕')
-			})
-		})
-		describe('set some text at given some initial textContent',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			testEl.textContent = '🐰'
-			Html.textContentSet(testEl,'🥕')
-			it('returns new content',() => {
-				expect(testEl.textContent).to.be('🥕')
-			})
-		})
-		describe('set undefined at given some initial textContent',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			testEl.textContent = '🐰'
-			Html.textContentSet(testEl,undefined)
-			it('returns original content',() => {
-				expect(testEl.textContent).to.be('🐰')
-			})
-		})
-		describe('set text content at an input with given value',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			const inputEl = new Html({parent:{el: testEl},html:'input',val:'🐟',atts:{'type':'text'}})
-			Html.textContentSet(inputEl.my.el,'🌊')
-			it('input value changes',() => {
-				expect(inputEl.my.el.value).to.be('🌊')
 			})
 		})
 	})

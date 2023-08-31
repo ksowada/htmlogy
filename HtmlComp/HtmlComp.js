@@ -1,3 +1,4 @@
+import Elem from '../Elem/Elem.js'
 import Html from '../Html/Html.js'
 /**
  * @class
@@ -44,10 +45,10 @@ class HtmlComp {
 	}
 	/** clear el */
 	remove() {
-		Html.removeChilds(this.parent) // FIXME would also remove other siblings of parent
+		Elem.removeChilds(this.parent) // FIXME would also remove other siblings of parent
 	}
 	removeChilds() {
-		Html.removeChilds(this)
+		Elem.removeChilds(this)
 	}
 }
 export default HtmlComp
