@@ -1,4 +1,3 @@
-import dateFormat from 'dateformat'
 import Html from '../Html/Html.js'
 import HtmlUtils from '../HtmlUtils/HtmlUtils.js'
 import HtmlElComp from './HtmlElComp.js'
@@ -64,9 +63,6 @@ class HtmlApplComp extends HtmlElComp {
 		const rest = HtmlUtils.searchParamToJson()
 		Times.log('rest:') // dont show compile-time twice, thus preciding date attach
 		Times.log(rest)
-		const dateStr = dateFormat(Date.now(),HtmlApplComp.DATE_TIME_FORMAT)
-		rest.datetime = dateStr
-		Times.log('compile-time:' + rest.datetime)
 		return rest
 	}
 }
