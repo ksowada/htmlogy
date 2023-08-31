@@ -1,8 +1,7 @@
-import Html from '../Html/Html.js'
-import HtmlUtils from '../HtmlUtils/HtmlUtils.js'
-import HtmlElComp from './HtmlElComp.js'
 import pkg from '../../../../package.json'
 import build_datetime from '../../../../build.datetime.json'
+import Html from '../Html/Html.js'
+import HtmlUtils from '../HtmlUtils/HtmlUtils.js'
 import Times from '../../Times.js'
 import Elem from '../Elem/Elem.js'
 /**
@@ -24,6 +23,10 @@ class HtmlApplComp {
 	 */
 	// TODO package get public through import
 	constructor(arg) {
+		/**
+		 * DOM-element for app
+		 * @type {HtmlElement}
+		 */
 		this.app = Html.getEl(arg.parent)
 		/** use log for relative time measures, and other issues */
 		Times.log(`package.version:${pkg.version}`)
@@ -42,12 +45,11 @@ class HtmlApplComp {
 	 * @param {any} arg.el will be attached
 	 */
 	// TODO rename domCreate to dom
-	domCreate(arg) {
+	domCreate() {
 		// care for body
-		super.remove() // remove noscript message from el
-		super.domCreate({container: undefined,...arg})
+		Elem.removeChilds(this.app)
 		// care for head
-		const headEl = Elem.getElByNameFirst('head')
+		const headEl = HtmlUtils.getElByNameFirst('head')
 		if (pkg.keywords) {
 			const keywordsStr = pkg.keywords.join(',')
 			Elem.findActions({html: 'meta',atts: {name: 'keywords'}},{atts: {content: keywordsStr}},headEl)
