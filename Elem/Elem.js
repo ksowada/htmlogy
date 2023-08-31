@@ -5,11 +5,11 @@ import Str from '../../Str/Str.js'
  * @class
  * utilities for exact one DOM element
  *
- * you can stringify this element, than .all contains all of the content of it, except of its events and child elements, so you may detect changes easily, as Element.outerHTML does not incude styles,value and other things added programmatically, that's the only way to do this
+ * you can stringify this element, than .all contains all of the content of it, except of its events and child elements, so you may detect changes easily, as Element.outerHTML does not include styles,value and other things added programmatically, that's the only way to do this
  * @example
  * {"el":{}} // an empty element
  */
-class El {
+class Elem {
 	/** all names of items of EL that describe HTMLElement */
 	static items = ['name','css','styles','id','atts','val']
 
@@ -31,14 +31,14 @@ class El {
 		return this.el.id
 	}
 	get atts() {
-		return El.attributes(this.el)
+		return Elem.attributes(this.el)
 	}
 	// get evts()// cannot find out them
 	/**
 	 * @returns {string} textContent of the element without subelements, or when input the value
 	 */
 	get val() {
-		let str = El.textContent(this.el)
+		let str = Elem.textContent(this.el)
 		if (this.el.value) {
 			if (str.length>0) str+= ' ' // sperator if other value present
 			str += this.el.value // for input value
@@ -47,7 +47,7 @@ class El {
 	}
 	get all() {
 		const obj = {}
-		for (const item of El.items) {
+		for (const item of Elem.items) {
 			if (Obj.hasDefined(this,item)) { //  prevent undefined values
 				const val = this[item]
 				if (val!==undefined && val!=='') obj[item] = this[item] // prevent empty values
@@ -122,8 +122,8 @@ class El {
 	 */
 	static addEndTag(text) {
 		let hText = text.trim()
-		let hTag = El.tag(hText)
-		let hTagEnd = El.tagClosing(hTag) //
+		let hTag = Elem.tag(hText)
+		let hTagEnd = Elem.tagClosing(hTag) //
 		if (!hText.toLowerCase().endsWith(hTagEnd)) hText += hTagEnd
 		return hText
 	}
@@ -134,8 +134,8 @@ class El {
 	 */
 	static omitEndTag(text) {
 		let hText = text.trim()
-		let hTag = El.tag(text)
-		let hTagEnd = El.tagClosing(hTag) //
+		let hTag = Elem.tag(text)
+		let hTagEnd = Elem.tagClosing(hTag) //
 		if (text.toLowerCase().endsWith(hTagEnd)) hText = Str.omitEnd(hText,hTagEnd.length)
 		return hText
 	}
@@ -162,10 +162,10 @@ class El {
 		}
 		if(mode==='text') {
 			ax= txt.indexOf('>')+1
-			txt= txt.substring(0,ax)+El.textContent(who)+ txt.substring(ax)
+			txt= txt.substring(0,ax)+Elem.textContent(who)+ txt.substring(ax)
 		}
 		el= null
 		return txt
 	}
 }
-export default El
+export default Elem

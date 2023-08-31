@@ -1,6 +1,6 @@
 /**
  * @class
- * utilities for DOM elements
+ * utilities for DOM , window and document
  */
 class HtmlUtils {
 	static getSelectionHtml() {

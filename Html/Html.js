@@ -8,7 +8,7 @@ import ObjObj from '../../Obj/ObjObj.js'
 import Str from '../../Str/Str.js'
 import Timer from '../../Timer/Timer.js'
 import Vars from '../../Vars/Vars.js'
-import El from '../El/El.js'
+import Elem from '../Elem/Elem.js'
 /**
  * @class
  * Virtual DOM tree - handles easy programmatic DOM creation, manipulation and removement
@@ -92,7 +92,7 @@ class Html {
 
 		/**
 		 * short utility to jsonify and compare the element without its child and events
-		 * @type {El}
+		 * @type {Elem}
 		 */
 		this.elo = undefined
 		/**
@@ -199,10 +199,10 @@ class Html {
 			let hVal // use copy to keep the original
 			if (Str.valid(arg.h)) {
 				// add eventually missing endtag
-				const hText = El.addEndTag(arg.h)
+				const hText = Elem.addEndTag(arg.h)
 				// let hText = arg.h.trim()
-				// let hTag = El.tag(hText) //first space  or closing bracket
-				// let hTagEnd = El.tagClosing(hTag) //
+				// let hTag = Elem.tag(hText) //first space  or closing bracket
+				// let hTagEnd = Elem.tagClosing(hTag) //
 				// if (!hText.toLowerCase().endsWith(hTagEnd)) hText += hTagEnd
 
 				hVal = html([hText])
@@ -254,7 +254,7 @@ class Html {
 			}
 		}
 		this.el = this.my.el
-		this.elo = new El(this.el)
+		this.elo = new Elem(this.el)
 		this.edit(this.my,arg,{append:true}) // TODO this.my is not type Html
 		this.domed = true
 		this.doming = false
@@ -357,7 +357,7 @@ class Html {
 	// TODO topObj is not Html, but .my or .top
 	// TODO remove not implemented for any item, just css
 	edit(topObj,arg,mode) {
-		const elo = new El(topObj.el) // build own elo, instead of this, cause at construction not existent, and topObj may vary between my or top
+		const elo = new Elem(topObj.el) // build own elo, instead of this, cause at construction not existent, and topObj may vary between my or top
 		const eloWatch = new Vars(elo.all)
 		let item = undefined
 
@@ -543,7 +543,7 @@ class Html {
 	 * compare may compare 2 or more element
 	 * use getEl internally
 	 * @param {object[]} objs must have at least 1 argument to comply and then accept unity and return true,
-	 * use same parameter as @see {@link this.El}
+	 * use same parameter as @see {@link this.Elem}
 	 * @returns {boolean} true, when all arguments are the same Element, or anything is undefined
 	 * - undefined, when one address cannot be detected by getEl
 	 * - false, when 1 or more of valid arguments are different
