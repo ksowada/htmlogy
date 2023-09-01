@@ -41,8 +41,6 @@ class HtmlApplComp {
 	}
 	// TODO rename domCreate to dom
 	domCreate() {
-		// care for body
-		Elem.removeChilds(this.app)
 		// care for head
 		const headEl = HtmlUtils.getElByNameFirst('head')
 		if (pkg.keywords) {
