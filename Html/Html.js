@@ -217,7 +217,7 @@ class Html {
 			const hPropsVal = Object.assign(hVal.props)
 			if (!arg.val) arg.val = ''
 			if (hPropsVal.children) arg.val = hPropsVal.children + arg.val // join val from htm and props
-			Obj.omit(hPropsVal,'children') // omit no regular attributes
+			Obj.omitMod(hPropsVal,'children') // omit no regular attributes
 			arg.atts = Object.assign(hPropsVal,arg.atts)
 		}
 		const htmlNamespaceParent = ObjObj.childsHasDefined(arg,['parent','obj'],'htmlParent','htmlNamespace')
