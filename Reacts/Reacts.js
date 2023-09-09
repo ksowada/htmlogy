@@ -14,7 +14,7 @@ class Reacts {
 	 * @returns {string} generated id
 	 */
 	static id(keys) {
-		const id = Ids.combineToId(keys)
+		const id = Ids.combineId(keys)
 		Obj.put(this.ids,keys,id)
 		return id
 	}
