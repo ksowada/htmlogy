@@ -26,5 +26,8 @@ class Reacts {
 		Obj.mapFunc(this.ids,this.els,id => document.getElementById(id))
 		return this.els
 	}
+	static get(keys) {
+		return Obj.get(this.els,keys)
+	}
 }
 export default Reacts
