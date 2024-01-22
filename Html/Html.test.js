@@ -156,6 +156,14 @@ describe('Html',() => {
 		// 	expect(masterObj.createdEl.css).to.be('styleful')
 		// })
 	})
+	describe('construct by use()',() => { // just extra test, because issues in HtmlState.test.js
+		const el = create_dom(domContent)
+		const newHtml = new Html({my:{id:myId}})
+		const addedHtml = newHtml.add({id:'aId'})
+		it('add {id} to created Element',() => {
+			expect(addedHtml.my.el.id).to.be('aId')
+		})
+	})
 	describe('change',() => {
 		describe('change val',() => {
 			const el = create_dom(domContent)

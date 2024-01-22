@@ -25,9 +25,10 @@ class Html {
 	// TODO extend constructor to add child elements in array
 	// TODO eliminate .top and .container through sub-class or in render (split it up) that enables this, causes trouble with htmlNamespace
 	/**
-	 * creates dynamic HTMLElement
+	 * creates dynamic HTMLElement, either usage to create element or for parent use with .my
 	 * @param {object} arg supply create()-like arg @see {@link this.create}
 	 * @param {boolean} arg.domLater if non-existent or false, don't render() directly
+	 * @param {Html~domadr} arg.my if given, don't render(), just use as parent
 	 * @param {Html~domadr} arg.parent if not given, don't render() directly
 	 * @param {object[]} childs these items get constructor-args, and will be append as children of this
 	 */
@@ -117,8 +118,13 @@ class Html {
 		 */
 		this.domLater = undefined
 
+		// if arg my is given, only use this element for later add() or as parent
+		if (arg.my !== undefined) {
+			this.useEl(this.arg)
+			this.domed = true
+			this.domLater = false
 		// existing .domLater or no parent given indiciate later processing
-		if (Obj.hasEql(this,['arg','domLater'],true) || this.arg.parent==undefined) {
+		} else if (Obj.hasEql(this,['arg','domLater'],true) || this.arg.parent==undefined) {
 			this.domLater = true
 		} else {
 			this.domLater = false
@@ -133,6 +139,18 @@ class Html {
 	render(arg) {
 		Html.mergeModDatas(this.arg,arg,{doming:true}) // merge args
 		this.create(this.arg)
+	}
+	/**
+	 * use existing element for Html construction, address it by .my 
+	 * @param {*} arg 
+	 * @private
+	 */
+	useEl(arg) {
+		// find matching HTMLElement to operate
+		this.el = Html.getEl(arg.my)
+		this.elo = new Elem(this.el)
+		this.elo.removeChilds()
+		this.my.el = this.el
 	}
 	/**
 	 * create DOMElement

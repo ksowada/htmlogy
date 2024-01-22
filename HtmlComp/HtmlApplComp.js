@@ -18,16 +18,18 @@ import Elem from '../Elem/Elem.js'
 class HtmlApplComp {
 	static DATE_TIME_FORMAT = 'yyyy-mm-dd HH:MM:ss'
 	/**
+	 * create .app with arg.my
 	 * @param {object} arg for Html-create function
 	 * @param {Function} arg.onResize {Method} may used as onResize Event
+	 * @param {object} arg.my address parent element, via .getEl method
 	 */
 	// TODO package get public through import
 	constructor(arg) {
 		/**
-		 * DOM-element for app
+		 * HTML-element for app, holding parent element
 		 * @type {HtmlElement}
 		 */
-		this.app = Html.getEl(arg.parent)
+		this.app = new Html(arg)
 		/** use log for relative time measures, and other issues */
 		Times.log(`package.version:${pkg.version}`)
 		/** rest has URLParts from query results */

@@ -262,6 +262,12 @@ class Elem {
 		if (el==undefined) return
 		el.innerHTML = ''
 	}
+	/**
+	 * clean subnodes and text contents from given parent, but leave parent element
+	 */
+	removeChilds() {
+		Elem.removeChilds(this.el)
+	}
 	static removeAttributes(el) {
 		while(el.attributes.length > 0) {
 			el.removeAttribute(el.attributes[0].name)
