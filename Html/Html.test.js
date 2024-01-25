@@ -103,6 +103,37 @@ describe('Html',() => {
 				expect(Elem.getChildsFirstVal(el,'div')).to.eql('test')
 			})
 		})
+		describe('call dom() later, but have prepared childs',() => {
+			const el = create_dom(domContent)
+			// eslint-disable-next-line no-new
+			const html = new Html({parent:{el},html:'div',val:'test',domLater:true})
+			html.add({id:'boy'})
+			html.add({id:'girl'})
+			html.render()
+			it('created element in DOM',() => {
+				expect(Elem.getChildsFirstVal(el,'div')).to.eql('test')
+			})
+			it('have succesive boy and girl childs',() => {
+				expect(Elem.getChilds(html.my.el)[0].id).to.eql('boy')
+				expect(Elem.getChilds(html.my.el)[1].id).to.eql('girl')
+			})
+		})
+		describe('call dom() later, but have prepared childs, deliver parent later at render',() => {
+			const el = create_dom(domContent)
+			// eslint-disable-next-line no-new
+			const html = new Html({html:'div',val:'test',domLater:true})
+			html.add({id:'boy'})
+			html.add({id:'girl'})
+			html.render({parent:{el}})
+			it('created element in DOM',() => {
+				expect(Elem.getChildsFirstVal(el,'div')).to.eql('test')
+			})
+			it('have succesive boy and girl childs',() => {
+				expect(Elem.getChilds(html.my.el)[0].id).to.eql('boy')
+				expect(Elem.getChilds(html.my.el)[1].id).to.eql('girl')
+			})
+		})
+		// TODO deliver parent with render()
 	})
 	describe('constructor creates a var',() => {
 		create_dom(domContent)
@@ -157,7 +188,7 @@ describe('Html',() => {
 		// })
 	})
 	describe('construct by use()',() => { // just extra test, because issues in HtmlState.test.js
-		const el = create_dom(domContent)
+		create_dom(domContent)
 		const newHtml = new Html({my:{id:myId}})
 		const addedHtml = newHtml.add({id:'aId'})
 		it('add {id} to created Element',() => {

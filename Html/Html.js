@@ -1,8 +1,5 @@
 import {html} from 'htm/preact'
 import Arr from '../../Arr/Arr.js'
-import Bit from '../../Bit/Bit.js'
-import Int from '../../Int/Int.js'
-import Numbers from '../../Numbers.js'
 import Obj from '../../Obj/Obj.js'
 import ObjObj from '../../Obj/ObjObj.js'
 import Str from '../../Str/Str.js'
@@ -24,15 +21,21 @@ class Html {
 	// TODO extends HTMLElement (see ACE https://mkslanc.github.io/ace-playground/#shadow-dom)
 	// TODO extend constructor to add child elements in array
 	// TODO eliminate .top and .container through sub-class or in render (split it up) that enables this, causes trouble with htmlNamespace
+	// TODO what about operations that are not supported without rendered element, f.e. classStateSet, see doc
 	/**
-	 * creates dynamic HTMLElement, either usage to create element or for parent use with .my
+	 * creates dynamic HTMLElement
+	 *
+	 * usage:
+	 * - to instantly create element in parent given as .el[element], .id, or .obj[Html]
+	 * - for parent, use with .my without creation of element but use existing element
+	 * - you may render later, also you can define the parent element later at render(), you can even add childs after creation and render them later, some operations are not supported without rendered element, f.e. classStateSet
 	 * @param {object} arg supply create()-like arg @see {@link this.create}
 	 * @param {boolean} arg.domLater if non-existent or false, don't render() directly
 	 * @param {Html~domadr} arg.my if given, don't render(), just use as parent
 	 * @param {Html~domadr} arg.parent if not given, don't render() directly
 	 * @param {object[]} childs these items get constructor-args, and will be append as children of this
 	 */
-	constructor(arg,childs=[]) {
+	constructor(arg={},childs=[]) {
 		/**
 		 * remember arg for later create or other purposes
 		 * @type {object[]}
@@ -123,8 +126,8 @@ class Html {
 			this.useEl(this.arg)
 			this.domed = true
 			this.domLater = false
-		// existing .domLater or no parent given indiciate later processing
-		} else if (Obj.hasEql(this,['arg','domLater'],true) || this.arg.parent==undefined) {
+		// existing .domLater or no parent given or parent has .domLater indiciate later processing
+		} else if (Obj.hasEql(this,['arg','domLater'],true) || this.arg.parent == undefined || (this.arg.parent.obj && this.arg.parent.obj.domLater == true)) {
 			this.domLater = true
 		} else {
 			this.domLater = false
@@ -132,17 +135,22 @@ class Html {
 		}
 		childs.forEach(child => this.add(child)) // just a abbreviation to shorten calls
 	}
+
 	/**
 	 * create dom from parameters given in constructor and here as arg. Use to create the constructed Html
+	 * - you can add a parent at this point
+	 * - the Html-object may contain childs already
 	 * @param {object} arg Html-parameters as described in constructor
 	 */
 	render(arg) {
-		Html.mergeModDatas(this.arg,arg,{doming:true}) // merge args
+		Html.mergeModDatas(this.arg,arg,{doming: true}) // merge args
 		this.create(this.arg)
 	}
+
 	/**
-	 * use existing element for Html construction, address it by .my 
-	 * @param {*} arg 
+	 * use existing element for Html construction, address it by .my
+	 * @param {object} arg hold address info
+	 * @param {Html~domadr} arg.my address info for accessing HTMLElement
 	 * @private
 	 */
 	useEl(arg) {
@@ -152,6 +160,7 @@ class Html {
 		this.elo.removeChilds()
 		this.my.el = this.el
 	}
+
 	/**
 	 * create DOMElement
 	 * @param {object} arg may be segmented in different arguments, obj will be merged with last-win
@@ -194,13 +203,6 @@ class Html {
 			arg.parent.obj.htmlChilds.push(this)
 			this.htmlParent = arg.parent.obj
 		}
-		// also involve childs when doming (before change arg)
-		// TODO may integrate List
-		if (arg.doming==true) {
-			this.htmlChilds.forEach(child => {
-				child.create({...child.arg,doming:true})
-			})
-		}
 		// if it is already domed cancel
 		if (this.domed) return
 
@@ -242,7 +244,7 @@ class Html {
 		if (htmlNamespaceParent) { // inherit namespace from parent
 			this.htmlNamespace = htmlNamespaceParent
 		}
-		if (arg.html==='svg') { // auto build svg namespace
+		if (arg.html === 'svg') { // auto build svg namespace
 			this.htmlNamespace = 'http://www.w3.org/2000/svg' // will also inherit to child elements
 		}
 
@@ -258,30 +260,39 @@ class Html {
 		// TODO use new Html for Container creation
 		if (arg.container) {
 			if (!arg.container.html) arg.container.html = 'div' // if html not given create a div
-			if (arg.container.html==='svg') { // auto build svg namespace
+			if (arg.container.html === 'svg') { // auto build svg namespace
 				arg.container.htmlNamespace = 'http://www.w3.org/2000/svg' // will also inherit to child elements
 			}
 			this.createEl(this.top,arg.container,arg.container.htmlNamespace)
 			this.top.el.appendChild(this.my.el)
 			if (arg.el) arg.el.appendChild(this.top.el)
-			this.edit(this.top,arg.container,{append:true})
+			this.edit(this.top,arg.container,{append: true})
 		} else {
 			this.top.el = this.my.el
 			if (arg.el) {
 				arg.el.appendChild(this.my.el)
 			}
 		}
+
 		this.el = this.my.el
 		this.elo = new Elem(this.el)
-		this.edit(this.my,arg,{append:true}) // TODO this.my is not type Html
+		this.edit(this.my,arg,{append: true}) // TODO this.my is not type Html
+		// also involve childs when doming (before change arg)
+		// TODO may integrate List
+		if (arg.doming == true) {
+			this.htmlChilds.forEach(child => {
+				child.create({...child.arg,doming: true})
+			})
+		}
 		this.domed = true
 		this.doming = false
 	}
+
 	// eslint-disable-next-line jsdoc/require-param
 	/**
-	 * @param parentObj
-	 * @param arg
-	 * @param htmlNamespace
+	 * @param {Html} parentObj parent with which the new element is created with
+	 * @param {object} arg hold create parameters
+	 * @param {string} htmlNamespace optional html namespace
 	 * @private
 	 */
 	createEl(parentObj,arg,htmlNamespace) {
@@ -295,6 +306,7 @@ class Html {
 			parentObj.el = document.createElement(arg.html)
 		}
 	}
+
 	// TODO unused, you may use edit directly
 	/**
 	 * change Html, this modifies given parameters
@@ -302,14 +314,14 @@ class Html {
 	 * @param {object} arg same arguments as create @see {@link this.create}
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
-	change(arg) {return this.edit(this.my,arg,{change:true})}
+	change(arg) { return this.edit(this.my,arg,{change: true}) }
 	/**
 	 * append Html, this create or add given parameters to existing
 	 * see details for change {@link Html#edit}
 	 * @param {object} arg same arguments as create @see {@link this.create}
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
-	append(arg) {return this.edit(this.my,arg,{append:true})}
+	append(arg) { return this.edit(this.my,arg,{append: true}) }
 	/**
 	 * remove HTMLElement or if given in argument, some item of it
 	 * - removeEventHandler before remove from DOM
@@ -319,7 +331,7 @@ class Html {
 	 */
 	remove(arg) {
 		if (Obj.valid(arg) && Object.keys(arg).length) { // if given Object it will remove these item of it, if existing
-			this.edit(this.my,arg,{remove:true})
+			this.edit(this.my,arg,{remove: true})
 		} else { // remove itself
 			// also care for childs
 			this.htmlChilds.forEach(child => {
@@ -349,6 +361,7 @@ class Html {
 			}
 		}
 	}
+
 	/**
 	 * edit given HTMLElement, may attach to new, change or remove
 	 * - class from .css: at change: remove all given css class and then edit new
@@ -394,26 +407,27 @@ class Html {
 			}
 		}
 		if (Obj.hasDefined(arg,item = 'styles')) {
-			for (const key in arg[item])
+			for (const key in arg[item]) {
 				if (Object.hasOwnProperty.call(arg[item],key)) {
 					const valItem = arg[item][key]
 					topObj.el.style.setProperty(key,valItem)
 				}
+			}
 		}
 		if (Obj.hasDefined(arg,item = 'id')) {
 			if (!arg.atts) {
-				arg.atts = {'id':arg[item]} // use atts and modify id of obj in that way later in method
+				arg.atts = {id: arg[item]} // use atts and modify id of obj in that way later in method
 			} else {
 				arg.atts.id = arg[item] // overwrite when directly given and defined from atts
 			}
 		}
 		if (Obj.hasDefined(arg,item = 'atts')) {
-			for (const key in arg[item])
+			for (const key in arg[item]) {
 				if (Object.hasOwnProperty.call(arg[item],key)) {
-					let valItem = arg[item][key]
+					const valItem = arg[item][key]
 					if (mode.remove) {
-						if (valItem!==undefined && valItem.length>0) { // if atts item:value is given and of string length more than 0
-							if (topObj.el.getAttribute(key)===valItem) topObj.el.removeAttribute(key)
+						if (valItem !== undefined && valItem.length > 0) { // if atts item:value is given and of string length more than 0
+							if (topObj.el.getAttribute(key) === valItem) topObj.el.removeAttribute(key)
 						} else {
 							topObj.el.removeAttribute(key)
 						}
@@ -421,30 +435,32 @@ class Html {
 						topObj.el.setAttribute(key,valItem)
 					}
 				}
+			}
 		}
-		if (Obj.hasDefined(arg,item = 'evts')) {// TODO mount when at dom also at change
-			for (const key in arg.evts)
+		if (Obj.hasDefined(arg,item = 'evts')) { // TODO mount when at dom also at change
+			for (const key in arg.evts) {
 				if (Object.hasOwnProperty.call(arg.evts,key)) {
 					const cbk = arg.evts[key]
 					topObj.el.addEventListener(key,cbk)
-					topObj.evts.push({key:key,cbk:cbk})
+					topObj.evts.push({key,cbk})
 				}
+			}
 		}
 		// than attach additional elements
 		if (Obj.hasDefined(arg,item = 'icon')) { // FEATURE handle multiple icon when array
-			if (mode.change && topObj.iconObj!==undefined) topObj.iconObj.remove()
+			if (mode.change && topObj.iconObj !== undefined) topObj.iconObj.remove()
 			/** holds optional icon @private, but in container as fontawesome, comment <i> out and add svg */
-			topObj.iconObj = new Html({parent:{el:topObj.el},container:{html:'span'},html:'i',css:arg.icon}) // TODO dont care about existing icons at update
+			topObj.iconObj = new Html({parent: {el: topObj.el},container: {html: 'span'},html: 'i',css: arg.icon}) // TODO dont care about existing icons at update
 		}
 		// than change elements contents, may be either sub element given by valhtml and val or just a textcontent in val
 		// TODO valhtml is this used, otherwise remove it
 		if (Obj.hasDefined(arg,item = 'valhtml')) { // FEATURE plural-arr
 			/** subelement given at create or change with valhtml and val */
 			if (mode.change && this.my.subElement !== undefined) this.my.subElement.remove()
-			this.my.subElement = new Html({parent:{el:topObj.el},html:arg.valhtml,val:arg.val})
+			this.my.subElement = new Html({parent: {el: topObj.el},html: arg.valhtml,val: arg.val})
 		// you can use either valhtml or val so else
 		} else if (Obj.hasDefined(arg,item = 'val')) { // FEATURE plural-arr
-			if (topObj.el.localName=='input') topObj.el.value = arg.val
+			if (topObj.el.localName == 'input') topObj.el.value = arg.val
 			else {
 				if (mode.change) {
 					// take last node being Textnode
@@ -461,6 +477,7 @@ class Html {
 		eloWatch.set(elo.all)
 		return eloWatch.changed
 	}
+
 	/**
 	 * @typedef {object} Html~domadr common ways to address HTMLElement in DOM, choose only 1 of those
 	 * @property {Html|HtmlElComp} obj optional to el and id of HTMLElement
@@ -478,7 +495,7 @@ class Html {
 	 */
 	// TODO add getEl from event
 	static getEl(arg) {
-		if (arg==undefined) return undefined
+		if (arg == undefined) return undefined
 		let el = null
 		const objType = Vars.type(arg)
 		const objHier = Vars.typeHier(arg)
@@ -498,9 +515,9 @@ class Html {
 			}
 		} else if (objHier.includes('Element')) { // direct element may be special
 			el = arg
-		} else if (objType=='Number') { // consider it as id
+		} else if (objType == 'Number') { // consider it as id
 			el = document.getElementById(arg.toString())
-		} else if (objType=='String') { // consider it as id
+		} else if (objType == 'String') { // consider it as id
 			el = document.getElementById(arg)
 		} else if (objHier.includes('HtmlElComp')) { // as it may extend Html use this sequence before matiching with Html
 			el = arg.div
@@ -509,6 +526,7 @@ class Html {
 		}
 		return el
 	}
+
 	/**
 	 * add introduce child, automatically sets parent with this and construct it
 	 * @param {object} arg supply create()-like arg
@@ -519,11 +537,14 @@ class Html {
 	add(arg) {
 		Obj.put(arg,['parent','obj'],this)
 		const htmlObj = new Html(arg)
+		// if (parent is not rendered, the child will not be rendered, unless it is in htmlChilds)
+		if (arg.parent && arg.parent.obj && arg.parent.obj.domLater) arg.parent.obj.htmlChilds.push(htmlObj)
 
 		// add as child, when .name is given
 		if (Str.valid(arg.name)) this[arg.name] = htmlObj
 		return htmlObj
 	}
+
 	/**
 	 * add introduce child and form array, if called multiple times it extend the array, automatically sets parent with this and construct it
 	 * @param {object} arg supply create()-like arg
@@ -536,11 +557,12 @@ class Html {
 
 		// add as child, when .name is given
 		if (Str.valid(arg.name)) {
-			if (this[arg.name]==undefined) this[arg.name] = []
+			if (this[arg.name] == undefined) this[arg.name] = []
 			this[arg.name].push(htmlObj)
 		}
 		return htmlObj
 	}
+
 	/**
 	 * get id from DOM, and write it to .my.atts (only if defined) and .my.id
 	 * @returns {string} id as red from DOM, if not given return undefined
@@ -549,14 +571,15 @@ class Html {
 	writeIdFromEl() {
 		/** if given show id */
 		let id = this.my.el.getAttribute('id')
-		if (id!==null && id!=='') {
+		if (id !== null && id !== '') {
 			/** the id if given at construction by .id or .atts */
 			this.my.id = id
-			if (this.my.atts==undefined) this.my.atts = {}
+			if (this.my.atts == undefined) this.my.atts = {}
 			this.my.atts.id = id // maybe overwrite if it was already there, when f.e. given by .atts instead .id
-		} else if (id===null) id = undefined
+		} else if (id === null) id = undefined
 		return id
 	}
+
 	/**
 	 * set some textContent given by Parameter, do overwrite
 	 * @param {string} str text to set textContent, if undefined change nothing
@@ -565,6 +588,7 @@ class Html {
 	textContentSet(str) {
 		return Elem.textContentSet(this.my.el,str)
 	}
+
 	/**
 	 * add some textContent given by Parameter, do not overwrite
 	 * @param {string} str text to add adjacent to textContent, if undefined change nothing
@@ -572,6 +596,7 @@ class Html {
 	textContentAdd(str) {
 		Elem.textContentAdd(this.my.el,str)
 	}
+
 	/**
 	 * set class from List, and delete other used in List
 	 * @param {string|number} css choose this class instead of other classes
@@ -583,6 +608,7 @@ class Html {
 	classStateSet(css,cssList) {
 		return Elem.classStateSet(this.my.el,css,cssList)
 	}
+
 	/**
 	 * get existent classes from List of Element
 	 * @param {string[]} cssList Array of classes
@@ -591,6 +617,7 @@ class Html {
 	classStateGet(cssList) {
 		return Elem.classStateGet(this.my.el,cssList)
 	}
+
 	/**
 	 * toggle or cycle through classes incrementally
 	 * - if none of cssList is active, set first
@@ -601,6 +628,7 @@ class Html {
 	classStateIncr(cssList) {
 		return Elem.classStateIncr(this.my.el,cssList)
 	}
+
 	timer(arg,time_ms) {
 		const self = this
 		// if existing, renew time
@@ -609,7 +637,7 @@ class Html {
 		const timer = Arr.getItemFromArr(this.timers,'name',name)
 
 		// if (this.timers.some(existing)) {
-		if (timer!==undefined) {
+		if (timer !== undefined) {
 			timer.set(time_ms)
 		} else {
 			this.timers.push(new Timer(
@@ -623,6 +651,7 @@ class Html {
 			))
 		}
 	}
+
 	/**
 	 * merge for HtmlElements
 	 * - merge css linear in whitespace list way to any level like {div:{css:'2ndlevel'}}
@@ -643,13 +672,13 @@ class Html {
 				if (Object.hasOwnProperty.call(arg,key)) {
 					if (!ret[key]) { // missing item will be written
 						ret[key] = arg[key]
-					} else if (ret[key] instanceof Object) {// merge 2nd layer internals of objects
+					} else if (ret[key] instanceof Object) { // merge 2nd layer internals of objects
 						if (Html.mergeAvailable(arg[key])) {
 							ret[key] = Html.mergeDatas(ret[key],arg[key])
 						} else {
 							ret[key] = arg[key]
 						}
-					} else if (key=='css') { // css will be joined
+					} else if (key == 'css') { // css will be joined
 						ret[key] = Str.enrichList(' ',ret[key],arg[key])
 					} else { // unknown will be overwritten
 						ret[key] = arg[key]
@@ -659,6 +688,7 @@ class Html {
 		}
 		return ret
 	}
+
 	/**
 	 * merge for HtmlElements, modify first argument which shall be an Object
 	 * - merge css linear in whitespace list way to any level like {div:{css:'2ndlevel'}}
@@ -683,7 +713,7 @@ class Html {
 						} else {
 							arguments[0][key] = arg[key]
 						}
-					} else if (key=='css') { // css will be joined
+					} else if (key == 'css') { // css will be joined
 						arguments[0][key] = Str.enrichList(' ',arguments[0][key],arg[key])
 					} else { // unknown will be overwritten
 						arguments[0][key] = arg[key]
@@ -693,6 +723,7 @@ class Html {
 		}
 		return arguments[0]
 	}
+
 	// eslint-disable-next-line jsdoc/require-param
 	/**
 	 * detect Object type and choose only Object and no Class
@@ -703,7 +734,7 @@ class Html {
 		const argItemType = Vars.type(arg)
 		const argItemClasses = Vars.typeHier(arg)
 		// console.log('Vars.type:'+argItemType+' Vars.typeHier:'+argItemClasses)
-		const isAvailable = ((argItemType==='Object' && argItemClasses[0]==='Object')||argItemType==='Function') // not merge foreign Class except Html
+		const isAvailable = ((argItemType === 'Object' && argItemClasses[0] === 'Object') || argItemType === 'Function') // not merge foreign Class except Html
 		return isAvailable
 	}
 }
