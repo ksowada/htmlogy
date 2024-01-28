@@ -4,7 +4,7 @@ import Arr from '../../logic/Arr/Arr.js'
 import HtmlComp from '../html/HtmlComp.js'
 import El from '../html/El/El.js'
 import Toolbar from '../../HtmlComponents/Toolbar/Toolbar.js/index.js'
-import ImgControl from '../html/ImgControl/ImgControl.js'
+import Sizes from '../html/Sizes/Sizes.js'
 import Times from '../../logic/Times'
 
 /**
@@ -42,7 +42,7 @@ class Flower extends HtmlComp {
 		})
 		this.footer = new Html({parent:{obj:this.containerObj},html:'div',css:'footer',val:'ardoid.de'}) // TODO pkg.name
 		// after all rows of page resize SVG
-		ImgControl.center(this.svg.my.el,this.width,this.height)
+		Sizes.center(this.svg.my.el,this.width,this.height)
 	}
 	// TODO on resize update
 	sin(x,i) {
