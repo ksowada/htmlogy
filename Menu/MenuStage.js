@@ -1,6 +1,7 @@
-import Html from '../html/html/Html/Html.js'
-import HtmlOpenable from '../Html/HtmlOpenable/HtmlOpenable.js'
-import HtmlSelect from '../Html/HtmlSelect/HtmlSelect.js'
+// import Html from '../html/html/Html/Html.js'
+import Html from '../Html/Html.js'
+import HtmlOpenable from '../HtmlOpenable/HtmlOpenable.js'
+import HtmlSelect from '../HtmlSelect/HtmlSelect.js'
 
 /**
  * @class one set of menu-items, displayed all at once on one panel consist of a HtmlSelect for item selection, this cares also for .sub, which are described in menu_info and may contain items that will be opened at action on a item

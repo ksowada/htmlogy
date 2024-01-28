@@ -29,7 +29,7 @@ class Html {
 	 * - to instantly create element in parent given as .el[element], .id, or .obj[Html]
 	 * - for parent, use with .my without creation of element but use existing element
 	 * - you may render later, also you can define the parent element later at render(), you can even add childs after creation and render them later, some operations are not supported without rendered element, f.e. classStateSet
-	 * @param {object} arg supply create()-like arg @see {@link this.create}
+	 * @param {Html~createarg} arg supply create()-like arg @see {@link this.create}
 	 * @param {boolean} arg.domLater if non-existent or false, don't render() directly
 	 * @param {Html~domadr} arg.my if given, don't render(), just use as parent
 	 * @param {Html~domadr} arg.parent if not given, don't render() directly
@@ -162,26 +162,31 @@ class Html {
 	}
 
 	/**
+	 * @typedef {object} Html~createarg common ways to address HTMLElement in DOM, choose only 1 of those
+	 * @param {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered)
+	 * @property {object} arg contains information about the element	 * 
+	 * @property {string} arg.id id of HTMLElement, optional to el
+	 * @property {string} arg.h template syntax, see htm from https://github.com/developit/htm/tree/master
+	 * - you may deliver a string, valid html or optionally with missing end tag
+	 * - for template syntax, use import {html} from 'htm/preact'
+	 * @property {string} arg.html htmlTagName, div if unused, SVG supported, it adds namespace automatically
+	 * @property {string} arg.htmlNS html Namespace, f.e. svg Element
+	 * @property {string|Array} arg.css row of CSSClass (str space-separated or arr of classes)
+	 * @property {object} arg.styles extra inline styles, like background-color
+	 * @property {string} arg.val value (input use value else use innerText)
+	 * @property {string} arg.valhtml optional subelement with and instead for val, f.e. use to center with val in grid use extra div
+	 * @property {object} arg.atts attributes of HTMLElement
+	 */
+	/**
 	 * create DOMElement
-	 * @param {object} arg may be segmented in different arguments, obj will be merged with last-win
+	 * @param {Html~createarg} arg may be segmented in different arguments, obj will be merged with last-win
 	 * @param {Html~domadr} arg.parent address info for accessing HTMLElement
-	 * - if el not given it will not be appended to dom
+	 * - if not given, it will not be appended to dom
 	 * - for use when manually appended or inserted on certain pos
 	 * @param {Html} arg.parent.obj optional to el and id of HTMLElement; when parent given this way, it enable backtrace of dom-hierarchy, it create htmlParent in this object, and  add htmlChilds in its parent
 	 * @param {object} arg.container optional container
 	 * @param {string} arg.container.html container, div if unused
 	 * @param {string} arg.container.htmlNS html Namespace, f.e. svg Element
-	 * @param {string} arg.h template syntax, see htm from https://github.com/developit/htm/tree/master
-	 * - you may deliver a string, valid html or optionally with missing end tag
-	 * - for template syntax, use import {html} from 'htm/preact'
-	 * @param {string} arg.html htmlTagName, div if unused, SVG supported, it adds namespace automatically
-	 * @param {string} arg.htmlNS html Namespace, f.e. svg Element
-	 * @param {string|Array} arg.css row of CSSClass (str space-separated or arr of classes)
-	 * @param {object} arg.styles extra inline styles, like background-color
-	 * @param {string} arg.val value (input use value else use innerText)
-	 * @param {string} arg.valhtml optional subelement with and instead for val, f.e. use to center with val in grid use extra div
-	 * @param {object} arg.atts attributes of HTMLElement
-	 * @param {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered)
 	 * @param {boolean} arg.domLater do not render Html instantly, but may be later with calling render()
 	 * - this property will be inherit to all childs
 	 * @param {boolean} arg.doming indicate that render() process is in progress, is used to dom childs even if domLater is set, only invoked from render()
@@ -240,6 +245,7 @@ class Html {
 			Obj.omitMod(hPropsVal,'children') // omit no regular attributes
 			arg.atts = Object.assign(hPropsVal,arg.atts)
 		}
+		// html-namespace issues
 		const htmlNamespaceParent = ObjObj.childsHasDefined(arg,['parent','obj'],'htmlParent','htmlNamespace')
 		if (htmlNamespaceParent) { // inherit namespace from parent
 			this.htmlNamespace = htmlNamespaceParent
@@ -247,14 +253,6 @@ class Html {
 		if (arg.html === 'svg') { // auto build svg namespace
 			this.htmlNamespace = 'http://www.w3.org/2000/svg' // will also inherit to child elements
 		}
-
-		// if (arg.htmlNS) { // manual given namespace
-		// 	this.my.el = document.createElementNS(arg.htmlNS,arg.html)
-		// } else if (this.htmlNamespace) { // auto or inherit namespace
-		// 	this.my.el = document.createElementNS(arg.htmlNS,this.htmlNamespace)
-		// } else { // usual tag without namespace
-		// 	this.my.el = document.createElement(arg.html)
-		// }
 		this.createEl(this.my,arg,this.htmlNamespace)
 		// TODO container may be unused or duplicate with HtmlElComp.container
 		// TODO use new Html for Container creation
@@ -315,6 +313,7 @@ class Html {
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
 	change(arg) { return this.edit(this.my,arg,{change: true}) }
+
 	/**
 	 * append Html, this create or add given parameters to existing
 	 * see details for change {@link Html#edit}
@@ -322,6 +321,7 @@ class Html {
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
 	append(arg) { return this.edit(this.my,arg,{append: true}) }
+
 	/**
 	 * remove HTMLElement or if given in argument, some item of it
 	 * - removeEventHandler before remove from DOM
@@ -363,8 +363,10 @@ class Html {
 	}
 
 	/**
-	 * edit given HTMLElement, may attach to new, change or remove
-	 * - class from .css: at change: remove all given css class and then edit new
+	 * edit given HTMLElement, may attach to new, change or remove,
+	 * also may edit a Html, when not mounted in .el, then change in .arg
+	 * also change this.arg according to dom (neithertheless this is mounted to DOM)
+	 * - class from .css: at change: remove all given css class and then edit new // TODO only allow 1 string at change and remove
 	 * - style from .styles: at change: enrich given style
 	 * - various attributes from .atts: at change: enrich given HTMLElement
 	 * - events from .evts: at change: enrich given events
@@ -388,37 +390,52 @@ class Html {
 	// TODO topObj is not Html, but .my or .top
 	// TODO remove not implemented for any item, just css
 	edit(topObj,arg,mode) {
+		const inDOM = (topObj.el!== undefined) // this.domed not working at test
 		const elo = new Elem(topObj.el) // build own elo, instead of this, cause at construction not existent, and topObj may vary between my or top
-		const eloWatch = new Vars(elo.all)
+		const eloWatch = new Vars(inDOM?elo.all:Obj.omit(this.arg,'parent')) // to find out if really something changed
 		let item = undefined
 
 		if (Obj.hasDefined(arg,item = 'css')) {
+			const key = arg[item]
 			if (mode.remove) {
-				const key = arg[item]
-				topObj.el.classList.remove(key)
+				if (inDOM) {
+					topObj.el.classList.remove(key)
+				}
+				this.arg = Str.enrichList(' ',this.arg[item]) // if array convert to string
+				this.arg = Str.removeFromList(this.arg,' ',key)
 			} else {
 				if (mode.change) {
-					topObj.el.removeAttribute('class') // at change, delete old classes, only use new given
+					if (inDOM) topObj.el.removeAttribute('class') // at change, delete old classes, only use new given
+					this.arg[item] = ''
 				}
-				let csss = []
-				csss = Str.enrichList(' ',arg[item]) // add arrays or list of whitespace seperated str
-				csss = Str.split(csss,' ') // convert into Array
-				csss.forEach(e => topObj.el.classList.add(e))
+				if (inDOM) {
+					let csss = []
+					csss = Str.enrichList(' ',arg[item]) // add arrays or list of whitespace seperated str
+					csss = Str.split(csss,' ') // convert into Array
+					csss.forEach(e => topObj.el.classList.add(e))
+				}
+				this.arg[item] = key
 			}
 		}
 		if (Obj.hasDefined(arg,item = 'styles')) {
 			for (const key in arg[item]) {
 				if (Object.hasOwnProperty.call(arg[item],key)) {
 					const valItem = arg[item][key]
-					topObj.el.style.setProperty(key,valItem)
+					if (inDOM) topObj.el.style.setProperty(key,valItem)
+					this.arg[key] = valItem
 				}
 			}
 		}
-		if (Obj.hasDefined(arg,item = 'id')) {
+		if (Obj.hasDefined(arg,item = 'id')) { // will be set later by atts.id
 			if (!arg.atts) {
 				arg.atts = {id: arg[item]} // use atts and modify id of obj in that way later in method
 			} else {
 				arg.atts.id = arg[item] // overwrite when directly given and defined from atts
+			}
+			if (!this.arg.atts) {
+				this.arg.atts = {id: arg[item]} // use atts and modify id of obj in that way later in method
+			} else {
+				this.arg.atts.id = arg[item] // overwrite when directly given and defined from atts
 			}
 		}
 		if (Obj.hasDefined(arg,item = 'atts')) {
@@ -426,13 +443,17 @@ class Html {
 				if (Object.hasOwnProperty.call(arg[item],key)) {
 					const valItem = arg[item][key]
 					if (mode.remove) {
-						if (valItem !== undefined && valItem.length > 0) { // if atts item:value is given and of string length more than 0
-							if (topObj.el.getAttribute(key) === valItem) topObj.el.removeAttribute(key)
-						} else {
-							topObj.el.removeAttribute(key)
+						if (inDOM) {
+							if (valItem !== undefined && valItem.length > 0) { // if atts item:value is given and of string length more than 0
+								if (topObj.el.getAttribute(key) === valItem) topObj.el.removeAttribute(key)
+							} else {
+								topObj.el.removeAttribute(key)
+							}
 						}
+						Obj.omit(this.arg,key)
 					} else {
-						topObj.el.setAttribute(key,valItem)
+						if (inDOM) topObj.el.setAttribute(key,valItem)
+						this.arg[key] = valItem
 					}
 				}
 			}
@@ -441,7 +462,7 @@ class Html {
 			for (const key in arg.evts) {
 				if (Object.hasOwnProperty.call(arg.evts,key)) {
 					const cbk = arg.evts[key]
-					topObj.el.addEventListener(key,cbk)
+					if (inDOM) topObj.el.addEventListener(key,cbk)
 					topObj.evts.push({key,cbk})
 				}
 			}
@@ -450,31 +471,34 @@ class Html {
 		if (Obj.hasDefined(arg,item = 'icon')) { // FEATURE handle multiple icon when array
 			if (mode.change && topObj.iconObj !== undefined) topObj.iconObj.remove()
 			/** holds optional icon @private, but in container as fontawesome, comment <i> out and add svg */
-			topObj.iconObj = new Html({parent: {el: topObj.el},container: {html: 'span'},html: 'i',css: arg.icon}) // TODO dont care about existing icons at update
+			topObj.iconObj = new Html({parent: {obj: topObj.obj},container: {html: 'span'},html: 'i',css: arg.icon}) // TODO dont care about existing icons at update
 		}
 		// than change elements contents, may be either sub element given by valhtml and val or just a textcontent in val
-		// TODO valhtml is this used, otherwise remove it
+		// TODO valhtml is this used, otherwise remove it, do not work properly as valhtml is given as html
 		if (Obj.hasDefined(arg,item = 'valhtml')) { // FEATURE plural-arr
 			/** subelement given at create or change with valhtml and val */
 			if (mode.change && this.my.subElement !== undefined) this.my.subElement.remove()
 			this.my.subElement = new Html({parent: {el: topObj.el},html: arg.valhtml,val: arg.val})
 		// you can use either valhtml or val so else
 		} else if (Obj.hasDefined(arg,item = 'val')) { // FEATURE plural-arr
-			if (topObj.el.localName == 'input') topObj.el.value = arg.val
+			if (inDOM && topObj.el.localName == 'input') topObj.el.value = arg.val
+			else if (!inDOM && this.arg.html == 'input') this.arg.val = arg.val
 			else {
 				if (mode.change) {
 					// take last node being Textnode
-					for (const node of topObj.el.childNodes) {
+					if (inDOM) for (const node of topObj.el.childNodes) {
 						if (node.nodeType === 3) { // as in test Node.TEXT_NODE is not defined so use int
 							topObj.el.removeChild(node)
 						}
 					}
 				}
-				topObj.el.insertAdjacentHTML('beforeend',arg.val)
+				// TODO remove in val is not defined
+				if (inDOM) topObj.el.insertAdjacentHTML('beforeend',arg.val)
+				this.arg.val = arg.val
 			}
 		}
-		this.writeIdFromEl() // if id would change, catch it here
-		eloWatch.set(elo.all)
+		if (inDOM) this.writeIdFromEl() // if id would change, catch it here
+		eloWatch.set(inDOM?elo.all:Obj.omit(this.arg,'parent'))
 		return eloWatch.changed
 	}
 
