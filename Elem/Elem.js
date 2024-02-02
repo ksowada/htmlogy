@@ -17,7 +17,6 @@ import Html from '../Html/Html.js'
 class Elem {
 	/** all names of items of EL that describe HTMLElement */
 	static items = ['name','css','styles','id','atts','val']
-
 	// TODO extends Element may provide easier access to other functions
 	constructor(el) {
 		this.el = el
@@ -144,9 +143,7 @@ class Elem {
 		if (text.toLowerCase().endsWith(hTagEnd)) hText = Str.omitEnd(hText,hTagEnd.length)
 		return hText
 	}
-
 	// from https://stackoverflow.com/questions/2474605/how-to-convert-a-htmlelement-to-a-string
-
 	/**
 	 * convert DOM element to string
 	 * @param {Element} who a DOM element
@@ -172,7 +169,6 @@ class Elem {
 		el= null
 		return txt
 	}
-
 	/**
 	 * compare may compare 2 or more element
 	 * use getEl internally
@@ -217,37 +213,41 @@ class Elem {
 	}
 	/**
 	 * find element by tag name and additional atts and change element according to edit
+	 * @param {object} el HTMLElement to attach created, and start point for search, if not found
 	 * @param {object} search object with certain arguments
 	 * @param {string} search.html HTMLElement to search
 	 * @param {object} search.atts a obj of HTMLAttribute (all atts must be found)
 	 * @param {object} edit Object to change HTMLElement
-	 * @param {object} el HTMLElement to attach created, and start point for search, if not found
-	 * @param {boolean} create set to create a new Html
+	 * @param {boolean} create set to create a new Html, defaults to true
 	 * @returns {Html} if created, otherwise undefined
 	 * @throws {Error} if search.html is not found
 	 */
-	static findActions(search,edit,el,create) { // TODO optional create, use it also for find
+	static findActions(el,search,edit,create=true) { // TODO optional create, use it also for find
 		if (!search.html) throw new Error('html not given but needed')
 		const foundEls = Elem.getChilds(el,search.html)
 		let changeCnt = 0
 		for (let ix = 0; ix < foundEls.length; ix++) {
 			const foundEl = foundEls[ix]
 			let found_atts = 0
-			const search_attsArr = Object.keys(search.atts)
-			for (const attKey in search_attsArr) {
-				if (Object.hasOwnProperty.call(search_attsArr,attKey)) {
-					// const element = search_attsArr[attKey]; // TODO only use attKey?
-					const foundElAtt = foundEl.getAttribute(attKey)
-					if (foundElAtt!==null && foundElAtt==search.atts[attKey]) found_atts++
-				}
-			}
-			if (found_atts==search_attsArr.length) {
-				Html.change({html:foundEl},edit) // TODO shall change el, but static change is deleted
+			const searchAttsLen = Object.keys(search.atts).length // remember as have to find any atts in foundEl
+			Object.keys(search.atts).forEach(attKey => {
+				const foundElAtt = foundEl.getAttribute(attKey)
+				if (foundElAtt!==null && foundElAtt==search.atts[attKey]) found_atts++
+			})
+			// for (const attKey in search_attsArr) {
+			// 	if (Object.hasOwnProperty.call(search_attsArr,attKey)) {
+			// 		// const element = search_attsArr[attKey]; // TODO only use attKey?
+
+			// 	}
+			// }
+			if (found_atts==searchAttsLen) {
+				Html.edit(undefined,{el:foundEl},edit,'change') // TODO shall change el, but static change is deleted
 				changeCnt++
 			}
 		}
 		if (changeCnt>1) console.info('multiple elements changed, expected 1, found:'+changeCnt)
-		if (create && changeCnt==0) return new Html({parent:{el},...search,...edit})
+		const joinedAtts = Html.mergeDatas(search,edit)
+		if (create && changeCnt==0) return new Html({parent:{el},...joinedAtts})
 		return undefined
 	}
 	/**
@@ -311,6 +311,15 @@ class Elem {
 		} else {
 			el.textContent = oldContent + str
 		}
+	}
+	/**
+	 * search in document for first given HTML-tag
+	 * @param {string} tag name of HTML-tag
+	 * @returns {Element} first found element with given tag-name
+	 */
+	static getElByNameFirst(tag) {
+		const els = document.getElementsByTagName(tag)
+		return els.item(0)
 	}
 	/**
 	 * get 1st level children of HTMLElement

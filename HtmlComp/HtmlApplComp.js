@@ -1,5 +1,5 @@
-import pkg from '../../../../package.json'
-import build_datetime from '../../../../build.datetime.json'
+// import pkg from './../../../../package.json'
+// import build_datetime from '../../../../build.datetime.json'
 import Html from '../Html/Html.js'
 import HtmlUtils from '../HtmlUtils/HtmlUtils.js'
 import Times from '../../Times.js'
@@ -31,7 +31,6 @@ class HtmlApplComp {
 		 */
 		this.app = new Html(arg)
 		/** use log for relative time measures, and other issues */
-		Times.log(`package.version:${pkg.version}`)
 		/** rest has URLParts from query results */
 		this.rest = this.queryREST() // the only data input
 		/** url of this webapp red from window */
@@ -42,16 +41,15 @@ class HtmlApplComp {
 		// FetchFile.fetch('build.datetime.json',this.onLoadDateTime.bind(this))
 	}
 	// TODO rename domCreate to dom
-	domCreate() {
+	domCreate(arg) {
 		// care for head
-		const headEl = HtmlUtils.getElByNameFirst('head')
-		if (pkg.keywords) {
-			const keywordsStr = pkg.keywords.join(',')
-			Elem.findActions({html: 'meta',atts: {name: 'keywords'}},{atts: {content: keywordsStr}},headEl)
+		const headEl = Elem.getElByNameFirst('head')
+		if (arg.keywords) {
+			const keywordsStr = arg.keywords.join(',')
+			Elem.findActions(headEl,{html: 'meta',atts: {name: 'keywords'}},{atts: {content: keywordsStr}})
 		}
-		if (pkg.description) Elem.findActions({html: 'meta',atts: {name: 'description'}},{atts: {content: pkg.description}},headEl)
-		if (pkg.name) Elem.findActions({html: 'title'},{val: pkg.name},headEl)
-		if (build_datetime) this.rest.build_datetime = build_datetime
+		if (arg.description) Elem.findActions(headEl,{html: 'meta',atts: {name: 'description'}},{atts: {content: arg.description}})
+		if (arg.title) Elem.findActions(headEl,{html: 'title'},{val: arg.title})
 		// TODO some metas missing ask twitter or facebook here a hint: https://www.vioma.de/de/wiki/online-marketing/seo/meta-tags/#Meta%20Keywords
 		// TODO https://web.dev/learn/pwa/web-app-manifest/ and show it in html
 	}

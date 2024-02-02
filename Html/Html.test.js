@@ -59,16 +59,6 @@ describe('Html',() => {
 			expect(ret.atts.draggable).to.be(true)
 		})
 	})
-	describe('findActions',() => {
-		create_dom(domContent)
-		const headEl = document.head // implicitly created
-		const search = {html:'title'}
-		const edit = {val:'test'}
-		Elem.findActions(search,edit,headEl,document)
-		it('was empty el and has now created element',() => {
-			expect(Elem.getChildsFirstVal(headEl,'title')).to.eql('test')
-		})
-	})
 	describe('constructor only',() => {
 		const el = create_dom(domContent)
 		// eslint-disable-next-line no-new
@@ -139,38 +129,38 @@ describe('Html',() => {
 		create_dom(domContent)
 		const testEl = document.getElementById(myId)
 		const myTestId = 'another-id'
-		const createdEl = new Html({parent:{el: testEl},css:['a',undefined,'new testClass '],val:'citrone',id:myTestId})
+		const createdHtml = new Html({parent:{el: testEl},css:['a',undefined,'new testClass '],val:'citrone',id:myTestId})
 		it('add {id} to created Element',() => {
-			expect(createdEl.my.el.id).to.be(myTestId)
+			expect(createdHtml.my.el.id).to.be(myTestId)
 		})
 		it('add {id} to atts',() => {
-			expect(createdEl.my.atts.id).to.be(myTestId)
+			expect(createdHtml.arg.atts.id).to.be(myTestId)
 		})
 		it('leave {id}',() => {
-			expect(createdEl.my.id).to.be(myTestId)
+			expect(createdHtml.arg.id).to.be(myTestId)
 		})
 		it('check for html content in .my.el',() => {
-			expect(createdEl.my.el.textContent).to.be('citrone')
+			expect(createdHtml.my.el.textContent).to.be('citrone')
 		})
 		it('check for html content in .top.el',() => {
-			expect(createdEl.top.el.textContent).to.be('citrone')
+			expect(createdHtml.top.el.textContent).to.be('citrone')
 		})
 		it('check for css class "a"',() => {
 			// expect(createdEl.my.el.getAttribute('class')).to.be('a new test')
-			expect(createdEl.my.el.classList.contains('a')).to.be(true)
+			expect(createdHtml.my.el.classList.contains('a')).to.be(true)
 		})
 		it('check for css class "new"',() => {
-			expect(createdEl.my.el.classList.contains('new')).to.be(true)
+			expect(createdHtml.my.el.classList.contains('new')).to.be(true)
 		})
 		it('check for css class "testClass"',() => {
-			expect(createdEl.my.el.classList.contains('testClass')).to.be(true)
+			expect(createdHtml.my.el.classList.contains('testClass')).to.be(true)
 		})
 		it('check for css class "notIncluded"',() => {
-			expect(createdEl.my.el.classList.contains('notIncluded')).to.be(false)
+			expect(createdHtml.my.el.classList.contains('notIncluded')).to.be(false)
 		})
 		it('check for css class count',() => {
 			// expect(createdEl.my.el.getAttribute('class')).to.be('a new test')
-			expect(createdEl.my.el.classList.length).to.be(3)
+			expect(createdHtml.my.el.classList.length).to.be(3)
 		})
 	})
 	describe('create2 alternative',() => { // just extra test, because issues in HtmlState.test.js
@@ -222,7 +212,7 @@ describe('Html',() => {
 			const el = create_dom(domContent)
 			const id = 3
 			const createdEl = new Html({parent:{el},val:'citrone',id:id})
-			expect(createdEl.my.atts.id).to.eql(id)
+			expect(createdEl.arg.atts.id).to.eql(id)
 		})
 		it('changed css',() => {
 			const el = create_dom(domContent)

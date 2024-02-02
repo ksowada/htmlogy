@@ -3,10 +3,6 @@
  * utilities for DOM , window and document
  */
 class HtmlUtils {
-	static getElByNameFirst(tag) {
-		const els = document.getElementsByTagName(tag)
-		return els.item(0)
-	}
 	static getSelectionHtml() {
 		var sel = ''
 		var html = ''

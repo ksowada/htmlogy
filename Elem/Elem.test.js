@@ -157,5 +157,55 @@ describe('Elem',() => {
 				expect(inputEl.my.el.value).to.be('🌊')
 			})
 		})
+		describe('findActions',() => {
+			create_dom(domContent)
+			const headEl = document.head // implicitly created
+			const search = {html:'title'}
+			const edit = {val:'test'}
+			Elem.findActions(headEl,search,edit,document)
+			it('was empty el and has now created element',() => {
+				expect(Elem.getChildsFirstVal(headEl,'title')).to.eql('test')
+			})
+		})
+		describe('findActions',() => {
+			describe('create a new element, as no existing found',() => {
+				create_dom(domContent)
+				const headEl = Elem.getElByNameFirst('head')
+				const id = 'desc1'
+				const description = 'a description'
+				Elem.findActions(headEl,{html: 'meta',atts: {name: 'description'}},{atts: {content: description},id:id})
+				const foundEl = document.head.getElementsByTagName('meta').item(0)
+				it('description added',() => {
+					expect(foundEl.getAttribute('name')).to.be('description')
+					expect(foundEl.getAttribute('content')).to.be(description)
+				})
+			})
+			describe('create a new element, 1 existing tag found, but not further atts found',() => {
+				create_dom(domContent)
+				const headEl = Elem.getElByNameFirst('head')
+				new Html({parent:headEl,html:'meta',atts: {name: 'keywords'}})
+				const id = 'desc1'
+				const description = 'a description'
+				Elem.findActions(headEl,{html: 'meta',atts: {name: 'description'}},{atts: {content: description},id:id})
+				const foundEl = document.head.getElementsByTagName('meta').item(1)
+				it('description added',() => {
+					expect(foundEl.getAttribute('name')).to.be('description')
+					expect(foundEl.getAttribute('content')).to.be(description)
+				})
+			})
+			describe('create a new element, but 1 existing tag with further serached att found, shall be replaced',() => {
+				create_dom(domContent)
+				const headEl = Elem.getElByNameFirst('head')
+				new Html({parent:headEl,html:'meta',atts: {name: 'description',content: 'old description'}})
+				const id = 'desc1'
+				const description = 'a description'
+				Elem.findActions(headEl,{html: 'meta',atts: {name: 'description'}},{atts: {content: description},id:id})
+				const foundEl = document.head.getElementsByTagName('meta').item(0)
+				it('description added',() => {
+					expect(foundEl.getAttribute('name')).to.be('description')
+					expect(foundEl.getAttribute('content')).to.be(description)
+				})
+			})
+		})
 	})
 })
