@@ -1,5 +1,5 @@
 import Arr from '../../logic/Arr/Arr.js'
-import Numbers from '../../logic/Numbers.js'
+import Numbers from '../../logic/Numbers/Numbers.js'
 import Obj from '../../logic/Obj/Obj.js'
 import Str from '../../logic/Str/Str.js'
 import Vars from '../../logic/Vars/Vars.js'

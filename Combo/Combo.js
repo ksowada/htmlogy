@@ -1,4 +1,4 @@
-import Numbers from '../../logic/Numbers.js'
+import Numbers from '../../logic/Numbers/Numbers.js'
 import Html from '../html/Html/Html.js'
 import './Combo.scss'
 import Modal from '../Modal/Modal.js'

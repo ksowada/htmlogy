@@ -1,5 +1,5 @@
 /* eslint-disable no-new */
-import Numbers from '../../logic/Numbers.js'
+import Numbers from '../../logic/Numbers/Numbers.js'
 import Obj from '../../logic/Obj/Obj.js'
 import Html from '../html/Html/Html.js'
 import Toolbar from '../../HtmlComponents/Toolbar/Toolbar.js/index.js'
