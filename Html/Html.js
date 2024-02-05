@@ -22,6 +22,7 @@ class Html {
 	// TODO extend constructor to add child elements in array
 	// TODO eliminate .top and .container through sub-class or in render (split it up) that enables this, causes trouble with htmlNamespace
 	// TODO what about operations that are not supported without rendered element, f.e. classStateSet, see doc
+	// TODO optimize member names .arg duplicates as argument
 	/**
 	 * creates dynamic HTMLElement
 	 *
@@ -544,16 +545,23 @@ class Html {
 	}
 	/**
 	 * add introduce child, automatically sets parent with this and construct it
-	 * @param {object} arg supply create()-like arg
+	 * @param {object|Html} arg supply create()-like arg or already created Html
 	 * @param {string} arg.name name of class member, if given it generate it, so you can use this child as .[name]
 	 * @returns {Html} new produced child of this
 	 */
 	// TODO add test
 	add(arg) {
 		Obj.put(arg,['parent','obj'],this)
-		const htmlObj = new Html(arg)
-		// if (parent is not rendered, the child will not be rendered, unless it is in htmlChilds)
-		if (arg.parent && arg.parent.obj && arg.parent.obj.domLater) arg.parent.obj.htmlChilds.push(htmlObj)
+		let htmlObj = undefined
+		if (Vars.typeHier(arg).includes('Html')) {
+			htmlObj = arg
+			// if parent is rendered, render now
+			if (arg.parent.obj.domLater!==true) htmlObj.render({parent:{obj:this}}) // only give parent, as arg already contain populated arg in form of Html
+		} else {
+			htmlObj = new Html(arg)
+		}
+		// if parent not rendered, child wont render, unless it is in htmlChilds
+		if (arg.parent.obj.domLater===true) arg.parent.obj.htmlChilds.push(htmlObj)
 
 		// add as child, when .name is given
 		if (Str.valid(arg.name)) this[arg.name] = htmlObj

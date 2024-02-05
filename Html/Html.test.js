@@ -177,12 +177,31 @@ describe('Html',() => {
 		// 	expect(masterObj.createdEl.css).to.be('styleful')
 		// })
 	})
-	describe('construct by use()',() => { // just extra test, because issues in HtmlState.test.js
+	describe('construct Html by existing id via .my',() => { // just extra test, because issues in HtmlState.test.js
 		create_dom(domContent)
 		const newHtml = new Html({my:{id:myId}})
 		const addedHtml = newHtml.add({id:'aId'})
-		it('add {id} to created Element',() => {
+		it('add element to existing element',() => {
 			expect(addedHtml.my.el.id).to.be('aId')
+		})
+	})
+	describe('construct by add()',() => { // tested also in other case
+		describe('with arg',() => {
+			create_dom(domContent)
+			const newHtml = new Html({my:{id:myId}})
+			const addedHtml = newHtml.add({id:'aId'})
+			it('add {id} to created Element',() => {
+				expect(addedHtml.my.el.id).to.be('aId')
+			})
+		})
+		describe('with Html',() => {
+			create_dom(domContent)
+			const newHtml = new Html({my:{id:myId}})
+			const addHtml = new Html({id:'aId'})
+			const addedHtml = newHtml.add(addHtml)
+			it('add {id} to created Element',() => {
+				expect(addedHtml.my.el.id).to.be('aId')
+			})
 		})
 	})
 	describe('change',() => {
