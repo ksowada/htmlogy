@@ -41,15 +41,40 @@ class HtmlApplComp {
 		// FetchFile.fetch('build.datetime.json',this.onLoadDateTime.bind(this))
 	}
 	// TODO rename domCreate to dom
+	/**
+	 * Creates the HTML document's <head> element by adding meta tags for keywords, description
+	 * @deprecated use static htmlPrepare instead
+	 */
 	domCreate(arg) {
-		// care for head
+	}
+	/**
+	 * Prepares the HTML document's <head> element by adding meta tags for keywords, description, and title, as well as other metadata as needed.
+	 * @param {object} arg - An object containing the metadata to be added to the <head> element.
+	 * @param {string[]} arg.keywords - An array of keywords to be added as a meta tag.
+	 * @param {string} arg.description - A description to be added as a meta tag.
+	 * @param {string} arg.title - The title to be added to the <title> element.
+	 */
+	static htmlPrepare(arg) {
+		// get the <head> element
 		const headEl = Elem.getElByNameFirst('head')
+
+		// add keywords meta tag
 		if (arg.keywords) {
 			const keywordsStr = arg.keywords.join(',')
 			Elem.findActions(headEl,{html: 'meta',atts: {name: 'keywords'}},{atts: {content: keywordsStr}})
 		}
-		if (arg.description) Elem.findActions(headEl,{html: 'meta',atts: {name: 'description'}},{atts: {content: arg.description}})
-		if (arg.title) Elem.findActions(headEl,{html: 'title'},{val: arg.title})
+
+		// add description meta tag
+		if (arg.description) {
+			Elem.findActions(headEl,{html: 'meta',atts: {name: 'description'}},{atts: {content: arg.description}})
+		}
+
+		// add title element
+		if (arg.title) {
+			Elem.findActions(headEl,{html: 'title'},{val: arg.title})
+		}
+
+		// TODO: add other metadata as needed (e.g., Open Graph tags)
 		// TODO some metas missing ask twitter or facebook here a hint: https://www.vioma.de/de/wiki/online-marketing/seo/meta-tags/#Meta%20Keywords
 		// TODO https://web.dev/learn/pwa/web-app-manifest/ and show it in html
 	}
