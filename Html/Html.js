@@ -443,7 +443,7 @@ class Html {
 		if (Obj.hasDefined(arg,item = 'atts')) {
 			for (const key in arg[item]) {
 				if (Object.hasOwnProperty.call(arg[item],key)) {
-					const valItem = arg[item][key]
+					const valItem = (arg[item][key]!==undefined)?''+arg[item][key] : undefined // always use string for atts, as remove measure length
 					if (mode.remove) {
 						if (inDOM) {
 							if (valItem !== undefined) { // if atts item:value is given, remove only if it is equal to value
@@ -452,7 +452,7 @@ class Html {
 								elem.el.removeAttribute(key)
 							}
 						}
-						if (valItem !== undefined) {
+						if (valItem !== undefined && valItem.length > 0) {
 							if (thisObj.arg[key] === valItem) Obj.omit(thisObj.arg,key)
 						} else {
 							Obj.omit(thisObj.arg,key)

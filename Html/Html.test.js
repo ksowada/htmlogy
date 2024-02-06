@@ -254,7 +254,7 @@ describe('Html',() => {
 			expect(createdEl.my.el.firstChild.firstChild.classList.contains('galaxy')).to.be(true)
 			expect(createdEl.my.el.firstChild.firstChild.classList.length==1).to.be(true)
 		})
-		it ('change att=""',() => {
+		it ('change atts=""',() => {
 			const el = create_dom(domContent)
 			const createdEl = new Html({parent:{el}})
 			createdEl.change({atts:{autoplay:''}})
@@ -266,7 +266,7 @@ describe('Html',() => {
 			const el = create_dom(domContent)
 			const createdEl = new Html({parent:{el},html:'div',atts:{title:'lemon',id:'3'}})
 			// expect(createdEl.my.el.getAttribute('title')).to.be('lemon')
-			createdEl.remove({atts:{title:''}})
+			createdEl.remove({atts:{title:undefined}})
 			expect(createdEl.my.el.getAttribute('title')).to.be(null)
 			expect(createdEl.my.el.getAttribute('id')).to.be('3')
 		})
