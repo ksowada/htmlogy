@@ -12,7 +12,7 @@ class InputVars {
  */
 	constructor(arg) {
 		Object.keys(arg).forEach(key => {
-			this[key] = new InputVar(arg[key])
+			this[key] = new InputVar(arg[key],key)
 		})
 		this.varsName = Arr.copy(Object.keys(arg))
 	}

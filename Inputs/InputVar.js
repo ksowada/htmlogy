@@ -1,5 +1,6 @@
 import Ids from '../../logic/Ids'
 import Model from '../../logic/Model/Model'
+import Numbers from '../../logic/Numbers/Numbers'
 import Obj from '../../logic/Obj/Obj'
 import Store from '../../logic/Store'
 import Html from '../../logic/html/Html/Html'
@@ -21,22 +22,27 @@ class InputVar {
 	 * generate a Html appropriate to var type
 	 * auto-load
 	 * @param {object} props parameter for variable
-	 * @param {number} props.min minimum value for variable
-	 * @param {number} props.max maximum value for variable
 	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
-	 * @param {string} props.placeholder embedded placeholder in input
+	 * @param {any} props.is default value, when no storage value is available
+	 * @param {string} props.type important for dom() and kind of element, and many other
 	 * @param {string} name (f.e. Storage)
 	 * @param {number} [ix] (f.e. Storage)
 	 */
-	constructor(props,name, ix) {
+	constructor(props,name,ix) {
+		/** as needed for Storage */
 		this.name = name
+
+		/** if needed in arrays */
 		this.ix = ix
-		const val = Store.get(Ids.combineId(this.name, this.ix),props.is)
+
+		const val = Store.get(Ids.combineId(this.name,this.ix),props.is)
 
 		/** stores actual value in val, and has capabilities for other vars bounded to this */
 		this.model = new Model({val})
 
 		this.props = Obj.copy(props)
+
+		Obj.assure(this.props,'atts',{}) // needed for min,max check etc.
 	}
 	get val() { return this.model.get('val') }
 	/**
@@ -44,20 +50,23 @@ class InputVar {
 	 *
 	 * may be called multiple times
 	 * @param {Html} parentHtml Html to attach to
-	 * @param {object} propsAdd properties to add to element, only for this html
+	 * @param {object} propsAdd properties to add to element, only for this html, dont change this
 	 * @returns {Html} Html of input or other element connected
 	 */
-	html(parentHtml,propsAdd) {
+	dom(parentHtml,propsAdd) {
 		// prepare html arg
 		const props = Html.mergeDatas(this.props,propsAdd)
-		const arg = Obj.omit(props,['label','min','max','type','change'])
+
+		// const arg = Obj.omit(props,['label','min','max','type','change','is'])
+		const arg = Obj.filter(props,Html.ARGS)
 		let myHtml = null
 
 		// create html according to type
 		if (props.type==='evt') {
 			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
-		} else if (props.type==='number'|| props.type==='text') {
-			const argType = {html:'input',atts:{type:props.type,min:props.min,max:props.max,val:this.model.get('val'),'placeholder':props.placeholder}}
+		} else if (props.type==='int'|| props.type==='text') {
+			const type = props.type==='int'?'number':'text'
+			const argType = {html:'input',atts:{type:type},val:this.model.get('val')}
 			if (!props.label) {
 				myHtml = parentHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
 			} else {
@@ -70,16 +79,38 @@ class InputVar {
 		// attach events
 		switch (props.type) {
 		case 'evt': myHtml.append({evts:{'click':this.onChange.bind(this)}}); break
-		default: myHtml.append({evts:{'input':this.onChange.bind(this)}}); break
+		default: myHtml.append({evts:{'change':this.onChange.bind(this)}}); break
 		}
 		/** the generated Html attached here */
 		this.html = myHtml
 		return myHtml
 	}
+	/**
+	 * sets the properties of the input variable
+	 * @param {object} props - properties to set
+	 */
+	setProps(props) {
+		/** merges this properties with the current properties */
+		Html.mergeModDatas(this.props,props)
+
+		/** filters the properties that are used for the html element */
+		const arg = Obj.filter(this.props,Html.ARGS)
+
+		/** changes the html element with the filtered properties */
+		this.html.change(arg)
+		this.onChange() // may change value, min, or max, etc.
+	}
 	onChange() {
-		const val = this.html.el.value
+		let val = this.html.el.value
+		console.log('onChange:',this.name,this.ix,val)
+		if (this.props.type==='int') {
+			val = Number.parseInt(val)
+			const valBound = Numbers.bound(val,this.props.atts.min,this.props.atts.max)
+			if (val!==valBound) this.html.el.value = valBound
+			val = valBound
+		}
 		this.model.set('val',val)
-		Store.set(Ids.combineId(this.name, this.ix),val)
+		Store.set(Ids.combineId(this.name,this.ix),val)
 	}
 }
 export default InputVar
