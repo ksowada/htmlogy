@@ -23,6 +23,24 @@ class Html {
 	// TODO eliminate .top and .container through sub-class or in render (split it up) that enables this, causes trouble with htmlNamespace
 	// TODO what about operations that are not supported without rendered element, f.e. classStateSet, see doc
 	// TODO optimize member names .arg duplicates as argument
+
+	static ARGS = ['id','h','html','htmlNS','css','styles','val','valhtml','atts','evts']
+	/**
+	 * @typedef {object} Html~createarg common ways to address HTMLElement in DOM, choose only 1 of those
+	 * @param {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered)
+	 * @property {object} arg contains information about the element	 *
+	 * @property {string} arg.id id of HTMLElement, optional to el
+	 * @property {string} arg.h template syntax, see htm from https://github.com/developit/htm/tree/master
+	 * - you may deliver a string, valid html or optionally with missing end tag
+	 * - for template syntax, use import {html} from 'htm/preact'
+	 * @property {string} arg.html htmlTagName, div if unused, SVG supported, it adds namespace automatically
+	 * @property {string} arg.htmlNS html Namespace, f.e. svg Element
+	 * @property {string|Array} arg.css row of CSSClass (str space-separated or arr of classes)
+	 * @property {object} arg.styles extra inline styles, like background-color
+	 * @property {string} arg.val value (input use value else use innerText)
+	 * @property {string} arg.valhtml @deprecated optional subelement with and instead for val, f.e. use to center with val in grid use extra div
+	 * @property {object} arg.atts attributes of HTMLElement
+	 */
 	/**
 	 * creates dynamic HTMLElement
 	 *
@@ -159,22 +177,6 @@ class Html {
 		this.elo.removeChilds()
 		this.my.el = this.el
 	}
-	/**
-	 * @typedef {object} Html~createarg common ways to address HTMLElement in DOM, choose only 1 of those
-	 * @param {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered)
-	 * @property {object} arg contains information about the element	 *
-	 * @property {string} arg.id id of HTMLElement, optional to el
-	 * @property {string} arg.h template syntax, see htm from https://github.com/developit/htm/tree/master
-	 * - you may deliver a string, valid html or optionally with missing end tag
-	 * - for template syntax, use import {html} from 'htm/preact'
-	 * @property {string} arg.html htmlTagName, div if unused, SVG supported, it adds namespace automatically
-	 * @property {string} arg.htmlNS html Namespace, f.e. svg Element
-	 * @property {string|Array} arg.css row of CSSClass (str space-separated or arr of classes)
-	 * @property {object} arg.styles extra inline styles, like background-color
-	 * @property {string} arg.val value (input use value else use innerText)
-	 * @property {string} arg.valhtml @deprecated optional subelement with and instead for val, f.e. use to center with val in grid use extra div
-	 * @property {object} arg.atts attributes of HTMLElement
-	 */
 	/**
 	 * create DOMElement
 	 * @param {Html~createarg} arg may be segmented in different arguments, obj will be merged with last-win
@@ -348,12 +350,18 @@ class Html {
 				// remove elements in my and top
 				if (this.my.iconObj !== undefined) this.my.iconObj.remove()
 				if (this.my.subElement !== undefined) this.my.subElement.remove()
-				this.my.el.remove()
+				this.my.el.remove() // removes the element from the DOM
 				if (this.top.iconObj !== undefined) this.top.iconObj.remove() // maybe unused at the moment
 				if (this.top.subElement !== undefined) this.top.subElement.remove() // maybe unused at the moment
 				if (this.top.el !== undefined) this.top.el.remove()
 			}
 		}
+	}
+	/**
+	 * Removes all child nodes from the element.
+	 */
+	removeChilds() {
+		this.elo.removeChilds()
 	}
 	/**
 	 * edit given HTMLElement, may attach to new, change or remove,
@@ -438,16 +446,22 @@ class Html {
 					const valItem = arg[item][key]
 					if (mode.remove) {
 						if (inDOM) {
-							if (valItem !== undefined && valItem.length > 0) { // if atts item:value is given and of string length more than 0
+							if (valItem !== undefined) { // if atts item:value is given, remove only if it is equal to value
 								if (elem.el.getAttribute(key) === valItem) elem.el.removeAttribute(key)
 							} else {
 								elem.el.removeAttribute(key)
 							}
 						}
-						Obj.omit(thisObj.arg,key)
+						if (valItem !== undefined) {
+							if (thisObj.arg[key] === valItem) Obj.omit(thisObj.arg,key)
+						} else {
+							Obj.omit(thisObj.arg,key)
+						}
 					} else {
-						if (inDOM) elem.el.setAttribute(key,valItem)
-						thisObj.arg[key] = valItem
+						if (valItem!== undefined) { // leave undefined, but .length is forbidden at number
+							if (inDOM) elem.el.setAttribute(key,valItem)
+							thisObj.arg[key] = valItem
+						}
 					}
 				}
 			}
