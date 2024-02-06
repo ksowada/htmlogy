@@ -35,7 +35,9 @@ class InputVar {
 		/** if needed in arrays */
 		this.ix = ix
 
-		const val = Store.get(Ids.combineId(this.name,this.ix),props.is)
+		const fallbackVal = props.is?props.is:(props.type==='int'||props.type==='float')?0:''
+
+		const val = Store.get(Ids.combineId(this.name,this.ix),fallbackVal)
 
 		/** stores actual value in val, and has capabilities for other vars bounded to this */
 		this.model = new Model({val})
@@ -64,13 +66,13 @@ class InputVar {
 		// create html according to type
 		if (props.type==='evt') {
 			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
-		} else if (props.type==='int'|| props.type==='text') {
-			const type = props.type==='int'?'number':'text'
+		} else if (props.type==='int'||props.type==='float'|| props.type==='text') {
+			const type = (props.type==='int'||props.type==='float')?'number':'text'
 			const argType = {html:'input',atts:{type:type},val:this.model.get('val')}
 			if (!props.label) {
 				myHtml = parentHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
 			} else {
-				const join = parentHtml.add({html:'div',css:'flex items-center '})
+				const join = parentHtml.add({html:'div',css:'flex items-center'})
 				join.add({html:'button',css:'btn w-24 text-right pr-4',val:props.label})
 				myHtml = join.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered w-24'}))
 			}
@@ -103,8 +105,9 @@ class InputVar {
 	onChange() {
 		let val = this.html.el.value
 		console.log('onChange:',this.name,this.ix,val)
-		if (this.props.type==='int') {
-			val = Number.parseInt(val)
+		if (this.props.type==='int'||this.props.type==='float') {
+			if (this.props.type==='int') val = Number.parseInt(val)
+			if (this.props.type==='float') val = Number.parseFloat(val)
 			const valBound = Numbers.bound(val,this.props.atts.min,this.props.atts.max)
 			if (val!==valBound) this.html.el.value = valBound
 			val = valBound
