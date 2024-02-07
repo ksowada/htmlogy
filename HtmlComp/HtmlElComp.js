@@ -61,7 +61,7 @@ class HtmlElComp extends HtmlComp {
 			 * - will be overwritten each time
 			 * @type {Html}
 			 */
-			this.headingObj = new Html({parent:{el:this.div}},...headingProps)
+			this.headingObj = new Html(Html.mergeDatas({parent:{el:this.div}},headingProps))
 		}
 	}
 }

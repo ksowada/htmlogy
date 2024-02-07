@@ -40,13 +40,6 @@ class HtmlApplComp {
 		// load external build datetime file for internal purpose
 		// FetchFile.fetch('build.datetime.json',this.onLoadDateTime.bind(this))
 	}
-	// TODO rename domCreate to dom
-	/**
-	 * Creates the HTML document's <head> element by adding meta tags for keywords, description
-	 * @deprecated use static htmlPrepare instead
-	 */
-	domCreate(arg) {
-	}
 	/**
 	 * Prepares the HTML document's <head> element by adding meta tags for keywords, description, and title, as well as other metadata as needed.
 	 * @param {object} arg - An object containing the metadata to be added to the <head> element.
@@ -78,7 +71,7 @@ class HtmlApplComp {
 		// TODO some metas missing ask twitter or facebook here a hint: https://www.vioma.de/de/wiki/online-marketing/seo/meta-tags/#Meta%20Keywords
 		// TODO https://web.dev/learn/pwa/web-app-manifest/ and show it in html
 	}
-	queryREST() {
+	static queryREST() {
 		const rest = HtmlUtils.searchParamToJson()
 		Times.log('rest:') // dont show compile-time twice, thus preciding date attach
 		Times.log(rest)
