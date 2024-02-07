@@ -1,10 +1,9 @@
 import Arr from '../../logic/Arr/Arr.js'
-import Numbers from '../../logic/Numbers/Numbers.js'
 import Obj from '../../logic/Obj/Obj.js'
 import Str from '../../logic/Str/Str.js'
 import Vars from '../../logic/Vars/Vars.js'
-import Html from '../html/Html/Html.js'
-import HtmlElComp from '../html/HtmlElComp.js'
+import Html from '../../logic/html/Html/Html.js'
+import HtmlElComp from '../../logic/html/HtmlComp/HtmlElComp.js'
 import './List.scss'
 /**
  * dynamic Container for Lists

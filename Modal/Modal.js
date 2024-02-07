@@ -1,9 +1,9 @@
-import Html from '../html/Html/Html.js'
+import Html from '../../logic/html/Html/Html'
 import './Modal.css'
 import {Ids} from '../../logic/Ids.js'
-import Toolbar from '../../HtmlComponents/Toolbar/Toolbar.js/index.js'
+import Toolbar from '../Toolbar/Toolbar'
 import Obj from '../../logic/Obj/Obj.js'
-import HtmlElComp from '../html/HtmlElComp.js'
+import HtmlElComp from '../../logic/html/HtmlComp/HtmlElComp.js'
 
 /**
  * @class

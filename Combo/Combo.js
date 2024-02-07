@@ -1,9 +1,8 @@
-import Numbers from '../../logic/Numbers/Numbers.js'
-import Html from '../html/Html/Html.js'
+import Html from '../../logic/html/Html/Html'
 import './Combo.scss'
 import Modal from '../Modal/Modal.js'
 import Toolbar from '../Toolbar/Toolbar.js'
-import HtmlElComp from '../html/HtmlElComp.js'
+import HtmlElComp from '../../logic/html/HtmlComp/HtmlElComp.js'
 import List from '../List/List.js'
 import Arr from '../../logic/Arr/Arr.js'
 // TODO have similar spell logic to merge tiperrs
