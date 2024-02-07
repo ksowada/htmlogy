@@ -130,8 +130,8 @@ class List extends HtmlElComp {
 		if (pos==undefined) pos=this.itemsMirrored.length
 		pos = Arr.boundIx(pos,this.itemsMirrored)
 		// merge inner and use optional select for further atts
-		const inner = Html.mergeDatas(this.inner)
-		Obj.assure(inner,'atts',{})
+		const inner = Obj.copy(this.inner)
+		// Obj.assure(inner,'atts',{})
 		if (inner.select && inner.select.atts) {
 			if (pos==inner.select.ix) {
 				Html.mergeModDatas(inner,{atts:inner.select.atts,css:'selected'})
@@ -140,8 +140,8 @@ class List extends HtmlElComp {
 			}
 		}
 		inner.css = Str.enrichList(' ',inner.css,this.selectStates[0],'list-item')
-		Obj.assure(inner,'evts',{})
-		Obj.mergeModOverwrite(inner,{evts:{'click':this.evtSelect.bind(this)}})
+		// Obj.assure(inner,'evts',{})
+		Html.mergeModDatas(inner,{evts:{'click':this.evtSelect.bind(this)}})
 		// decide how item will be instantiated
 		const itemClassHier = Vars.typeHier(item)
 		let htmlObj = undefined

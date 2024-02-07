@@ -54,7 +54,7 @@ class Button extends HtmlComp {
 			this.a.classList.add('dragout')
 		} else {
 			// updated if not already created
-			if (!this.btn) this.btn = new Html(this,{html:'button',css:css})
+			if (!this.btn) this.btn = new Html(Html.mergeDatas(this,{html:'button',css:css}))
 			else this.btn.change({...this,css:css})
 			this.div = this.btn.my.el
 		}
