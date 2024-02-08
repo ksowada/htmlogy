@@ -18,6 +18,7 @@ import Html from '../../logic/html/Html/Html'
  * - implements Model
  */
 class InputVar {
+	typeIsNumber = type => (type==='int' || type==='float' || type==='currency')
 	/**
 	 * generate a Html appropriate to var type
 	 * auto-load
@@ -25,9 +26,14 @@ class InputVar {
 	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
 	 * @param {any} props.is default value, when no storage value is available
 	 * @param {string} props.type important for dom() and kind of element, and many other
+	 * - text
+	 * - int
+	 * - float
+	 * - currency
 	 * @param {string} name (f.e. Storage)
 	 * @param {number} [ix] (f.e. Storage)
 	 */
+	// typeNeedsInput = type => type
 	constructor(props,name,ix) {
 		/** as needed for Storage */
 		this.name = name
@@ -35,7 +41,7 @@ class InputVar {
 		/** if needed in arrays */
 		this.ix = ix
 
-		const fallbackVal = props.is?props.is:(props.type==='int'||props.type==='float')?0:''
+		const fallbackVal = props.is?props.is:this.typeIsNumber(props.type)?0:''
 
 		const val = Store.get(Ids.combineId(this.name,this.ix),fallbackVal)
 
@@ -47,6 +53,10 @@ class InputVar {
 		Obj.assure(this.props,'atts',{}) // needed for min,max check etc.
 	}
 	get val() { return this.model.get('val') }
+	set val(val) {
+		this.model.set('val',val)
+		this.setVal(val)
+	}
 	/**
 	 * creates Html (may be included in additional element) for InputVar and attach it to parent-Html
 	 *
@@ -66,9 +76,11 @@ class InputVar {
 		// create html according to type
 		if (props.type==='evt') {
 			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
-		} else if (props.type==='int'||props.type==='float'|| props.type==='text') {
+		} else if (props.type==='int'||props.type==='float'|| props.type==='currency'|| props.type==='text') {
 			const type = (props.type==='int'||props.type==='float')?'number':'text'
-			const argType = {html:'input',atts:{type:type},val:this.model.get('val')}
+			let val = this.model.get('val')
+			if (type==='currency') val = val.toLocaleString(undefined,{style: 'currency',currency: 'EUR'})
+			const argType = {html:'input',atts:{type:type},val}
 			if (!props.label) {
 				myHtml = parentHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
 			} else {
@@ -114,6 +126,9 @@ class InputVar {
 		}
 		this.model.set('val',val)
 		Store.set(Ids.combineId(this.name,this.ix),val)
+	}
+	setVal(val) {
+		if (this.html) this.html.my.el.value = val
 	}
 }
 export default InputVar

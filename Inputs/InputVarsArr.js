@@ -28,8 +28,8 @@ class InputVarsArr extends Listener {
 		this.varsName.forEach(varName => {
 			while (this[varName].length > len) { this[varName].pop() }
 			while (this[varName].length < len) {
-				this[varName].push(new InputVar(this.argCreate[varName],varName,this[varName].length)) }
-			this[varName][this[varName].length-1].model.on('val',this.onChange.bind(this,varName,this[varName].length))
+				this[varName].push(new InputVar(this.argCreate[varName],varName,this[varName].length))
+				this[varName][this[varName].length-1].model.on('val',this.onChange.bind(this,varName,this[varName].length))}
 		})
 		this.size = len
 	}
