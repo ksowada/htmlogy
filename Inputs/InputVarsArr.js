@@ -11,10 +11,12 @@ import InputVar from './InputVar'
 class InputVarsArr extends Listener {
 /**
  * initialize all variables and set name gathered from keys for further purposes (f.e. Store)
+ * @param {string} id - unique identifier for Storage, to store more than one App in 1 domain
  * @param {object} arg - object with variable names as keys and variable objects as values
  */
-	constructor(arg) {
+	constructor(id,arg) {
 		super()
+		this.id = id
 		this.varsName = Arr.copy(Object.keys(arg))
 		this.varsName.forEach(varName => {
 			this[varName] = [] // todo new InputVar(arg[key])
@@ -28,7 +30,7 @@ class InputVarsArr extends Listener {
 		this.varsName.forEach(varName => {
 			while (this[varName].length > len) { this[varName].pop() }
 			while (this[varName].length < len) {
-				this[varName].push(new InputVar(this.argCreate[varName],varName,this[varName].length))
+				this[varName].push(new InputVar(this.id,this.argCreate[varName],varName,this[varName].length))
 				this[varName][this[varName].length-1].model.on('val',this.onChange.bind(this,varName,this[varName].length))}
 		})
 		this.size = len

@@ -21,6 +21,7 @@ class InputVar {
 	typeIsNumber = type => (type==='int' || type==='float' || type==='currency')
 	/**
 	 * generate a Html appropriate to var type
+	 * @param {string} id - unique identifier for Storage, to store more than one App in 1 domain
 	 * auto-load
 	 * @param {object} props parameter for variable
 	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
@@ -34,7 +35,8 @@ class InputVar {
 	 * @param {number} [ix] (f.e. Storage)
 	 */
 	// typeNeedsInput = type => type
-	constructor(props,name,ix) {
+	constructor(id,props,name,ix) {
+		this.id = id
 		/** as needed for Storage */
 		this.name = name
 
@@ -43,7 +45,7 @@ class InputVar {
 
 		const fallbackVal = props.is?props.is:this.typeIsNumber(props.type)?0:''
 
-		const val = Store.get(Ids.combineId(this.name,this.ix),fallbackVal)
+		const val = Store.get(Ids.combineId(this.id,this.name,this.ix),fallbackVal)
 
 		/** stores actual value in val, and has capabilities for other vars bounded to this */
 		this.model = new Model({val})
@@ -125,7 +127,7 @@ class InputVar {
 			val = valBound
 		}
 		this.model.set('val',val)
-		Store.set(Ids.combineId(this.name,this.ix),val)
+		Store.set(Ids.combineId(this.id,this.name,this.ix),val)
 	}
 	setVal(val) {
 		if (this.html) this.html.my.el.value = val
