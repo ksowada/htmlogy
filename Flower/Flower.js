@@ -2,7 +2,7 @@ import './Flower.scss'
 import Html from '../html/Html/Html.js'
 import Arr from '../../logic/Arr/Arr.js'
 import HtmlComp from '../html/HtmlComp.js'
-import El from '../html/El/El.js'
+import Elem from '../html/Elem/Elem.js'
 import Toolbar from '../../HtmlComponents/Toolbar/Toolbar.js/index.js'
 import Sizes from '../html/Sizes/Sizes.js'
 import Times from '../../logic/Times'
@@ -26,7 +26,7 @@ class Flower extends HtmlComp {
 		toolbarItems['green'] = {css:'btn green',styles:{'background-color':'green'},evts:{'click':this.toolbarClick.bind(this)}}
 		this.btns = new Toolbar({parent:{obj:this.containerObj},items:toolbarItems})
 
-		const dims = El.dimensions(this.containerObj.my.el)
+		const dims = Elem.dimensions(this.containerObj.my.el)
 		dims.min = Math.min(dims.width,dims.height)
 		this.width = dims.min
 		this.height = dims.min

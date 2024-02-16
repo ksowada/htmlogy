@@ -2,8 +2,9 @@ import Arr from '../../logic/Arr/Arr.js'
 import Obj from '../../logic/Obj/Obj.js'
 import Str from '../../logic/Str/Str.js'
 import Vars from '../../logic/Vars/Vars.js'
-import Html from '../../logic/html/Html/Html.js'
-import HtmlElComp from '../../logic/html/HtmlComp/HtmlElComp.js'
+import Elem from '../../logic/html/Elem/Elem.js'
+import Html from '../html/Html/Html.js'
+import HtmlElComp from '../html/HtmlElComp.js'
 import './List.scss'
 /**
  * dynamic Container for Lists
@@ -130,8 +131,8 @@ class List extends HtmlElComp {
 		if (pos==undefined) pos=this.itemsMirrored.length
 		pos = Arr.boundIx(pos,this.itemsMirrored)
 		// merge inner and use optional select for further atts
-		const inner = Obj.copy(this.inner)
-		// Obj.assure(inner,'atts',{})
+		const inner = Html.mergeDatas(this.inner)
+		Obj.assure(inner,'atts',{})
 		if (inner.select && inner.select.atts) {
 			if (pos==inner.select.ix) {
 				Html.mergeModDatas(inner,{atts:inner.select.atts,css:'selected'})
@@ -140,8 +141,8 @@ class List extends HtmlElComp {
 			}
 		}
 		inner.css = Str.enrichList(' ',inner.css,this.selectStates[0],'list-item')
-		// Obj.assure(inner,'evts',{})
-		Html.mergeModDatas(inner,{evts:{'click':this.evtSelect.bind(this)}})
+		Obj.assure(inner,'evts',{})
+		Obj.mergeModOverwrite(inner,{evts:{'click':this.evtSelect.bind(this)}})
 		// decide how item will be instantiated
 		const itemClassHier = Vars.typeHier(item)
 		let htmlObj = undefined
@@ -202,7 +203,7 @@ class List extends HtmlElComp {
 				const id = selecteds[ix]
 				const itemMirrored = this.itemsMirrored[id]
 				if (el==undefined || !el.isSameNode(itemMirrored.my.el)) {
-					Html.classStateSet(itemMirrored.my.el,'deselected',this.selectStates)
+					Elem.classStateSet(itemMirrored.my.el,'deselected',this.selectStates)
 				}
 			}
 		}
@@ -214,7 +215,7 @@ class List extends HtmlElComp {
 		const selectedsIx = []
 		this.itemsMirrored.forEach((item,ix) => {
 			const el = getEl(this.itemsMirrored[ix])
-			const selectState = Html.classStateGet(el,this.selectStates)
+			const selectState = Elem.classStateGet(el,this.selectStates)
 			if (selectState=='selected') selectedsIx.push(ix)
 		})
 		selectedsIx.sort((a,b) => b - a) // sort from behind to top
@@ -231,7 +232,7 @@ class List extends HtmlElComp {
 		if (this.inner.select.mode=='none') return
 		if (this.inner.select.mode=='single') this.removeSelection()
 		const itemMirroredEl = getEl(this.itemsMirrored[ix])
-		Html.classStateSet(itemMirroredEl,'selected',this.selectStates)
+		Elem.classStateSet(itemMirroredEl,'selected',this.selectStates)
 	}
 	// eslint-disable-next-line jsdoc/require-param
 	/**
@@ -240,13 +241,13 @@ class List extends HtmlElComp {
 	evtSelect(evt) {
 		if (this.inner.select==undefined) return
 		if (this.inner.select.mode=='none') return
-		const el = Html.findParent(evt.target,undefined,1)
-		const selectState = Html.classStateGet(el,this.selectStates)[0]
+		const el = Elem.findParent(evt.target,undefined,1)
+		const selectState = Elem.classStateGet(el,this.selectStates)[0]
 		if (this.inner.select.mode=='single'||this.inner.select.mode=='singleForce') this.removeSelection(0,el)
 		if (selectState==undefined || selectState=='deselected') {
-			Html.classStateSet(el,'selected',this.selectStates)
+			Elem.classStateSet(el,'selected',this.selectStates)
 		} else if (this.inner.select.mode=='single' && selectState=='selected') {
-			Html.classStateSet(el,'deselected',this.selectStates)
+			Elem.classStateSet(el,'deselected',this.selectStates)
 		}
 		if (this.selection) this.selection()
 	}

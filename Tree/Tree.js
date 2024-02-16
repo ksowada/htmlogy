@@ -4,10 +4,11 @@ import Obj from '../../logic/Obj/Obj.js'
 import Html from '../html/Html/Html.js'
 import Toolbar from '../../HtmlComponents/Toolbar/Toolbar.js/index.js'
 import './Tree.scss'
-import {Ids} from '../../logic/Ids.js'
+import Ids from '../../logic/Ids.js'
 import State from '../../logic/State.js'
 import Trees from '../../logic/Trees.js'
 import HtmlElComp from '../html/HtmlElComp.js'
+import Elem from '../../logic/html/Elem/Elem.js'
 
 /**
  * shows an tree from given data. data can be applied by method update
@@ -133,58 +134,58 @@ class Tree extends HtmlElComp {
 	}
 	itemCollapse(evt) {
 		console.log('itemCollapse')
-		const liEl = Html.findParent(evt.target,undefined,1) // find parent of <i> icon, should be li
+		const liEl = Elem.findParent(evt.target,undefined,1) // find parent of <i> icon, should be li
 		if (liEl==undefined) return
-		const ulEl = Html.getChilds(liEl,'ul')[0]
-		const iEl = Html.getChilds(liEl,'i')[0] // clickable collapse btn or icon is first child in li
+		const ulEl = Elem.getChilds(liEl,'ul')[0]
+		const iEl = Elem.getChilds(liEl,'i')[0] // clickable collapse btn or icon is first child in li
 		if (ulEl) {
 			if (ulEl.classList.contains('show')) {
-				Html.classStateSet(ulEl,'hide',this.nodeExpStates)
+				Elem.classStateSet(ulEl,'hide',this.nodeExpStates)
 				Html.change({node:{el:iEl},css:[this.icons.hide,'collapse-btn']})
 			} else {
-				Html.classStateSet(ulEl,'show',this.nodeExpStates)
+				Elem.classStateSet(ulEl,'show',this.nodeExpStates)
 				Html.change({node:{el:iEl},css:[this.icons.show,'collapse-btn']})
 			}
 		}
 	}
 	itemClicked(evt) { // TODO use mode1 selected, mode2 edit (: achieve key < > v n)
 		console.log('itemClicked')
-		const liEl = Html.findParent(evt.target) // FIXME untesteted
+		const liEl = Elem.findParent(evt.target) // FIXME untesteted
 		if (liEl==undefined) return
 		const state = this.getNodeState(liEl)
 		const stateNew = State.forward(state,this.nodeSelStates)
-		Html.classStateSet(liEl,stateNew,this.nodeSelStates)
+		Elem.classStateSet(liEl,stateNew,this.nodeSelStates)
 		if (stateNew == 'edit') this.nodeEditSet({el: liEl,edit: true})
 	}
 	itemInput(evt) {
 		console.log('itemInput')
-		const liEl = Html.findParent(evt.target)
+		const liEl = Elem.findParent(evt.target)
 		if (liEl==undefined) return
 		if (evt.key=='Enter') {
 			this.nodeEditSet({el:liEl,edit:false,apply:true})
 		} else if (evt.key=='Escape') {
 			this.nodeEditSet({el:liEl,edit:false,apply:false})
 		}
-		Html.classStateSet(liEl,'sel',this.nodeSelStates)
+		Elem.classStateSet(liEl,'sel',this.nodeSelStates)
 	}
 	// TODO use also addEventListener('pagehide', event => { }); to not capture / modern tools capture in real-time, so why not save
 	// https://developer.mozilla.org/en-US/docs/Web/API/Window/unload_event
 	// Especially on mobile, the unload event is not reliably fired. For example, the unload event is not fired at all in the following scenario:
 	itemInputFocusOut(evt) {
 		console.log('itemInputFocusOut')
-		const liEl = Html.findParent(evt.target)
+		const liEl = Elem.findParent(evt.target)
 		if (liEl == undefined) return
 		this.nodeEditSet({el: liEl,edit: false,apply: true}) // tab switch, or F1 also loose focus, and than save typed data
-		Html.classStateSet(liEl,'unsel',this.nodeSelStates)
+		Elem.classStateSet(liEl,'unsel',this.nodeSelStates)
 	}
 	getNodeState(el) {
-		const states = Html.classStateGet(el,this.nodeSelStates)
+		const states = Elem.classStateGet(el,this.nodeSelStates)
 		// eslint-disable-next-line no-undef
 		if (states.length != 1) throw new Exception('so many states found')
 		return states[0]
 	}
 	saveNodeState(el,val) {
-		Html.classStateSet(el,val,this.nodeSelStates)
+		Elem.classStateSet(el,val,this.nodeSelStates)
 	}
 	selectNodeId(id,state) {
 		const val = state ? state : 'sel'
@@ -196,7 +197,7 @@ class Tree extends HtmlElComp {
 			}
 		}
 		const el = document.getElementById(id)
-		Html.classStateSet(el,val,this.nodeSelStates)
+		Elem.classStateSet(el,val,this.nodeSelStates)
 		this.setSelected(el)
 	}
 	/**
@@ -208,22 +209,22 @@ class Tree extends HtmlElComp {
 	nodeEditSet(obj) {
 		const liEl = obj.el // TODO abbrev
 		if (liEl==undefined) return
-		const labelEl = Html.getChilds(liEl,'span')[1]
-		const inputEl = Html.getChilds(liEl,'input')[0]
+		const labelEl = Elem.getChilds(liEl,'span')[1]
+		const inputEl = Elem.getChilds(liEl,'input')[0]
 		if (obj.edit) {
-			Html.classStateSet(labelEl,'hide',this.nodeExpStates)
-			Html.classStateSet(inputEl,'show-inline',this.nodeExpStates)
+			Elem.classStateSet(labelEl,'hide',this.nodeExpStates)
+			Elem.classStateSet(inputEl,'show-inline',this.nodeExpStates)
 			inputEl.value = labelEl.innerHTML
 			inputEl.focus()
 			this.setSelected(liEl)
 		} else {
 			if (obj.apply) labelEl.innerHTML = inputEl.value // save value when losing focus, only Escape discard value
-			Html.classStateSet(labelEl,'show-inline',this.nodeExpStates)
-			Html.classStateSet(inputEl,'hide',this.nodeExpStates)
+			Elem.classStateSet(labelEl,'show-inline',this.nodeExpStates)
+			Elem.classStateSet(inputEl,'hide',this.nodeExpStates)
 			// deselect upper li after edit (FIXME untested, unseen or unused)
 			const state = this.getNodeState(liEl)
 			const stateNew = State.forward(state,this.nodeSelStates)
-			Html.classStateSet(liEl,stateNew,this.nodeSelStates)
+			Elem.classStateSet(liEl,stateNew,this.nodeSelStates)
 			// sign for toolbarCare
 			this.setSelected(undefined)
 		}
@@ -232,7 +233,7 @@ class Tree extends HtmlElComp {
 		console.log('Tree: createNode')
 		console.log(parent)
 		if (type===undefined) type='default'
-		const ulEl = Html.getChildsAssured(parent,'ul',{el:parent,html:'ul',css:'node show'})[0]
+		const ulEl = Elem.getChildsAssured(parent,'ul',{el:parent,html:'ul',css:'node show'})[0]
 		// TODO fetch into data to find parent, need to attach type
 		const newId = this.ids.next()
 		this.createNodeInt(ulEl,text,'leaf',type,newId)
@@ -292,8 +293,8 @@ class Tree extends HtmlElComp {
 			ret.parentId = ret.parent.id
 		}
 		// TODO ret.parentInfo = this.treeObj.get_node(ret.parentId)
-		const child_ulEl = Html.getChilds(ret.sel,'ul')[0]
-		ret.children = Html.getChilds(child_ulEl,'li')
+		const child_ulEl = Elem.getChilds(ret.sel,'ul')[0]
+		ret.children = Elem.getChilds(child_ulEl,'li')
 		if (ret.children.length==0) return ret
 		ret.selPos = -1 // usually not possible as itself must be contained in parents.children
 		for (let ix = 0; ix < ret.children.length; ix++) {
