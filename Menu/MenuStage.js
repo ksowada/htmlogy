@@ -18,7 +18,7 @@ class MenuStage extends HtmlOpenable {
 	 * @param {number} mode a mode for select 1 or more Bits
 	 */
 	constructor(menu_info,mode) {
-		const child_states = {
+		const items_states = {
 			a:{
 				css:['','active']
 			}
@@ -30,7 +30,7 @@ class MenuStage extends HtmlOpenable {
 		this.menu_info = menu_info
 
 		/** a select over all items of this menu */
-		this.select = new HtmlSelect(child_states,this.menu_info,mode)
+		this.select = new HtmlSelect(items_states,this.menu_info,mode)
 	}
 	/**
 	 * draw the menu instantly in the given Html, with every child
@@ -40,16 +40,17 @@ class MenuStage extends HtmlOpenable {
 		super.dom(arg)
 
 		// iterate over each menu-item
+		const mySelect = []
 		this.menu_info.forEach((menu_item_obj,menu_item_ix) => {
 			let menu_item = Object.values(menu_item_obj)[0] // use first value, and neglect key, key is only use when named access is needed
 			const menu_item_li = new Html({parent:{obj:this},html:'li'})
-			this.childs.push({li:menu_item_li})
+			mySelect.push(this.add({li:menu_item_li}))
 
 			const menu_item_a = new Html({parent:{obj:menu_item_li},html:'a',val:menu_item.title,icon:menu_item.icon,evts:{click:this.click.bind(this,menu_item_ix)}})
 			if (menu_item.tooltip!==undefined) menu_item_a.change({css:'tooltip',atts:{'data-tip':menu_item.tooltip}})
-			menu_item_li.childs.push({a:menu_item_a})
+			menu_item_li.add({a:menu_item_a})
 		})
-		this.select.refresh(this)
+		this.select.refresh(mySelect)
 	}
 	/**
 	 * handles click on a single item
@@ -61,7 +62,6 @@ class MenuStage extends HtmlOpenable {
 		this.select.child_click(menu_item_ix)
 		// console.log('click:',this.select.bits.toString())
 	}
-
 	// to override from Bits
 	// ---------------------
 	on() {

@@ -11,7 +11,7 @@ import Int from '../../Int/Int.js' // TODO for test: npm run test need .js exten
 class HtmlState {
 	/**
 	 * @param {object} master containing the Object whose Html-Object(s) may be changed, may also be Array, containing Objects with one key, used for address in state_info (f.e. like in Html.childs)
-	 * @param {object} state_info contains states and actions on obj like css,atts,etc.
+	 * @param {object} state_info contains states and actions on obj, but only .css is implemented
 	 * - each key in state_info (except of key='states') refers to a Html-Object of master
 	 * - in it you can describe changes to Html-Objects and there actions on Html with each state bundled in complete Array with size as states
 	 * @param {string[]} state_info.states optional
@@ -130,9 +130,10 @@ class HtmlState {
 	/**
 	 * set state and refresh automatically, if state changed
 	 * @param {string} state_ix the wished state index
+	 * @param {boolean} refresh
 	 */
-	set_state_ix(state_ix) {
-		if (this.set_state_ix_only(state_ix))		this.refresh()
+	set_state_ix(state_ix,refresh) {
+		if (this.set_state_ix_only(state_ix) || (refresh && refresh===true)) this.refresh()
 	}
 	/**
 	 * set state, without refresh

@@ -37,8 +37,9 @@ class Html {
 	 * @property {string} arg.htmlNS html Namespace, f.e. svg Element
 	 * @property {string|Array} arg.css row of CSSClass (str space-separated or arr of classes)
 	 * @property {object} arg.styles extra inline styles, like background-color
+	 * - @example styles:{'background-color':'red'}
 	 * @property {string} arg.val value (input use value else use innerText)
-	 * @property {string} arg.valhtml @deprecated optional subelement with and instead for val, f.e. use to center with val in grid use extra div
+	 * @property {string} arg.valhtml optional subelement with and instead for val, f.e. use to center with val in grid use extra div
 	 * @property {object} arg.atts attributes of HTMLElement
 	 */
 	/**
@@ -86,7 +87,7 @@ class Html {
 		 * Array of object in which key represent an item, as named child in which you lay subelements (Html-Objects) for some State or Select-actions, no internal usage, just for access directly, f.e. for HtmlState which contain actions for the element as well as for subelements, at once
 		 * @type {object[]}
 		 */
-		this.childs = []
+		// this.childs = [] // TODO replaced through add() ability to render later and instantly
 
 		// TODO pack all html* in .hier. object for a clear view
 		/**
@@ -310,14 +311,24 @@ class Html {
 	 * @param {object} arg same arguments as create @see {@link this.create}
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
-	change(arg) { return Html.edit(this,this.my,arg,{change: true}) }
+	change(arg) {
+		if (Obj.valid(arg) && Object.keys(arg).length) {
+			return Html.edit(this,this.my,arg,{change: true})
+		}
+		return false
+	}
 	/**
 	 * append Html, this create or add given parameters to existing
 	 * see details for change {@link Html#edit}
 	 * @param {object} arg same arguments as create @see {@link this.create}
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
-	append(arg) { return Html.edit(this,this.my,arg,{append: true}) }
+	append(arg) {
+		if (Obj.valid(arg) && Object.keys(arg).length) {
+			return Html.edit(this,this.my,arg,{append: true})
+		}
+		return false
+	}
 	/**
 	 * remove HTMLElement or if given in argument, some item of it
 	 * - removeEventHandler before remove from DOM
@@ -443,7 +454,7 @@ class Html {
 		if (Obj.hasDefined(arg,item = 'atts')) {
 			for (const key in arg[item]) {
 				if (Object.hasOwnProperty.call(arg[item],key)) {
-					const valItem = (arg[item][key]!==undefined)?''+arg[item][key] : undefined // always use string for atts, as remove measure length
+					const valItem = (arg[item][key]!==undefined)?String(arg[item][key]) : undefined // always use string for atts, as remove measure length
 					if (mode.remove) {
 						if (inDOM) {
 							if (valItem !== undefined) { // if atts item:value is given, remove only if it is equal to value

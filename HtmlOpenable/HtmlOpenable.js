@@ -31,9 +31,9 @@ class HtmlOpenable extends Html {
 	// TODO move to Html, but use addLater
 	add() {
 		if (Vars.typeHier(arguments[0]).includes('Html')) {
-			this.childs.push(arguments[0])
+			this.add(arguments[0])
 		} else {
-			this.childs.push(new Html({...arguments,...this.domArgAddition}))
+			this.add(new Html({...arguments,...this.domArgAddition}))
 		}
 	}
 	/**
@@ -48,9 +48,9 @@ class HtmlOpenable extends Html {
 		const stateIx = (visibleEn!==undefined) ? 1 : 0
 		const argModed = Html.mergeModDatas(arg,{css:HtmlOpenable.states[stateIx]})
 		super.render(argModed)
-		this.childs.forEach(child => { // dom() all added childs
-			child.render({parent:{obj:this}})
-		})
+		// this.childs.forEach(child => { // dom() all added childs
+		// 	child.render({parent:{obj:this}})
+		// })
 	}
 	// to override from Bits
 	// ---------------------

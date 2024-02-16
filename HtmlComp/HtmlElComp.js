@@ -17,7 +17,10 @@ class HtmlElComp extends HtmlComp {
 	constructor() {
 		super(Html.mergeDatas.apply(null,arguments))
 
-		/** @type {object} some container object with args see {@link Html#create} */
+		/**
+		 * some container object with args see {@link Html#create} 
+		* @type {object} 
+		*/
 		this.container = undefined
 
 		const thisTypeHier = Vars.typeHier(this) // test if this is BaseClass
