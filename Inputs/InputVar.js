@@ -9,6 +9,7 @@ import Html from '../../logic/html/Html/Html'
 /**
  * @class InputVar
  * represents a variable
+ * - multiple DOM implementations are available
  * - Storage (with initial,load,save)
  * - Toolbox optional (copy,paste,reset,delete), or additional user-buttons
  * - direct access to value
@@ -26,36 +27,42 @@ class InputVar {
 	 * other data may use prefix .user
 	 * @param {string} id - unique identifier for Storage, to store more than one App in 1 domain
 	 * auto-load
-	 * @param {object} props parameter for variable
+	 * @param {object} props parameter for variable, all attributes of Html are used @link {Html#create}
 	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
-	 * @param {any} props.is default value, when no storage value is available
+	 * @param {any} props.val default value, when no storage value is available
 	 * @param {string} props.kind important for dom() and kind of element, and many other
-	 * @param {string} props.dir f.e. write: prohibit store and disable models listener
-	 * 
 	 * - text
 	 * - int
 	 * - float
 	 * - currency
+	 * @param {string} props.dir f.e. write: prohibit store and disable models listener
 	 * @param {string} name (f.e. Storage)
 	 * @param {number} [ix] (f.e. Storage)
 	 */
 	constructor(id,props,name,ix) {
 		this.id = id
+
 		/** as needed for Storage */
 		this.name = name
 
 		/** if needed in arrays */
 		this.ix = ix
 
+		/**
+		 * all DOM implementations of this
+		 * @type {Html[]}
+		 */
+		this.htmls = []
+
 		const writeEn = (props.dir && props.dir==='write')
 		this.storeEn = !(writeEn || (props.kind && props.kind==='btn'))
 
-		const fallbackVal = props.is?props.is:this.typeIsNumber(props.kind)?0:''
+		const fallbackVal = props.val?props.val:this.typeIsNumber(props.kind)?0:''
 
 		const val = (this.storeEn) ? Store.get(Ids.combineId(this.id,this.name,this.ix),fallbackVal) : fallbackVal
 
 		/** stores actual value in val, and has capabilities for other vars bounded to this */
-		this.model = new Model({val}, writeEn) // if not storage enable it wont trigger
+		this.model = new Model({val},writeEn) // if not storage enable it wont trigger
 
 		this.props = Obj.copy(props)
 
@@ -80,13 +87,14 @@ class InputVar {
 	 * may be called multiple times
 	 * @param {Html} parentHtml Html to attach to
 	 * @param {object} propsAdd properties to add to element, only for this html, dont change this
+	 * @param implName
 	 * @returns {Html} Html of input or other element connected
 	 * @throws {Error} if kind is not implemented
 	 */
-	dom(parentHtml,propsAdd) {
+	dom(parentHtml,propsAdd,implName) {
 		// prepare html arg
 		const props = Html.mergeDatas(this.props,propsAdd)
-		const arg = Obj.filter(props,Html.ARGS)
+		const arg = Obj.filter(props,Html.ARGS) // use all props that are included in Html
 		let myHtml = null
 
 		// create html according to kind
@@ -122,14 +130,16 @@ class InputVar {
 		default: myHtml.append({evts:{'change':this.onChange.bind(this)}}); break
 		}
 		/** the generated Html attached here */
-		this.html = myHtml
+		// remember dom implementation, ⚠️ forget propsAdd
+		this.htmls.push(myHtml)
+
 		return myHtml
 	}
 	/**
-	 * sets the properties of the input variable
+	 * sets the properties of the input variable at all DOM implementations
 	 * @param {object} props - properties to set
 	 */
-	setProps(props) {
+	change(props) {
 		/** merges this properties with the current properties */
 		Html.mergeModDatas(this.props,props)
 
@@ -137,26 +147,28 @@ class InputVar {
 		const arg = Obj.filter(this.props,Html.ARGS)
 
 		/** changes the html element with the filtered properties */
-		this.html.change(arg)
-		this.onChange() // may change value, min, or max, etc.
+
+		this.htmls.forEach(html => html.change(arg))
+		// this.onChange() // may change value, min, or max, etc.
 	}
 	/**
 	 * This function is called when the value of the input element changes.
 	 * It checks if the value is an integer or a float, and if so, it ensures that it is within the specified minimum and maximum values.
 	 * If the value is outside the specified range, it is adjusted to the nearest value within the range.
 	 * The adjusted value is then stored in the model and in the local storage.
+	 * @param event
 	 */
-	onChange() {
-		let val = this.html.el.value
+	onChange(event) {
+		let val = event.target.value
 		console.log('onChange:',this.name,this.ix,val)
 		if (this.props.kind==='int'||this.props.kind==='float') {
 			if (this.props.kind==='int') val = Number.parseInt(val)
 			if (this.props.kind==='float') val = Number.parseFloat(val)
 			const valBound = Numbers.bound(val,this.props.atts.min,this.props.atts.max)
-			if (val!==valBound) this.html.el.value = valBound
+			if (val!==valBound) event.target.value = valBound
 			val = valBound
 		}
-		this.model.set('val',val)
+		this.val = val
 		if (this.storeEn) Store.set(Ids.combineId(this.id,this.name,this.ix),val)
 	}
 	/**
@@ -165,7 +177,9 @@ class InputVar {
 	 * @private
 	 */
 	setVal(val) {
-		if (this.html) this.html.my.el.value = val
+		this.htmls.forEach(html => {
+			html.el.value = val
+		})
 	}
 }
 export default InputVar
