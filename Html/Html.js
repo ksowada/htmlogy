@@ -372,6 +372,9 @@ class Html {
 	 * Removes all child nodes from the element.
 	 */
 	removeChilds() {
+		this.htmlChilds.forEach(child => {
+			child.remove()
+		})
 		this.elo.removeChilds()
 	}
 	/**
