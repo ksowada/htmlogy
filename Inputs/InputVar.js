@@ -30,6 +30,8 @@ class InputVar {
 	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
 	 * @param {any} props.is default value, when no storage value is available
 	 * @param {string} props.kind important for dom() and kind of element, and many other
+	 * @param {string} props.dir f.e. write: prohibit store and disable models listener
+	 * 
 	 * - text
 	 * - int
 	 * - float
@@ -45,12 +47,15 @@ class InputVar {
 		/** if needed in arrays */
 		this.ix = ix
 
+		const writeEn = (props.dir && props.dir==='write')
+		this.storeEn = !(writeEn || (props.kind && props.kind==='btn'))
+
 		const fallbackVal = props.is?props.is:this.typeIsNumber(props.kind)?0:''
 
-		const val = Store.get(Ids.combineId(this.id,this.name,this.ix),fallbackVal)
+		const val = (this.storeEn) ? Store.get(Ids.combineId(this.id,this.name,this.ix),fallbackVal) : fallbackVal
 
 		/** stores actual value in val, and has capabilities for other vars bounded to this */
-		this.model = new Model({val})
+		this.model = new Model({val}, writeEn) // if not storage enable it wont trigger
 
 		this.props = Obj.copy(props)
 
@@ -106,8 +111,11 @@ class InputVar {
 				join.add({html:'button',css:'btn w-24 text-right pr-4',val:props.label})
 				myHtml = join.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered w-24'}))
 			}
+		} else {
+			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'input',atts:{type:props.kind},css:props.kind}))
 		}
 		if (!myHtml) throw new Error('no known kind so extract no HTML')
+
 		// attach events
 		switch (props.kind) {
 		case 'evt': myHtml.append({evts:{'click':this.onChange.bind(this)}}); break
@@ -149,7 +157,7 @@ class InputVar {
 			val = valBound
 		}
 		this.model.set('val',val)
-		Store.set(Ids.combineId(this.id,this.name,this.ix),val)
+		if (this.storeEn) Store.set(Ids.combineId(this.id,this.name,this.ix),val)
 	}
 	/**
 	 * sets the value of the DOM element, if already existing
