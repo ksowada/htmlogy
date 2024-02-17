@@ -1,3 +1,4 @@
+import ArrList from '../../logic/Arr/ArrList'
 import Ids from '../../logic/Ids'
 import Model from '../../logic/Model/Model'
 import Numbers from '../../logic/Numbers/Numbers'
@@ -18,15 +19,17 @@ import Html from '../../logic/html/Html/Html'
  * - implements Model
  */
 class InputVar {
-	typeIsNumber = type => (type==='int' || type==='float' || type==='currency')
+	typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency')
 	/**
-	 * generate a Html appropriate to var type
+	 * generate a Html appropriate to var kind
+	 *
+	 * other data may use prefix .user
 	 * @param {string} id - unique identifier for Storage, to store more than one App in 1 domain
 	 * auto-load
 	 * @param {object} props parameter for variable
 	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
 	 * @param {any} props.is default value, when no storage value is available
-	 * @param {string} props.type important for dom() and kind of element, and many other
+	 * @param {string} props.kind important for dom() and kind of element, and many other
 	 * - text
 	 * - int
 	 * - float
@@ -34,7 +37,6 @@ class InputVar {
 	 * @param {string} name (f.e. Storage)
 	 * @param {number} [ix] (f.e. Storage)
 	 */
-	// typeNeedsInput = type => type
 	constructor(id,props,name,ix) {
 		this.id = id
 		/** as needed for Storage */
@@ -43,7 +45,7 @@ class InputVar {
 		/** if needed in arrays */
 		this.ix = ix
 
-		const fallbackVal = props.is?props.is:this.typeIsNumber(props.type)?0:''
+		const fallbackVal = props.is?props.is:this.typeIsNumber(props.kind)?0:''
 
 		const val = Store.get(Ids.combineId(this.id,this.name,this.ix),fallbackVal)
 
@@ -54,7 +56,15 @@ class InputVar {
 
 		Obj.assure(this.props,'atts',{}) // needed for min,max check etc.
 	}
+	/**
+	 * get actual value
+	 * @returns {any}	actual value
+	 */
 	get val() { return this.model.get('val') }
+	/**
+	 * set actual value
+	 * @param {any} val	actual value
+	 */
 	set val(val) {
 		this.model.set('val',val)
 		this.setVal(val)
@@ -66,23 +76,29 @@ class InputVar {
 	 * @param {Html} parentHtml Html to attach to
 	 * @param {object} propsAdd properties to add to element, only for this html, dont change this
 	 * @returns {Html} Html of input or other element connected
+	 * @throws {Error} if kind is not implemented
 	 */
 	dom(parentHtml,propsAdd) {
 		// prepare html arg
 		const props = Html.mergeDatas(this.props,propsAdd)
-
-		// const arg = Obj.omit(props,['label','min','max','type','change','is'])
 		const arg = Obj.filter(props,Html.ARGS)
 		let myHtml = null
 
-		// create html according to type
-		if (props.type==='evt') {
+		// create html according to kind
+		if (props.kind==='evt') {
 			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
-		} else if (props.type==='int'||props.type==='float'|| props.type==='currency'|| props.type==='text') {
-			const type = (props.type==='int'||props.type==='float')?'number':'text'
+		} else if (props.kind==='select') {
+			parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
+			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'select',val:props.label}))
+			this.list = new ArrList(
+				myHtml,item => new Html({html:'option',val:item}),
+				() => {return myHtml.el.value},
+				val => {myHtml.el.value = val})
+		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
+			const kind = (props.kind==='int'||props.kind==='float')?'number':'text'
 			let val = this.model.get('val')
-			if (type==='currency') val = val.toLocaleString(undefined,{style: 'currency',currency: 'EUR'})
-			const argType = {html:'input',atts:{type:type},val}
+			if (kind==='currency') val = val.toLocaleString(undefined,{style: 'currency',currency: 'EUR'})
+			const argType = {html:'input',atts:{type:kind},val}
 			if (!props.label) {
 				myHtml = parentHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
 			} else {
@@ -91,9 +107,9 @@ class InputVar {
 				myHtml = join.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered w-24'}))
 			}
 		}
-
+		if (!myHtml) throw new Error('no known kind so extract no HTML')
 		// attach events
-		switch (props.type) {
+		switch (props.kind) {
 		case 'evt': myHtml.append({evts:{'click':this.onChange.bind(this)}}); break
 		default: myHtml.append({evts:{'change':this.onChange.bind(this)}}); break
 		}
@@ -116,12 +132,18 @@ class InputVar {
 		this.html.change(arg)
 		this.onChange() // may change value, min, or max, etc.
 	}
+	/**
+	 * This function is called when the value of the input element changes.
+	 * It checks if the value is an integer or a float, and if so, it ensures that it is within the specified minimum and maximum values.
+	 * If the value is outside the specified range, it is adjusted to the nearest value within the range.
+	 * The adjusted value is then stored in the model and in the local storage.
+	 */
 	onChange() {
 		let val = this.html.el.value
 		console.log('onChange:',this.name,this.ix,val)
-		if (this.props.type==='int'||this.props.type==='float') {
-			if (this.props.type==='int') val = Number.parseInt(val)
-			if (this.props.type==='float') val = Number.parseFloat(val)
+		if (this.props.kind==='int'||this.props.kind==='float') {
+			if (this.props.kind==='int') val = Number.parseInt(val)
+			if (this.props.kind==='float') val = Number.parseFloat(val)
 			const valBound = Numbers.bound(val,this.props.atts.min,this.props.atts.max)
 			if (val!==valBound) this.html.el.value = valBound
 			val = valBound
@@ -129,6 +151,11 @@ class InputVar {
 		this.model.set('val',val)
 		Store.set(Ids.combineId(this.id,this.name,this.ix),val)
 	}
+	/**
+	 * sets the value of the DOM element, if already existing
+	 * @param {any} val a value to set in DOM element
+	 * @private
+	 */
 	setVal(val) {
 		if (this.html) this.html.my.el.value = val
 	}
