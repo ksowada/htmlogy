@@ -281,7 +281,7 @@ class Elem {
 	 * @returns {boolean} true if content has changed
 	 */
 	static textContentSet(el,str) {
-		if (!Str.valid(str)) return undefined
+		if (!Str.is(str)) return undefined
 		const isInput = (el.localName==='input')
 		if (isInput) {
 			if (el.value!==str) {
@@ -303,7 +303,7 @@ class Elem {
 	 * @param {string} str text to add adjacent to textContent, if undefined change nothing
 	 */
 	static textContentAdd(el,str) {
-		if (!Str.valid1(str)) return
+		if (!Str.is1(str)) return
 		const isInput = (el.localName==='input')
 		const oldContent = (isInput)?el.value:el.textContent
 		if (isInput) {
@@ -384,12 +384,12 @@ class Elem {
 	 * @returns {number} cnt of removed in classList
 	 */
 	static classStateSet(el,css,cssList) {
-		if (!Obj.valid(el)) return undefined
+		if (!Vars.is(el)) return undefined
 		if (typeof css==='number') { // css must be an index in cssList
-			if (!Arr.valid1(cssList)) return undefined
+			if (!Arr.is1(cssList)) return undefined
 			css = cssList[css].trim()
 		} else if (typeof css==='boolean') { // css must be a boolean in cssList
-			if (!Arr.valid1(cssList)) return undefined
+			if (!Arr.is1(cssList)) return undefined
 			css = cssList[Bit.toInt(css)].trim()
 		} else if (css==undefined) {
 			css = ''
@@ -397,7 +397,7 @@ class Elem {
 			css = css.trim()
 		}
 		let removeCnt = 0
-		if (Arr.valid1(cssList)) {
+		if (Arr.is1(cssList)) {
 			cssList.forEach(e => {
 				if (e.length>0 && el.classList.contains(e)) {
 					el.classList.remove(e)
@@ -405,7 +405,7 @@ class Elem {
 				}
 			})
 		}
-		if (Str.valid1(css)) el.classList.add(css)
+		if (Str.is1(css)) el.classList.add(css)
 		return removeCnt
 	}
 	/**

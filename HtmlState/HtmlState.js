@@ -47,7 +47,7 @@ class HtmlState {
 		}
 		if (state==undefined) {
 			this.set_state_ix(0)
-		} else if (Str.valid(state)) {
+		} else if (Str.is(state)) {
 			this.set_state(state)
 		} else if (Int.is(state)) {
 			this.set_state_ix(state)
@@ -65,7 +65,7 @@ class HtmlState {
 			// find key in array of this.master's arr
 			// only when key is in childs, otherwise directly in master's object
 			let master_match = undefined
-			if (Arr.valid(this.master)) { // if master is Array
+			if (Arr.is(this.master)) { // if master is Array
 				let master_key_match_ixs =[]
 				for (let ix = 0; ix < this.master.length; ix++) {
 					if (Object.keys(this.master[ix])[0]===key) {

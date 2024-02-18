@@ -25,6 +25,7 @@ class Html {
 	// TODO optimize member names .arg duplicates as argument
 
 	static ARGS = ['id','h','html','htmlNS','css','styles','val','valhtml','atts','evts']
+	static ELS_USE_VALUE = ['input','select']
 	/**
 	 * @typedef {object} Html~createarg common ways to address HTMLElement in DOM, choose only 1 of those
 	 * @param {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered)
@@ -38,7 +39,7 @@ class Html {
 	 * @property {string|Array} arg.css row of CSSClass (str space-separated or arr of classes)
 	 * @property {object} arg.styles extra inline styles, like background-color
 	 * - @example styles:{'background-color':'red'}
-	 * @property {string} arg.val value (input use value else use innerText)
+	 * @property {string} arg.val input|select will set value, otherwise set innerText
 	 * @property {string} arg.valhtml optional subelement with and instead for val, f.e. use to center with val in grid use extra div
 	 * @property {object} arg.atts attributes of HTMLElement
 	 */
@@ -223,7 +224,7 @@ class Html {
 		if (arg.h) {
 			// eslint-disable-next-line init-declarations
 			let hVal // use copy to keep the original
-			if (Str.valid(arg.h)) {
+			if (Str.is(arg.h)) {
 				// add eventually missing endtag
 				const hText = Elem.addEndTag(arg.h)
 				// let hText = arg.h.trim()
@@ -312,7 +313,7 @@ class Html {
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
 	change(arg) {
-		if (Obj.valid(arg) && Object.keys(arg).length) {
+		if (Vars.is(arg) && Object.keys(arg).length) {
 			return Html.edit(this,this.my,arg,{change: true})
 		}
 		return false
@@ -324,7 +325,7 @@ class Html {
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
 	append(arg) {
-		if (Obj.valid(arg) && Object.keys(arg).length) {
+		if (Vars.is(arg) && Object.keys(arg).length) {
 			return Html.edit(this,this.my,arg,{append: true})
 		}
 		return false
@@ -337,7 +338,7 @@ class Html {
 	 * @param {object} arg arguments so you can Html.obj.parameters as .atts, .val, .evts, see @link {Html#edit}
 	 */
 	remove(arg) {
-		if (Obj.valid(arg) && Object.keys(arg).length) { // if given Object it will remove these item of it, if existing
+		if (Vars.is(arg) && Object.keys(arg).length) { // if given Object it will remove these item of it, if existing
 			Html.edit(this,this.my,arg,{remove: true})
 		} else { // remove itself
 			// also care for childs
@@ -377,6 +378,9 @@ class Html {
 		})
 		this.elo.removeChilds()
 	}
+	// TODO at id make auto atts to appreviate and overwrite defined from atts
+	// TODO topObj is not Html, but .my or .top
+	// TODO remove not implemented for any item, just css
 	/**
 	 * edit given HTMLElement, may attach to new, change or remove,
 	 * also may edit a Html, when not mounted in .el, then change in .arg
@@ -401,9 +405,6 @@ class Html {
 	 * - if atts:{item:''} | atts:{item:undefined} remove attribute
 	 * @returns {boolean} true when html has changed (do not notify changes on events)
 	 */
-	// TODO at id make auto atts to appreviate and overwrite defined from atts
-	// TODO topObj is not Html, but .my or .top
-	// TODO remove not implemented for any item, just css
 	static edit(thisObj={arg:{}},elem,arg,mode) {
 		const inDOM = (elem.el!== undefined) // thisObj.domed not working at test
 		const inHtml = Vars.type(elem)==='Html'
@@ -503,8 +504,8 @@ class Html {
 			thisObj.my.subElement = new Html({parent: {el: elem.el},html: arg.valhtml,val: arg.val})
 		// you can use either valhtml or val so else
 		} else if (Obj.hasDefined(arg,item = 'val')) { // FEATURE plural-arr
-			if (inDOM && elem.el.localName == 'input') elem.el.value = arg.val
-			else if (!inDOM && thisObj.arg.html == 'input') thisObj.arg.val = arg.val
+			if (inDOM && Html.ELS_USE_VALUE.includes(elem.el.localName)) elem.el.value = arg.val
+			else if (!inDOM && Html.ELS_USE_VALUE.includes(elem.el.localName)) thisObj.arg.val = arg.val
 			else {
 				if (mode.change) {
 					// take last node being Textnode
@@ -592,7 +593,7 @@ class Html {
 		if (arg.parent.obj.domLater===true) arg.parent.obj.htmlChilds.push(htmlObj)
 
 		// add as child, when .name is given
-		if (Str.valid(arg.name)) this[arg.name] = htmlObj
+		if (Str.is(arg.name)) this[arg.name] = htmlObj
 		return htmlObj
 	}
 	/**
@@ -606,7 +607,7 @@ class Html {
 		const htmlObj = new Html(arg)
 
 		// add as child, when .name is given
-		if (Str.valid(arg.name)) {
+		if (Str.is(arg.name)) {
 			if (this[arg.name] == undefined) this[arg.name] = []
 			this[arg.name].push(htmlObj)
 		}
@@ -742,7 +743,7 @@ class Html {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	static mergeModDatas(objs) {
-		if (!Obj.valid(arguments[0])) return undefined
+		if (!Vars.is(arguments[0])) return undefined
 		for (let i = 1; i < arguments.length; i++) {
 			const arg = arguments[i]
 			for (const key in arg) {

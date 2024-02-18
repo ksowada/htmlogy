@@ -5,6 +5,11 @@ import Html from '../Html/Html.js'
 import HtmlSelect from './HtmlSelect.js'
 import Bits from '../../Bits/Bits.js'
 
+// window.localStorage = {
+// 	get() {return null},
+// 	set(value) {return null},
+// }
+
 describe('HtmlSelect',() => {
 	const myId = 'myId'
 	const domContent = '<main id="'+myId+'"></main>' // will be surrounded from html/body etc
