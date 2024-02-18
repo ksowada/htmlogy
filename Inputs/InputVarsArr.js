@@ -41,7 +41,6 @@ class InputVarsArr extends Listener {
 	 * @param {number} ix - the index of the variable in the InputVarsArr
 	 */
 	onChange(varName,ix) {
-		console.log('onChange',varName,ix)
 		this.changed('val')
 	}
 }

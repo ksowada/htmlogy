@@ -78,8 +78,9 @@ class InputVar {
 	 * @param {any} val	actual value
 	 */
 	set val(val) {
-		this.model.set('val',val)
+		this.model.set(val)
 		this.setVal(val)
+		if (this.storeEn) Store.set(Ids.combineId(this.id,this.name,this.ix),val)
 	}
 	/**
 	 * creates Html (may be included in additional element) for InputVar and attach it to parent-Html
@@ -91,7 +92,7 @@ class InputVar {
 	 * @returns {Html} Html of input or other element connected
 	 * @throws {Error} if kind is not implemented
 	 */
-	dom(parentHtml,propsAdd,implName) {
+	dom(parentHtml,propsAdd) {
 		// prepare html arg
 		const props = Html.mergeDatas(this.props,propsAdd)
 		const arg = Obj.filter(props,Html.ARGS) // use all props that are included in Html
@@ -160,7 +161,6 @@ class InputVar {
 	 */
 	onChange(event) {
 		let val = event.target.value
-		console.log('onChange:',this.name,this.ix,val)
 		if (this.props.kind==='int'||this.props.kind==='float') {
 			if (this.props.kind==='int') val = Number.parseInt(val)
 			if (this.props.kind==='float') val = Number.parseFloat(val)
@@ -169,7 +169,6 @@ class InputVar {
 			val = valBound
 		}
 		this.val = val
-		if (this.storeEn) Store.set(Ids.combineId(this.id,this.name,this.ix),val)
 	}
 	/**
 	 * sets the value of the DOM element, if already existing
