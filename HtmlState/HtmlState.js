@@ -1,13 +1,14 @@
 // import Int from '../../Int/Int' // TODO for dev and build: npm run test need .js extension, but not dev...
 import Arr from '../../Arr/Arr.js'
 import Int from '../../Int/Int.js' // TODO for test: npm run test need .js extension, but not dev...
+import Str from '../../Str/Str.js'
 
+// TODO dont work, as btn may be carry 2 States at once, deactivate (but show other toggle state also ), allow mult master, as many states can involve 1 Html extends is not appropriate (extend container Html and), introduce .toggle() that introduce an event
 /**
  * @class
  * Stateful Html
  * it may select one or more elements out of a sequential list of equal elements, even with subelements, f.e. for menu items, with multiple subelements which can be accesses or modified at once, due to select-state
  */
-// TODO dont work, as btn may be carry 2 States at once, deactivate (but show other toggle state also ), allow mult master, as many states can involve 1 Html extends is not appropriate (extend container Html and), introduce .toggle() that introduce an event
 class HtmlState {
 	/**
 	 * @param {object} master containing the Object whose Html-Object(s) may be changed, may also be Array, containing Objects with one key, used for address in state_info (f.e. like in Html.childs)
@@ -18,15 +19,15 @@ class HtmlState {
 	 * - array of names of all available states in sequence with other actions
 	 * - or if no named states are used (so you can select states only by set_state_ix) supply the count of states as integer
 	 * - or if undefined then defaults to count of 2 states
-	 * @param {string} state actual state at reset, when undefined it uses the 1st state
+	 * @param {any} state actual state at reset, when undefined it uses the 1st state, either string for named states or number for unnamed states
 	 * @throws Error is state_actual is not contained or multiple times in state_info.states
 	 * @example
-	 * this.replay_st = new HtmlState(this,'replay_on',{
+	 * this.replay_st = new HtmlState(this,{
 	 * 	 states:['replay_on','replay_off'],
 	 * 	 replay_switch:{
 	 * 		css:['btn-primary','btn-outline'],
 	 * 		icon:['fa-repeat fa-solid fa-fw','fa-forward-step fa-solid fa-fw']}
-	 * })
+	 * },'replay_on')
 	 * this.replay_st.refresh() // actualize all UI-Elements described through the state_info
 	 */
 	constructor(master,state_info,state) {
@@ -45,10 +46,11 @@ class HtmlState {
 			this.state_cnt = this.state_info.states.length
 		}
 		if (state==undefined) {
-			this.set_state_ix_only(0)
-		} else {
-			/** {string} state in text, will be undefined when states are not named */
-			this.set_state_only(state)
+			this.set_state_ix(0)
+		} else if (Str.valid(state)) {
+			this.set_state(state)
+		} else if (Int.is(state)) {
+			this.set_state_ix(state)
 		}
 	}
 	/**
@@ -130,10 +132,10 @@ class HtmlState {
 	/**
 	 * set state and refresh automatically, if state changed
 	 * @param {string} state_ix the wished state index
-	 * @param {boolean} refresh
 	 */
-	set_state_ix(state_ix,refresh) {
-		if (this.set_state_ix_only(state_ix) || (refresh && refresh===true)) this.refresh()
+	set_state_ix(state_ix) { // TODO eliminate refresh for easiness
+		this.set_state_ix_only(state_ix)
+		this.refresh()
 	}
 	/**
 	 * set state, without refresh

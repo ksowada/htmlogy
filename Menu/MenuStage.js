@@ -59,7 +59,7 @@ class MenuStage extends HtmlOpenable {
 	 */
 	// TODO handle states inherently,  Mouse-down --> glow, uni-or bistable so infer new kind of Bits and handle with sophisticated Bit
 	click(menu_item_ix) {
-		this.select.child_click(menu_item_ix)
+		this.select.elementClick(menu_item_ix)
 		// console.log('click:',this.select.bits.toString())
 	}
 	// to override from Bits

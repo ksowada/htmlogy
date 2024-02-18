@@ -1,17 +1,17 @@
 import Arr from '../../Arr/Arr.js'
 import Bits from '../../Bits/Bits.js'
-import Listener from '../../Listener/Listener.js'
 import HtmlState from '../HtmlState/HtmlState.js'
 
 /**
  * @class
+ * @augments Bits
  * Container for 1 Combination of multiple similar childs consist of HtmlState
  * adds a HtmlSelect for ease use of many similar items
  * - f.e. for a drop-down-menu, which vary at click-action and may be selected all or only 1 and more,
  * - required: DOM-items are introduced after construction at refresh()
  * - events are handled by menu_info.subs and/or the implemented listener with event on|off for overall-items-events
  */
-class HtmlSelect extends Listener {
+class HtmlSelect extends Bits {
 	/**
 	 * @param {object} items_states_info contains states and actions on childs of obj like css,atts,etc.
 	 * - each key in state_info (except of states) refers to a Html-Object of master
@@ -21,7 +21,9 @@ class HtmlSelect extends Listener {
 	 * @param {number} reactOnClick shall react to clicks to Html objects, 0|undefined=no, 1=single click, 2=double click
 	 */
 	constructor(items_states_info,menu_info,mode,reactOnClick=0) {
-		super()
+		// use a BITS as logical bit-list for different modes and set-styles to use it otherplace also and to simplify this class
+		super({mode:mode})
+
 		/** {string} state in text */
 		this.items_states_info = items_states_info
 
@@ -31,11 +33,14 @@ class HtmlSelect extends Listener {
 		/** HtmlState for each parent's child */
 		this.htmlStates = []
 
-		/** subs are subComponent, contains events that shall be fired at Bit change, of each item, which may handle .click() | on() | off() */
+		/**
+		 * subs are subComponent, contains events that shall be fired at Bit change, of each item, which may handle .click() | on() | off()
+		 * @deprecated use listener instead
+		 */
 		this.subs = []
 
-		/** use a logical bit-list for different modes and set-styles to use it otherplace also and to simplify this class */
-		this.bits = new Bits({mode:mode,on:this.on.bind(this),off:this.off.bind(this)})
+		this.on('on',this.onSet.bind(this))
+		this.on('off',this.onReset.bind(this))
 
 		this.reactOnClick = reactOnClick
 	}
@@ -45,9 +50,10 @@ class HtmlSelect extends Listener {
 	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to items_states_info
 	 * - used when items_states_info is given, if given Html-Object containing children, which are interpolated, via items_states_info
 	 * @param {string} subKey as HtmlState needs a key at Html-object to modify Html, you may pass the key if items_states_info consist of single object
+	 * @param {boolean[]} [bitsInitial] optional initial value of select
 	 * @throws {Error} if parent is undefined
 	 */
-	refresh(htmlArr,subKey) {
+	refresh(htmlArr,subKey,bitsInitial) {
 		if (htmlArr == undefined) throw new Error('no parent is given, where shall I render childs?')
 		Arr.resize(this.subs,htmlArr.length,{}) // resize without change, before fillUp needed
 
@@ -56,7 +62,7 @@ class HtmlSelect extends Listener {
 			// get first key of array-item
 			// const htmlItem = Object.values(htmlArr[ix])
 			if (this.htmlStates[ix]==undefined) this.htmlStates[ix] = new HtmlState(htmlArr[ix],this.items_states_info)
-
+			this.htmlStates[ix].refresh()
 			if (this.menu_info!==undefined) {
 				// TODO to ease this command, use unnamed object in menu_info
 				const menu_info_item = Object.values(this.menu_info[ix]) // read info menu_item's object shall be according to array
@@ -71,35 +77,44 @@ class HtmlSelect extends Listener {
 				}
 			}
 		}
-		// fill this.bits to actual nr of items, uses callbacks on and off, so  htmlStates and subs shall be available
-		this.bits.fillUp(htmlArr.length)
-	}
-	elementClick(ix,evt) {
-		if (evt.detail === this.reactOnClick) { // single or double click
-			this.child_click(ix)
-		}
+		this.fillUp(htmlArr.length,bitsInitial) // set bits and care for mode, by the way HtmlStates will be triggered
 	}
 	/**
 	 * click on child which is self a HtmlState
 	 * you can bind this as callback
 	 * it finds item count on itself due to ancestor in master.childs[]
 	 * @param {number} ix ix of item
-	 * @public
+	 * @param {MouseEvent} evt DOM event
+	 * @private
 	 */
-	child_click(ix) {
+	elementClick(ix,evt) {
+		if (evt.detail === this.reactOnClick) { // single or double click
 		// toggle evt.ix in select-logic & in there handle sub specific
-		this.bits.toggle(ix) // will fire multiple on & off-events
-		const state_ix = this.bits.getIntOf(ix)
-		this.htmlStates[ix].set_state_ix(state_ix)
+			this.toggle(ix) // will fire multiple on & off-events
+			// const state_ix = this.getIntOf(ix)
+			// this.htmlStates[ix].set_state_ix(state_ix)
+		}
 	}
-	on(menu_item_ix,refresh) {
+	/**
+	 * an item gets true, alias selected
+	 * @param {number} menu_item_ix index of the menu item that was clicked
+	 * @param {boolean} [refresh] whether to refresh the HTML element
+	 * @private
+	 */
+	onSet(menu_item_ix,refresh) {
 		this.htmlStates[menu_item_ix].set_state_ix(1,refresh)
-		super.changed('on')
+		// super.changed('on')
 		if (this.subs[menu_item_ix]!==undefined && this.subs[menu_item_ix].on!==undefined) this.subs[menu_item_ix].on()
 	}
-	off(menu_item_ix,refresh) {
+	/**
+	 * an item gets false, alias deselected
+	 * @param {number} menu_item_ix index of the menu item that was clicked
+	 * @param {boolean} [refresh] whether to refresh the HTML element
+	 * @private
+	 */
+	onReset(menu_item_ix,refresh) {
 		this.htmlStates[menu_item_ix].set_state_ix(0,refresh)
-		super.changed('off')
+		// super.changed('off')
 		if (this.subs[menu_item_ix]!==undefined && this.subs[menu_item_ix].off!==undefined) this.subs[menu_item_ix].off()
 	}
 }
