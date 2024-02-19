@@ -68,7 +68,7 @@ class MenuStage extends HtmlOpenable {
 		// console.log('on()')
 		super.on()
 		// remember [Option! per menu_item, may use select.mode] state of sub (to reopen them, when reopen this (in parent-role))
-		this.select.bits.bits.forEach((bit,ix) => {
+		this.select.val.forEach((bit,ix) => {
 			if (bit==true && this.select.subs[ix]!==undefined && this.select.subs[ix].on!==undefined) this.select.subs[ix].on()
 		})
 	}

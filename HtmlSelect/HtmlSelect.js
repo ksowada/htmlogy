@@ -58,7 +58,8 @@ class HtmlSelect extends Bits {
 	 */
 	refresh(htmlArr,subKey,bitsInitial) {
 		if (htmlArr == undefined) throw new Error('no parent is given, where shall I render childs?')
-		Arr.resize(this.subs,htmlArr.length,{}) // resize without change, before fillUp needed
+
+		Arr.resize(this.subs,htmlArr.length,{}) // resize without change, before refresh needed
 
 		// iterate over childs and refresh them
 		for (let ix=0; ix<htmlArr.length; ix++) {
@@ -80,7 +81,9 @@ class HtmlSelect extends Bits {
 				}
 			}
 		}
-		this.fillUp(htmlArr.length,bitsInitial) // set bits and care for mode, by the way HtmlStates will be triggered
+		// HtmlState is triggered at bit change, via .onSet() and .onReset()
+		super.refreshBits(htmlArr.length,bitsInitial) // set bits and care for mode, by the way HtmlStates will be triggered
+
 	}
 	/**
 	 * click on child which is self a HtmlState
