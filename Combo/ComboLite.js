@@ -72,7 +72,7 @@ class ComboLite extends HtmlElComp {
 	 */
 	setData(arr) {
 		this.rows = []
-		if (!Arr.valid(arr)) return
+		if (!Arr.is(arr)) return
 		this.rows = arr.slice() // copy array
 	}
 	/**

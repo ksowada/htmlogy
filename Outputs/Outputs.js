@@ -52,7 +52,7 @@ class Outputs extends HtmlElComp {
 		this.treeLvl++
 		const li = new Html({parent:{el:elIt},html:'li',css:'output depth-'+this.treeLvl})
 		const divText = new Html({parent:{el:li},html:'div',css:'output depth-'+this.treeLvl,val:data.text})
-		if (Arr.valid1(data.children)) {
+		if (Arr.is1(data.children)) {
 			const ul = new Html({parent:{el:li},html:'ul',css:'output depth-'+this.treeLvl})
 			for (let childIx = 0; childIx < data.children.length; childIx++) {
 				const child = data.children[childIx]

@@ -24,7 +24,7 @@ class Inputs extends HtmlElComp {
 		if (!this.data) return
 		for (let i = 0; i < this.dataNames.length; i++) {
 			const dataName = this.dataNames[i]
-			if (Obj.valid(this.data[dataName])) {
+			if (Vars.is(this.data[dataName])) {
 				const title = this.dataTitles[i]
 				const icon = this.dataIcons[i]
 				switch (dataName) {

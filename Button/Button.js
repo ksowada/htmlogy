@@ -40,7 +40,7 @@ class Button extends HtmlComp {
 		css = Str.listAssure(css,' ',this.btnTypes)
 		css = Str.listAssure(css,' ',this.disabledTypes,Vars.boolToInt(this.disabled))
 		Obj.assure(this,'atts',{})
-		if (Str.valid1(this.title)) this.atts.title = this.title // Tooltip
+		if (Str.is1(this.title)) this.atts.title = this.title // Tooltip
 		// if (this.disabled) this.atts.disabled=true // an simple disabled is preferred but dont want to try another hack, besides false setting keeps disabled
 		if (this.blob && this.blobFile) { // TODO try to use only one html-Element instead of a and div
 			// TODO not implemented for update
@@ -66,7 +66,7 @@ class Button extends HtmlComp {
 	 */
 	update(arg) {
 		Obj.assure(arg,'atts',{})
-		if (Str.valid1(arg.title)) arg.atts.title = arg.title // Tooltip
+		if (Str.is1(arg.title)) arg.atts.title = arg.title // Tooltip
 		// change css, via accessor not per change()
 		if (arg.disabled!==undefined) {
 			Elem.classStateSet(this.btn.my.el,Vars.boolToInt(arg.disabled),this.disabledTypes)

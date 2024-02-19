@@ -1,9 +1,7 @@
 import ArrList from '../../logic/Arr/ArrList'
-import Ids from '../../logic/Ids'
 import Model from '../../logic/Model/Model'
 import Numbers from '../../logic/Numbers/Numbers'
 import Obj from '../../logic/Obj/Obj'
-import Store from '../../logic/Store'
 import Html from '../../logic/html/Html/Html'
 
 /**
@@ -17,16 +15,12 @@ import Html from '../../logic/html/Html/Html'
  * - Buttons with edge (simple) or state (toggle)
  * - select
  * - multiple events can be triggered on change
- * - implements Model
+ * - extends Model
  */
-class InputVar {
-	typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency')
+class InputVar extends Model {
+	static typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency')
 	/**
 	 * generate a Html appropriate to var kind
-	 *
-	 * other data may use prefix .user
-	 * @param {string} id - unique identifier for Storage, to store more than one App in 1 domain
-	 * auto-load
 	 * @param {object} props parameter for variable, all attributes of Html are used @link {Html#create}
 	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
 	 * @param {any} props.val default value, when no storage value is available
@@ -35,34 +29,19 @@ class InputVar {
 	 * - int
 	 * - float
 	 * - currency
-	 * @param {string} props.dir f.e. write: prohibit store and disable models listener
-	 * @param {string} name (f.e. Storage)
-	 * @param {number} [ix] (f.e. Storage)
+	 * @param {string} props.storeEn f.e. write: prohibit store and disable models listener, default is tru
+	 * @param {string|number} ids (f.e. Storage)
 	 */
-	constructor(id,props,name,ix) {
-		this.id = id
-
-		/** as needed for Storage */
-		this.name = name
-
-		/** if needed in arrays */
-		this.ix = ix
+	constructor(props,...ids) {
+		const val = props.val?props.val:InputVar.typeIsNumber(props.kind)?0:''
+		const storeEn = (props.storeEn!==undefined)?props.storeEn:!(props.kind && props.kind==='btn') // true is default, but props.kind=btn
+		super(val,ids,storeEn)
 
 		/**
 		 * all DOM implementations of this
 		 * @type {Html[]}
 		 */
 		this.htmls = []
-
-		const writeEn = (props.dir && props.dir==='write')
-		this.storeEn = !(writeEn || (props.kind && props.kind==='btn'))
-
-		const fallbackVal = props.val?props.val:this.typeIsNumber(props.kind)?0:''
-
-		const val = (this.storeEn) ? Store.get(Ids.combineId(this.id,this.name,this.ix),fallbackVal) : fallbackVal
-
-		/** stores actual value in val, and has capabilities for other vars bounded to this */
-		this.model = new Model({val},writeEn) // if not storage enable it wont trigger
 
 		this.props = Obj.copy(props)
 
@@ -72,15 +51,14 @@ class InputVar {
 	 * get actual value
 	 * @returns {any}	actual value
 	 */
-	get val() { return this.model.get('val') }
+	get val() { return super.val }
 	/**
 	 * set actual value
 	 * @param {any} val	actual value
 	 */
 	set val(val) {
-		this.model.set(val)
+		super.val = val
 		this.setVal(val)
-		if (this.storeEn) Store.set(Ids.combineId(this.id,this.name,this.ix),val)
 	}
 	/**
 	 * creates Html (may be included in additional element) for InputVar and attach it to parent-Html
@@ -88,11 +66,12 @@ class InputVar {
 	 * may be called multiple times
 	 * @param {Html} parentHtml Html to attach to
 	 * @param {object} propsAdd properties to add to element, only for this html, dont change this
-	 * @param implName
 	 * @returns {Html} Html of input or other element connected
 	 * @throws {Error} if kind is not implemented
 	 */
 	dom(parentHtml,propsAdd) {
+		if (propsAdd && propsAdd.val) this.val = propsAdd.val
+
 		// prepare html arg
 		const props = Html.mergeDatas(this.props,propsAdd)
 		const arg = Obj.filter(props,Html.ARGS) // use all props that are included in Html
@@ -103,14 +82,14 @@ class InputVar {
 			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
 		} else if (props.kind==='select') {
 			parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
-			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'select',val:props.label}))
+			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'select',val:this.val}))
 			this.list = new ArrList(
 				myHtml,item => new Html({html:'option',val:item}),
 				() => {return myHtml.el.value},
 				val => {myHtml.el.value = val})
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
 			const kind = (props.kind==='int'||props.kind==='float')?'number':'text'
-			let val = this.model.get('val')
+			let val = this.val
 			if (kind==='currency') val = val.toLocaleString(undefined,{style: 'currency',currency: 'EUR'})
 			const argType = {html:'input',atts:{type:kind},val}
 			if (!props.label) {
@@ -121,7 +100,7 @@ class InputVar {
 				myHtml = join.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered w-24'}))
 			}
 		} else {
-			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'input',atts:{type:props.kind},css:props.kind}))
+			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'input',val:this.val,atts:{type:props.kind},css:props.kind}))
 		}
 		if (!myHtml) throw new Error('no known kind so extract no HTML')
 
@@ -157,7 +136,7 @@ class InputVar {
 	 * It checks if the value is an integer or a float, and if so, it ensures that it is within the specified minimum and maximum values.
 	 * If the value is outside the specified range, it is adjusted to the nearest value within the range.
 	 * The adjusted value is then stored in the model and in the local storage.
-	 * @param event
+	 * @param {Event} event to identify the event targets value
 	 */
 	onChange(event) {
 		let val = event.target.value
