@@ -1,5 +1,6 @@
 import Arr from '../../logic/Arr/Arr'
 import Listener from '../../logic/Listener/Listener'
+import Model from '../../logic/Model/Model'
 import Obj from '../../logic/Obj/Obj'
 import InputVars from './InputVars'
 
@@ -41,7 +42,7 @@ class InputVarsArr extends Listener {
 			while (this[varName].length > len) { this[varName].pop() }
 			while (this[varName].length < len) {
 				this[varName].push(InputVars.getInstance(this.argCreate[varName].kind,this.argCreate[varName],[this.id,varName,this[varName].length]))
-				this[varName][this[varName].length-1].on('val',this.onChange.bind(this,varName,this[varName].length))}
+				this[varName][this[varName].length-1].on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this[varName].length))}
 		})
 		this.size = len
 	}
@@ -51,7 +52,7 @@ class InputVarsArr extends Listener {
 	 * @param {number} ix - the index of the variable in the InputVarsArr
 	 */
 	onChange(varName,ix) {
-		this.changed('val')
+		this.changed(Model.DEFAULT_KEY)
 	}
 }
 export default InputVarsArr
