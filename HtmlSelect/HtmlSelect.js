@@ -13,22 +13,27 @@ import HtmlState from '../HtmlState/HtmlState.js'
  */
 class HtmlSelect extends Bits {
 	/**
-	 * @param {object} items_states_info contains states and actions on childs of obj like css,atts,etc.
+	 * @param {object} props instance properties
+	 * @param {object} props.items_states contains states and actions on childs of obj like css,atts,etc.
 	 * - each key in state_info (except of states) refers to a Html-Object of master
 	 * - in it you can describe changes to Html-Objects and there actions on Html with each state bundled in complete Array with size as states
-	 * @param {object[]} [menu_info] info describe each item, and have subs that may implement individual .on()|.off() callback
-	 * @param {number} mode a mode for select 1 or more Bits
-	 * @param {number} reactOnClick shall react to clicks to Html objects, 0|undefined=no, 1=single click, 2=double click
+	 * @param {object[]} [props.menu_info] info describe each item, and have subs that may implement individual .on()|.off() callback
+	 * @param {number} props.mode a mode for select 1 or more Bits
+	 * @param {number} props.reactOnClick shall react to clicks to Html objects, 0|undefined=no, 1=single click, 2=double click
+	 * @param {string[]} names names to inherit to Model and Storage, keep unique
 	 */
-	constructor(items_states_info,menu_info,mode,reactOnClick=0) {
+	constructor(props,names) {
 		// use a BITS as logical bit-list for different modes and set-styles to use it otherplace also and to simplify this class
-		super({mode:mode})
+		super({mode:props.mode},names)
+		// items_states,menu_info,mode,reactOnClick=0
 
 		/** {string} state in text */
-		this.items_states_info = items_states_info
+		this.items_states = props.items_states
 
 		/** info of each menu item */
-		this.menu_info = menu_info
+		this.menu_info = props.menu_info
+
+		this.reactOnClick = props.reactOnClick?props.reactOnClick:0
 
 		/** HtmlState for each parent's child */
 		this.htmlStates = []
@@ -41,15 +46,13 @@ class HtmlSelect extends Bits {
 
 		this.on('on',this.onSet.bind(this))
 		this.on('off',this.onReset.bind(this))
-
-		this.reactOnClick = reactOnClick
 	}
 	/**
 	 * essentially call it when DOM-Html are available as prepare
 	 * set all components given in state_info according to actual state
-	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to items_states_info
-	 * - used when items_states_info is given, if given Html-Object containing children, which are interpolated, via items_states_info
-	 * @param {string} subKey as HtmlState needs a key at Html-object to modify Html, you may pass the key if items_states_info consist of single object
+	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to items_states
+	 * - used when items_states is given, if given Html-Object containing children, which are interpolated, via items_states
+	 * @param {string} subKey as HtmlState needs a key at Html-object to modify Html, you may pass the key if items_states consist of single object
 	 * @param {boolean[]} [bitsInitial] optional initial value of select
 	 * @throws {Error} if parent is undefined
 	 */
@@ -61,7 +64,7 @@ class HtmlSelect extends Bits {
 		for (let ix=0; ix<htmlArr.length; ix++) {
 			// get first key of array-item
 			// const htmlItem = Object.values(htmlArr[ix])
-			if (this.htmlStates[ix]==undefined) this.htmlStates[ix] = new HtmlState(htmlArr[ix],this.items_states_info)
+			if (this.htmlStates[ix]==undefined) this.htmlStates[ix] = new HtmlState(htmlArr[ix],this.items_states)
 			this.htmlStates[ix].refresh()
 			if (this.menu_info!==undefined) {
 				// TODO to ease this command, use unnamed object in menu_info

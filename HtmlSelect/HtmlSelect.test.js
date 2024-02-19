@@ -21,7 +21,7 @@ describe('HtmlSelect',() => {
 			{div:createdEl.add(new Html())},
 			{div:createdEl.add(new Html())},
 		]
-		const htmlState = new HtmlSelect({div:{css:['designA','designB']}},undefined,Bits.MODE_SINGLE_1,0)
+		const htmlState = new HtmlSelect({items_states:{div:{css:['designA','designB']}},mode:Bits.MODE_SINGLE_1})
 		htmlState.refresh(selectEls,'div')
 		it('css is appended',() => {
 			expect(selectEls[0].div.el.classList.contains('designA')).to.be(false)
