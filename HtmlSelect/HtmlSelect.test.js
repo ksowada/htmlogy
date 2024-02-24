@@ -8,11 +8,6 @@ import Store from '../../Store.js'
 import Ids from '../../Ids.js'
 import Model from '../../Model/Model.js'
 
-// window.localStorage = {
-// 	get() {return null},
-// 	set(value) {return null},
-// }
-
 describe('HtmlSelect',() => {
 	const myId = 'myId'
 	const domContent = '<main id="'+myId+'"></main>' // will be surrounded from html/body etc
