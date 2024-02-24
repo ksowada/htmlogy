@@ -1,0 +1,48 @@
+/**
+ * @class
+ * A list of items that can be displayed in HTML
+ */
+class ArrList {
+	/**
+	 * Create a new ArrList
+	 * @param {HTMLElement} html - The HTML element to display the list in
+	 * @param {Function} func function that creates HTML element by setting Html.create arguments for each item in the list
+	 * - parameter for function is (item, index)
+	 * @param {Function} funcGet - A function that returns the value of one item
+	 * @param {Function} funcSet - A function that sets the value of one item
+	 * - parameter for function is (value)
+	 */
+	constructor(html,func,funcGet,funcSet) {
+		this.html = html
+		this.func = func
+		this.funcGet = funcGet
+		this.funcSet = funcSet
+	}
+	/**
+	 * (re-)create items in the list, according to arr
+	 * - always remove all items before
+	 * - use .func to create Html creation arguments
+	 * @param {Array} arr - The array of items to set
+	 */
+	 set(arr) {
+		 this.html.removeChilds()
+		 arr.forEach((item,ix) => {
+			this.html.add(this.func(item,ix))
+		 })
+	 }
+	/**
+	 * Get the value of the list
+	 */
+	 get value() {
+		 return this.funcGet()
+	 }
+	/**
+	 * Set the value of the list
+	 * @param {any} val - The new value of the list
+	 */
+	 set value(val) {
+		 this.funcSet(val)
+	 }
+}
+
+export default ArrList

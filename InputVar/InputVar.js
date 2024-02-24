@@ -1,4 +1,4 @@
-import ArrList from '../../logic/Arr/ArrList'
+import ArrList from './ArrList'
 import Model from '../../logic/Model/Model'
 import Numbers from '../../logic/Numbers/Numbers'
 import Obj from '../../logic/Obj/Obj'
@@ -24,6 +24,7 @@ class InputVar extends Model {
 	 * @param {object} props parameter for variable, all attributes of Html are used @link {Html#create}
 	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
 	 * @param {any} props.val default value, when no storage value is available
+	 * @param {any[]} props.vals default values, for list items as <select> <option>
 	 * @param {string} props.kind important for dom() and kind of element, and many other
 	 * - text
 	 * - int
@@ -78,15 +79,23 @@ class InputVar extends Model {
 		let myHtml = null
 
 		// create html according to kind
+		// evt (button)
 		if (props.kind==='evt') {
 			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
 		} else if (props.kind==='select') {
 			parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
 			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'select',val:this.val}))
+			// set <select> <option>
 			this.list = new ArrList(
 				myHtml,item => new Html({html:'option',val:item}),
 				() => {return myHtml.el.value},
 				val => {myHtml.el.value = val})
+
+				// if vals defined set list
+				if (props.vals) {
+					this.list.set(props.vals)
+					if (props.val) myHtml.el.value = props.val
+				}
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
 			const kind = (props.kind==='int'||props.kind==='float')?'number':'text'
 			let val = this.val
