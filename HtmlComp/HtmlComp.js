@@ -12,7 +12,7 @@ class HtmlComp {
 	 * may also be used as data obj containing unmodified data for next component
 	 * - capture Object and attach it to this
 	 * - in Sub-Components: constructor not use it to edit DOM, use method dom() for clearness, even if HtmlComp call dom after constructed
-	 * @param {object} obj of @see {@link Html#create}
+	 * @param {object} obj of @see {@link Html~createarg}
 	 */
 	// eslint-disable-next-line no-unused-vars
 	constructor(obj) {
@@ -36,7 +36,7 @@ class HtmlComp {
 	 * - load concated obj (last will overwrite) in this {@link Html#mergeDatas}
 	 * - call at begin of dom()
 	 * - will reset dom each time
-	 * @param {object[]} objs manual addition to merge with obj, see {@link Html#create}
+	 * @param {object[]} objs manual addition to merge with obj, see {@link Html~createarg}
 	 */
 	// eslint-disable-next-line no-unused-vars
 	domCreate(objs) {

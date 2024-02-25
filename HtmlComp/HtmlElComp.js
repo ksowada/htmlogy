@@ -18,7 +18,7 @@ class HtmlElComp extends HtmlComp {
 		super(Html.mergeDatas.apply(null,arguments))
 
 		/**
-		 * some container object with args see {@link Html#create} 
+		 * some container object with args see {@link Html~createarg} 
 		* @type {object} 
 		*/
 		this.container = undefined
@@ -33,7 +33,7 @@ class HtmlElComp extends HtmlComp {
 	 * - load arg in this
 	 * - call it at begin of dom()
 	 * - use .div to work or .containerObj
-	 * @param {object} arg see {@link Html#create}
+	 * @param {object} arg see {@link Html~createarg}
 	 * @param {object} arg.container if valid then build a Container for this Component, if nothing given create <div>
 	 * @param {object} arg.heading if valid give container a header, if nothing given create <h2>
 	 */
