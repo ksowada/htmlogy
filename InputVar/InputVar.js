@@ -93,6 +93,7 @@ class InputVar extends Model {
 		if (props.tooltip) {
 			const tooltipArg = Html.mergeDatas({html:'div',css:'tooltip'},props.tooltip,{atts:{'data-tip':props.tooltip.val}})
 			/** here you have the Html of tooltip, if requested */
+			delete tooltipArg.val
 			tooltip = workHtml = parentHtml.add(tooltipArg)
 		} else {
 			workHtml = parentHtml

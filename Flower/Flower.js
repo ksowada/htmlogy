@@ -6,6 +6,7 @@ import Elem from '../html/Elem/Elem.js'
 import Toolbar from '../../HtmlComponents/Toolbar/Toolbar.js/index.js'
 import Sizes from '../html/Sizes/Sizes.js'
 import Times from '../../logic/Times'
+import NumbersArr from '../../logic/Numbers/NumbersArr'
 
 /**
  * @class Flower of Live with SVG
@@ -80,7 +81,7 @@ class Flower extends HtmlComp {
 		const evtPoint = [evt.offsetX,evt.offsetY]
 		this.circles.forEach(e => {
 			const circleCenter = [e.atts.cx,e.atts.cy]
-			const dist = Arr.distArr(circleCenter,evtPoint)
+			const dist = NumbersArr.distArr(circleCenter,evtPoint)
 			if (dist<=e.atts.r) {
 				e.change({atts:{'fill':'red'}})
 			}
