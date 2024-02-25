@@ -21,16 +21,17 @@ class InputVar extends Model {
 	static typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency')
 	/**
 	 * generate a Html appropriate to var kind
-	 * @param {object} props parameter for variable, all attributes of Html are used @link {Html#create}
-	 * @param {string} props.label label for input, or button, (distinct from val, which is the val of this)
-	 * @param {any} props.val default value, when no storage value is available
-	 * @param {any[]} props.vals default values, for list items as <select> <option>
+	 * @param {object} props parameter for variable, all attributes of Html are used {@link Html~createarg}
 	 * @param {string} props.kind important for dom() and kind of element, and many other
 	 * - text
 	 * - int
 	 * - float
 	 * - currency
-	 * @param {string} props.storeEn f.e. write: prohibit store and disable models listener, default is tru
+	 * @param {string} [props.label] label for input, or button, (distinct from val, which is the val of this)
+	 * @param {any} [props.val] default value, when no storage value is available
+	 * @param {any[]} [props.vals] default values, for list items as select option
+	 * @param {object} [props.tooltip] optional object containing Html args {@link Html~createarg}, you may find it in .htmls[ix].tooltip for access and manipulation, and there is function set(val) implemented
+	 * @param {string} [props.storeEn] f.e. write: prohibit store and disable models listener, default is tru
 	 * @param {string|number} ids (f.e. Storage)
 	 */
 	constructor(props,...ids) {
@@ -62,6 +63,15 @@ class InputVar extends Model {
 		this.setVal(val)
 	}
 	/**
+	 * set actual value, with prevent for some trigger type
+	 * @param {any} val	actual value
+	 * @param {string} [prevent]	dont call this type of listener
+	 */
+	set(val,prevent) {
+		super.set(val,undefined,prevent)
+		this.setVal(val)
+	}
+	/**
 	 * creates Html (may be included in additional element) for InputVar and attach it to parent-Html
 	 *
 	 * may be called multiple times
@@ -78,46 +88,64 @@ class InputVar extends Model {
 		const arg = Obj.filter(props,Html.ARGS) // use all props that are included in Html
 		let myHtml = null
 
+		let workHtml = null
+		let tooltip = undefined
+		if (props.tooltip) {
+			const tooltipArg = Html.mergeDatas({html:'div',css:'tooltip'},props.tooltip,{atts:{'data-tip':props.tooltip.val}})
+			/** here you have the Html of tooltip, if requested */
+			tooltip = workHtml = parentHtml.add(tooltipArg)
+		} else {
+			workHtml = parentHtml
+		}
+
 		// create html according to kind
 		// evt (button)
 		if (props.kind==='evt') {
-			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
+			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
 		} else if (props.kind==='select') {
-			parentHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
-			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'select',val:this.val}))
+			workHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
+			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'select',val:this.val}))
 			// set <select> <option>
 			this.list = new ArrList(
 				myHtml,item => new Html({html:'option',val:item}),
 				() => {return myHtml.el.value},
 				val => {myHtml.el.value = val})
 
-				// if vals defined set list
-				if (props.vals) {
-					this.list.set(props.vals)
-					if (props.val) myHtml.el.value = props.val
-				}
+			// if vals defined set list
+			if (props.vals) {
+				this.list.set(props.vals)
+				if (props.val) myHtml.el.value = props.val
+			}
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
 			const kind = (props.kind==='int'||props.kind==='float')?'number':'text'
 			let val = this.val
 			if (kind==='currency') val = val.toLocaleString(undefined,{style: 'currency',currency: 'EUR'})
 			const argType = {html:'input',atts:{type:kind},val}
 			if (!props.label) {
-				myHtml = parentHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
+				myHtml = workHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
 			} else {
-				const join = parentHtml.add({html:'div',css:'flex items-center'})
+				const join = workHtml.add({html:'div',css:'flex items-center'})
 				join.add({html:'button',css:'btn w-24 text-right pr-4',val:props.label})
 				myHtml = join.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered w-24'}))
 			}
 		} else {
-			myHtml = parentHtml.add(Html.mergeDatas(arg,{html:'input',val:this.val,atts:{type:props.kind},css:props.kind}))
+			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'input',val:this.val,atts:{type:props.kind},css:props.kind}))
 		}
 		if (!myHtml) throw new Error('no known kind so extract no HTML')
 
 		// attach events
 		switch (props.kind) {
 		case 'evt': myHtml.append({evts:{'click':this.onChange.bind(this)}}); break
+		case 'range': myHtml.append({evts:{'input':this.onChange.bind(this)}}); break
 		default: myHtml.append({evts:{'change':this.onChange.bind(this)}}); break
 		}
+
+		// attach optional tooltip to Html object
+		if (tooltip) {
+			myHtml.tooltip = tooltip
+			myHtml.tooltip.set = val => myHtml.tooltip.change({atts:{'data-tip':val}})
+		}
+
 		/** the generated Html attached here */
 		// remember dom implementation, ⚠️ forget propsAdd
 		this.htmls.push(myHtml)

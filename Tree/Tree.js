@@ -24,8 +24,8 @@ class Tree extends HtmlElComp {
 	 * @param {string} arg.dataIxId default to id
 	 * @param {string} arg.dataChildId name in JSON of subchilds Array, default to children
 	 * @param {string} arg.dataNameId name or value of each tree item, default to text
-	 * @param {HtmlEl} arg.parent see @link {Html#create}
-	 * @param {HtmlEl} arg.container see @link {Html#create}
+	 * @param {HtmlEl} arg.parent see @link {Html~createarg}
+	 * @param {HtmlEl} arg.container see @link {Html~createarg}
 	 * @param {HtmlEl} arg.heading see @link {HtmlElComp}
 	 * @param {Function} arg.change
 	 * @param {Function} arg.create

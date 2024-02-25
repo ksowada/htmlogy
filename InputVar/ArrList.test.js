@@ -11,13 +11,17 @@ describe('ArrList',() => {
 	describe('set',() => {
 		create_dom(domContent)
 		const parentHtml = new Html({parent:{el:document.getElementById(myId)},html:'div'})
-		const arrList = new ArrList(parentHtml, (item,ix) => {return {html:'span', id:ix, val:item}})
+		const arrList = new ArrList(parentHtml,(item,ix) => {return {html:'span',id:ix,val:item}})
 		const items = ['house','garden','fence']
 		arrList.set(items)
 
+		// have to store vars here in it, it was another content from HtmlSelectTest
+		const itemFirst = document.getElementById(0).innerHTML
+		const itemCnt = parentHtml.el.childElementCount
+
 		it('item created',() => {
-			const itemFirst = document.getElementById(0)
-			expect(itemFirst.innerText).to.eql('house')
+			expect(itemFirst).to.eql('house')
+			expect(itemCnt).to.eql(3)
 		})
 	})
 })

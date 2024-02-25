@@ -17,7 +17,7 @@ class Inputs extends HtmlElComp {
 		super.constructed()
 	}
 	/**
-	 * @param {object} arg see {@link Html#create}
+	 * @param {object} arg see {@link Html~createarg}
 	 */
 	dom(arg) {
 		super.domCreate(arg)

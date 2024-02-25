@@ -30,7 +30,7 @@ class List extends HtmlElComp {
 	 * - mode: singleForce: select always one, if ix not given will select first, if given vals
 	 */
 	/**
-	 * @param {object} arg carries properties {@link Html#create}
+	 * @param {object} arg carries properties {@link Html~createarg}
 	 * @param {object} arg.container optional container for inner, if not given there will not be a common top div with given parameters like css see {@link HtmlElComp}
 	 * @param {List~inner} arg.inner additional info for item-html
 	 * @param {Function} arg.selection optional: called when selection in List changes, or when list items removed or added

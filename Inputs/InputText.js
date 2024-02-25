@@ -7,7 +7,7 @@ import Html from '../html/Html/Html.js'
  */
 class InputText extends HtmlElComp {
 	/**
-	 * @param {object} arg see {@link Html#create}
+	 * @param {object} arg see {@link Html~createarg}
 	 */
 	constructor(arg) {
 		super(arg)

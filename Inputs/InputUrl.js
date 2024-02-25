@@ -9,7 +9,7 @@ import Html from '../html/Html/Html.js'
 // TODO no use any more, so remove
 class InputUrl extends HtmlElComp {
 	/**
-	 * @param {object} arg contains major data about this element; see {@link Html#create}
+	 * @param {object} arg contains major data about this element; see {@link Html~createarg}
 	 * @param {string} arg.title use as label
 	 * @param {Function} arg.click use this callback function when clicked or hit enter or clicked the button
 	 * @deprecated as individual styling seems to more efficient in calling class and less worth here
@@ -20,7 +20,7 @@ class InputUrl extends HtmlElComp {
 		super.constructed()
 	}
 	/**
-	 * @param {object} arg contains major data about this element; see {@link Html#create}
+	 * @param {object} arg contains major data about this element; see {@link Html~createarg}
 	 * @private
 	 */
 	dom(arg) {

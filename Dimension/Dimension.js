@@ -10,7 +10,7 @@ import Html from '../../html/html/Html/Html.js'
 // TODO extend Combo, seems possible
 class Dimension extends HtmlElComp {
 	/**
-	 * @param {object} arg see also here {@link Html#create}
+	 * @param {object} arg see also here {@link Html~createarg}
 	 * @param {HTMLElement} arg.el to attach
 	 * @param {string} arg.id id for Store, will use ids also as list
 	 * @param {string} arg.label some man readible description
