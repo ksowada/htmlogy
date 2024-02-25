@@ -53,9 +53,10 @@ class HtmlSelect extends Bits {
 	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to items_states
 	 * - used when items_states is given, if given Html-Object containing children, which are interpolated, via items_states
 	 * @param {string} subKey as HtmlState needs a key at Html-object to modify Html, you may pass the key if items_states consist of single object
+	 * @param {string} [prevent] don't call this type of listeners
 	 * @throws {Error} if parent is undefined
 	 */
-	refresh(htmlArr,subKey) {
+	refresh(htmlArr,subKey,prevent) {
 		if (htmlArr == undefined) throw new Error('no parent is given, where shall I render childs?')
 
 		Arr.resize(this.subs,htmlArr.length,{}) // resize without change, before refresh needed
@@ -81,7 +82,7 @@ class HtmlSelect extends Bits {
 			}
 		}
 		// set bits and care for mode, by the way HtmlStates will be triggered at bit change, via .onSet() and .onReset()
-		super.refreshBits(htmlArr.length)
+		super.refreshBits(htmlArr.length,prevent)
 	}
 	/**
 	 * click on child which is self a HtmlState
