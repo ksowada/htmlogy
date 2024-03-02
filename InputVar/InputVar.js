@@ -228,13 +228,14 @@ class InputVar extends Model {
 		if (props.max!==undefined) Obj.put(arg,['atts','max'],props.max)
 	}
 	/**
-	 * checks value against min and max values
-	 * @param {number} valOld original value
-	 * @returns {number} bounded value
+	 * checks value against min and max values, if val is NaN, returns ''
+	 * @param {number} val original value
+	 * @returns {number} bounded value, or empty string if val is NaN
 	 * @private
 	 */
-	checkBound(valOld) {
-		let valNew = valOld
+	checkBound(val) {
+		if (Number.isNaN(val)) return ''
+		let valNew = val
 		if (this.props.min!==undefined && valNew < this.props.min) valNew = this.props.min
 		if (this.props.max!==undefined && valNew > this.props.max) valNew = this.props.max
 		return valNew

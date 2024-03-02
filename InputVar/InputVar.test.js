@@ -64,4 +64,21 @@ describe('InputVar',() => {
 			expect(itemFirstHtml.el.classList.length).to.be(2)
 		})
 	})
+	describe('set float to empty string',() => {
+		create_dom(domContent)
+		const inputVar = new InputVar({kind:'float'})
+		const parentHtml = new Html({parent:{id:myId},html:'div'})
+		inputVar.dom(parentHtml)
+
+		// have to store vars here in it, it was another content from HtmlSelectTest
+		const itemFirstHtml = inputVar.htmls[0]
+
+		inputVar.val = ''
+		it('value of DOM',() => {
+			expect(itemFirstHtml.el.value).to.eql('')
+		})
+		it('value of Model',() => {
+			expect(inputVar.val).to.eql('')
+		})
+	})
 })
