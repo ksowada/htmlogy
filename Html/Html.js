@@ -28,7 +28,6 @@ class Html {
 	static ELS_USE_VALUE = ['input','select']
 	/**
 	 * @typedef {object} Html~createarg common ways to address HTMLElement in DOM, choose only 1 of those
-	 * @param {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered)
 	 * @property {object} arg contains information about the element	 *
 	 * @property {string} arg.id id of HTMLElement, optional to el
 	 * @property {string} arg.h template syntax, see htm from https://github.com/developit/htm/tree/master
@@ -42,6 +41,7 @@ class Html {
 	 * @property {string} arg.val input|select will set value, otherwise set innerText
 	 * @property {string} arg.valhtml optional subelement with and instead for val, f.e. use to center with val in grid use extra div
 	 * @property {object} arg.atts attributes of HTMLElement
+	 * @property {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered)
 	 */
 	/**
 	 * creates dynamic HTMLElement
