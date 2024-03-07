@@ -1,5 +1,6 @@
 import Arr from '../../logic/Arr/Arr'
 import HtmlSelect from '../../logic/html/HtmlSelect/HtmlSelect'
+import Tags from '../Tags/Tags'
 import InputVar from './InputVar'
 
 /**
@@ -31,6 +32,8 @@ class InputVars {
 		switch (className) {
 		case 'HtmlSelect':
 			return new HtmlSelect(arg,names)
+		case 'Tags':
+			return new Tags(arg,names)
 		}
 		return new InputVar(arg,names)
 	}
