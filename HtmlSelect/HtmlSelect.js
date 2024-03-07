@@ -4,33 +4,37 @@ import Obj from '../../Obj/Obj.js'
 import HtmlState from '../HtmlState/HtmlState.js'
 
 /**
- * @class
- * @augments Bits
- * Container for 1 Combination of multiple similar childs consist of HtmlState
+ * @class Container for 1 Combination of multiple similar childs consist of HtmlState
  * adds a HtmlSelect for ease use of many similar items
  * - f.e. for a drop-down-menu, which vary at click-action and may be selected all or only 1 and more,
  * - required: DOM-items are introduced after construction at refresh()
  * - events are handled by menu_info.subs and/or the implemented listener with event on|off for overall-items-events
+ * @augments Bits
  */
 class HtmlSelect extends Bits {
 	/**
-	 * @param {object} props instance properties
-	 * @param {object} props.selectItemsStates contains states and actions on childs of obj like css,atts,etc.
-	 * - each key in state_info (except of states) refers to a Html-Object of master
-	 * - in it you can describe changes to Html-Objects and there actions on Html with each state bundled in complete Array with size as states
-	 * @param {object[]} [props.menu_info] info describe each item, and have subs that may implement individual .on()|.off() callback
- 	 * @param {string} [props.subKey] as HtmlState needs a key at Html-object to modify Html, you may pass the key if selectItemsStates consist of single object
-	 * @param {number} props.mode a mode for select 1 or more Bits
-	 * @param {number} props.reactOnClick shall react to clicks to Html objects, 0|undefined=no, 1=single click, 2=double click
+	 * @typedef {object} HtmlSelect~props
+	 * - also pass props to each HtmlState instance @see {@link HtmlState~props}
+	 * @property {object} props properties
+	 * @property {object[]} [props.menu_info] info describe each item, and have subs that may implement individual .on()|.off() callback
+	 * @property {string} [props.subKey] if defined, it will be used to address master's property to attach the click event, if undefined it will use master itself
+	 * @property {number} [props.mode] a mode for select 1 or more Bits, see Bits for more information, defaults to MODE_MULTI_1
+	 * @property {number} props.reactOnClick shall react to clicks to Html objects, 0=no, 1|undefined=single click, 2=double click
+	 */
+
+	/**
+	 * create a new instance
+	 * @param {HtmlSelect~props} props instance properties
 	 * @param {string[]} names names to inherit to Model and Storage, keep unique
 	 */
 	constructor(props,names) {
 		// use a BITS as logical bit-list for different modes and set-styles to use it otherplace also and to simplify this class
 		super({mode:props.mode},names)
 
-		props.reactOnClick = props.reactOnClick?props.reactOnClick:0
+		props.reactOnClick = props.reactOnClick?props.reactOnClick:1
+		props.mode = (props.mode!==undefined)?props.mode:Bits.MODE_MULTI_1
 
-		/** properties */
+		/** properties, that will not change during operation */
 		this.props = props
 
 		/** HtmlState for each parent's child */
@@ -47,9 +51,10 @@ class HtmlSelect extends Bits {
 	}
 	/**
 	 * essentially call it when DOM-Html are available as prepare
-	 * set all components given in state_info according to actual state
-	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to selectItemsStates
-	 * - used when selectItemsStates is given, if given Html-Object containing children, which are interpolated, via selectItemsStates
+	 * set all components given in state_items_arg according to actual state
+	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to state_items_arg
+	 * - used when state_items_arg is given, if given Html-Object containing children, which are interpolated, via state_items_arg
+	 * @param {object} propsAdd properties
 	 * @param {string} [prevent] don't call this type of listeners
 	 * @throws {Error} if parent is undefined
 	 */
@@ -63,7 +68,7 @@ class HtmlSelect extends Bits {
 		for (let ix=0; ix<htmlArr.length; ix++) {
 			// get first key of array-item
 			// const htmlItem = Object.values(htmlArr[ix])
-			if (this.htmlStates[ix]==undefined) this.htmlStates[ix] = new HtmlState(htmlArr[ix],props.selectItemsStates)
+			if (this.htmlStates[ix]==undefined) this.htmlStates[ix] = new HtmlState(htmlArr[ix],props)
 			this.htmlStates[ix].refresh()
 			if (props.menu_info!==undefined) {
 				// TODO to ease this command, use unnamed object in menu_info

@@ -18,7 +18,7 @@ class MenuStage extends HtmlOpenable {
 	 * @param {number} mode a mode for select 1 or more Bits
 	 */
 	constructor(menu_info,mode) {
-		const selectItemsStates = {
+		const state_items_arg = {
 			a:{
 				css:['','active']
 			}
@@ -30,7 +30,7 @@ class MenuStage extends HtmlOpenable {
 		this.menu_info = menu_info
 
 		/** a select over all items of this menu */
-		this.select = new HtmlSelect(selectItemsStates,this.menu_info,mode)
+		this.select = new HtmlSelect(state_items_arg,this.menu_info,mode)
 	}
 	/**
 	 * draw the menu instantly in the given Html, with every child
