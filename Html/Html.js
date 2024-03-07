@@ -574,12 +574,13 @@ class Html {
 	}
 	/**
 	 * add introduce child, automatically sets parent with this and construct it
-	 * @param {object|Html} arg supply create()-like arg or already created Html
+	 * @param {object|Html} [arg] supply create()-like arg or already created Html
 	 * @param {string} arg.name name of class member, if given it generate it, so you can use this child as .[name]
 	 * @returns {Html} new produced child of this
 	 */
 	// TODO add test
 	add(arg) {
+		if (arg===undefined) arg={}
 		Obj.put(arg,['parent','obj'],this)
 		let htmlObj = undefined
 		if (Vars.typeHier(arg).includes('Html')) {
