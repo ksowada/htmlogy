@@ -1,4 +1,4 @@
-import {flatten} from 'lodash-es'
+import {flattenDeep} from 'lodash-es'
 import Ids from '../../Ids'
 import Obj from '../../Obj/Obj'
 
@@ -24,17 +24,15 @@ class Els {
 	 * @returns {Els} a new Els instance with the given keys concatenated to the current instance's keys
 	 */
 	sub(...keys) {
-		// Arr.concatMod(this.subKeys,flatten(keys))
-		return new Els(this.name,this.subKeys.concat(flatten(keys)))
+		return new Els(this.name,this.subKeys.concat(flattenDeep(keys)))
 	}
-
 	/**
 	 * generate id and save hierarchically
 	 * @param {...string|...number} keys set of keys to generate hierarchy
 	 * @returns {string} generated id
 	 */
 	id(...keys) {
-		const keysFlat = flatten([this.name,this.subKeys,keys])
+		const keysFlat = flattenDeep([this.name,this.subKeys,keys])
 		const id = Ids.combineId(keysFlat)
 		Obj.put(this.ids,keysFlat,id)
 		return id
@@ -53,7 +51,7 @@ class Els {
 	 * @returns {HTMLElement} the DOM-Element
 	 */
 	get(...keys) {
-		const keysFlat = flatten([this.name,this.subKeys,keys])
+		const keysFlat = flattenDeep([this.name,this.subKeys,keys])
 		return Obj.get(this.els,keysFlat)
 	}
 }
