@@ -16,11 +16,11 @@ describe('Tags',() => {
 		const storeName = 'Tags-Test-1'
 		const el = create_dom(domContent)
 		const html = new Html({parent:{el},html:'div'})
-		const tags = new Tags({title:'some-title',vals:['rain','sun','outside'],mode:Bits.MODE_SINGLE_1},storeName)
+		const tags = new Tags({title:'some-title',container:{html:'span'},vals:['rain','sun','outside'],mode:Bits.MODE_SINGLE_1},storeName)
 		tags.dom(html,{state_item_arg:{css:['A','B']}})
 
 		it ('builds list and selects the first one',() => {
-			expect(html.el.innerHTML).to.eql('<div><div class="B">rain</div><div class="A">sun</div><div class="A">outside</div></div>')
+			expect(html.el.innerHTML).to.eql('<span><div class="B">rain</div><div class="A">sun</div><div class="A">outside</div></span>')
 		})
 	})
 })

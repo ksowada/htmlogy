@@ -33,13 +33,25 @@ class ArrList {
 		 */
 		this.htmls = []
 		arr.forEach((item,ix) => {
-			this.htmls.push(this.html.add(this.func(item,ix)))
+			this.append(item,ix)
 		})
 		return this.htmls
 	}
 	/**
+	 * Adds an item to the end of the list.
+	 * @param {any} item - The item to add to the list.
+	 * @param {number} [index] - The index at which to add the item. If omitted, the item will be added to the end of the list.
+	 * @returns {Html} The HTML element that was added to the list.
+	 */
+	append(item,index) {
+		if (index===undefined) index=this.htmls.length
+		const html = this.html.add(this.func(item,index))
+		this.htmls.push(html)
+		return html
+	}
+	/**
 	 * Get the value of the list
-	 * @returns {any} the value of the list
+	 * @returns {any} the value of the list - unused
 	 * @deprecated unused
 	 */
 	get value() {
