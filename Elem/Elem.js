@@ -6,9 +6,9 @@ import Str from '../../Str/Str.js'
 import Vars from '../../Vars/Vars.js'
 import Html from '../Html/Html.js'
 
+// TODO extends Element may provide easier access to other functions
 /**
- * @class
- * utilities for exact one DOM element
+ * @class utilities for exact one DOM element
  *
  * you can stringify this element, than .all contains all of the content of it, except of its events and child elements, so you may detect changes easily, as Element.outerHTML does not include styles,value and other things added programmatically, that's the only way to do this
  * @example
@@ -17,23 +17,41 @@ import Html from '../Html/Html.js'
 class Elem {
 	/** all names of items of EL that describe HTMLElement */
 	static items = ['name','css','styles','id','atts','val']
-	// TODO extends Element may provide easier access to other functions
+	/**
+	 * construct helper functions for HTMLElement
+	 * @param {Element} el element to handle
+	 */
 	constructor(el) {
 		this.el = el
 	}
+	/**
+	 * @returns {string} tag name
+	 */
 	get name() {
 		return this.el.nodeName // usally upper-case
 	}
+	/**
+	 * @returns {string} list of css classes
+	 */
 	get css() {
 		return this.el.classList.value
 	}
+	/**
+	 * @returns {string} all styles of this
+	 */
 	get styles() {
 		if (this.el.style) return this.el.style.cssText
 		return ''
 	}
+	/**
+	 * @returns {string} id of element
+	 */
 	get id() {
 		return this.el.id
 	}
+	/**
+	 * @returns {object} all attributes of element
+	 */
 	get atts() {
 		return Elem.attributes(this.el)
 	}
@@ -49,6 +67,9 @@ class Elem {
 		}
 		return str
 	}
+	/**
+	 * @returns {object} every property and attribute of element that are listed as getters here, for easy compare and recreations, cannot contain events and other invisible DOM element properties
+	 */
 	get all() {
 		const obj = {}
 		for (const item of Elem.items) {
@@ -77,6 +98,12 @@ class Elem {
 		}
 		return output
 	}
+	/**
+	 * Returns the text content of an element, concatenating all text nodes separated by a separator string.
+	 * @param {HTMLElement} el The element to extract the text content from.
+	 * @param {string} [separator] The separator string to use between text nodes.
+	 * @returns {string} The concatenated text content of the element.
+	 */
 	static textContent(el,separator=' ') {
 		let str = ''
 		el.childNodes.forEach((node,ix) => {
@@ -178,7 +205,6 @@ class Elem {
 	 * - undefined, when one address cannot be detected by getEl
 	 * - false, when 1 or more of valid arguments are different
 	 */
-	// eslint-disable-next-line no-unused-vars
 	static equalEl(objs) {
 		if (arguments.length==0) return undefined
 		// if (arguments[0]==undefined) return // when not defined
@@ -268,6 +294,10 @@ class Elem {
 	removeChilds() {
 		Elem.removeChilds(this.el)
 	}
+	/**
+	 * Removes all attributes from an element.
+	 * @param {HTMLElement} el The element to remove attributes from.
+	 */
 	static removeAttributes(el) {
 		while(el.attributes.length > 0) {
 			el.removeAttribute(el.attributes[0].name)
@@ -461,6 +491,8 @@ class Elem {
 		}
 		throw new Error('more than 1 state active in classList')
 	}
+	// TODO use getEl for ease adaption
+	// TODO old identity compare not work
 	/**
 	 * find parent of HTMLElement
 	 * - if no parameter is given return parent of el
@@ -477,8 +509,6 @@ class Elem {
 	 * - 0 return itself (or if parentEl is given return parentEl)
 	 * @returns {HTMLElement} parent to be found
 	 */
-	// TODO use getEl for ease adaption
-	// TODO old identity compare not work
 	static findParent(el,parentEl,parentDepth) {
 		if (!el) return undefined
 		if (parentDepth==undefined && parentEl==undefined) {

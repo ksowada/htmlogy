@@ -9,9 +9,9 @@ describe('Elem',() => {
 	describe('test empty node',() => {
 		const body = create_dom('<div/>')
 		const el = body.getElementsByTagName('div')[0]
-		const elo = new Elem(el)
+		const elem = new Elem(el)
 		it ('shall show name,id, and atts.id',() => {
-			const ret = JSON.stringify(elo.all)
+			const ret = JSON.stringify(elem.all)
 			expect(ret).to.eql('{"name":"DIV"}')
 		})
 	})
@@ -19,14 +19,14 @@ describe('Elem',() => {
 		const body = create_dom('<input/>')
 		const el = body.getElementsByTagName('input')[0]
 		// const el = document.getElementById('myId')
-		const elo = new Elem(el)
+		const elem = new Elem(el)
 		el.id = '1'
 		el.setAttribute('type','number')
 		el.textContent = '300'
 		el.style.backgroundColor = 'yellow'
 		el.classList.add('blinking')
 		it ('shall show every item',() => {
-			const ret = JSON.stringify(elo.all)
+			const ret = JSON.stringify(elem.all)
 			expect(ret).to.eql('{"name":"INPUT","css":"blinking","styles":"background-color: yellow;","id":"1","atts":{"id":"1","type":"number","style":"background-color: yellow;","class":"blinking"},"val":"300"}')
 		})
 	})
