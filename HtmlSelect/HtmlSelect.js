@@ -1,3 +1,4 @@
+import {merge} from 'lodash-es'
 import Arr from '../../Arr/Arr.js'
 import Bits from '../../Bits/Bits.js'
 import Obj from '../../Obj/Obj.js'
@@ -35,7 +36,7 @@ class HtmlSelect extends Bits {
 		props.mode = (props.mode!==undefined)?props.mode:Bits.MODE_MULTI_1
 
 		/** properties, that will not change during operation */
-		this.props = props
+		this.props = Obj.copy(props)
 
 		/** HtmlState for each parent's child */
 		this.htmlStates = []
@@ -54,12 +55,13 @@ class HtmlSelect extends Bits {
 	 * set all components given in state_items_arg according to actual state
 	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to state_items_arg
 	 * - used when state_items_arg is given, if given Html-Object containing children, which are interpolated, via state_items_arg
-	 * @param {object} propsAdd properties
+	 * @param {object} propsAdd properties, they will be added to object, so you dont need to repeatedly pass them
 	 * @param {string} [prevent] don't call this type of listeners
 	 * @throws {Error} if parent is undefined
 	 */
 	refresh(htmlArr,propsAdd,prevent) {
-		const props = Obj.mergeOverwrite(this.props,propsAdd)
+		const props = merge(this.props,propsAdd)
+		this.props = Obj.copy(props) // save props, so refresh can be called later, at many other places, with only htmlArr
 		if (htmlArr == undefined) throw new Error('no parent is given, where shall I render childs?')
 
 		Arr.resize(this.subs,htmlArr.length,{}) // resize without change, before refresh needed
@@ -110,7 +112,11 @@ class HtmlSelect extends Bits {
 	 * @private
 	 */
 	onSet(menu_item_ix,refresh) {
-		this.htmlStates[menu_item_ix].set_state_ix(1,refresh)
+		if (this.htmlStates[menu_item_ix]!==undefined) {
+			this.htmlStates[menu_item_ix].set_state_ix(1,refresh)
+		} else {
+			console.error('HtmlSelect.vals is not available for index (Bits are bigger) ' + menu_item_ix)
+		}
 		// super.changed('on')
 		if (this.subs[menu_item_ix]!==undefined && this.subs[menu_item_ix].on!==undefined) this.subs[menu_item_ix].on()
 	}
@@ -121,7 +127,11 @@ class HtmlSelect extends Bits {
 	 * @private
 	 */
 	onReset(menu_item_ix,refresh) {
-		this.htmlStates[menu_item_ix].set_state_ix(0,refresh)
+		if (this.htmlStates[menu_item_ix]!==undefined) {
+			this.htmlStates[menu_item_ix].set_state_ix(0,refresh)
+		} else {
+			console.error('HtmlSelect.vals is not available for index (Bits are bigger) ' + menu_item_ix)
+		}
 		// super.changed('off')
 		if (this.subs[menu_item_ix]!==undefined && this.subs[menu_item_ix].off!==undefined) this.subs[menu_item_ix].off()
 	}

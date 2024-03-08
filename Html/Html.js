@@ -119,7 +119,7 @@ class Html {
 		 * short utility to jsonify and compare the element without its child and events
 		 * @type {Elem}
 		 */
-		this.elo = undefined
+		this.elem = undefined
 		/**
 		 * collect all timers, to remove them also at remove()
 		 * @type {Timer[]}
@@ -175,8 +175,8 @@ class Html {
 	useEl(arg) {
 		// find matching HTMLElement to operate
 		this.el = Html.getEl(arg.my)
-		this.elo = new Elem(this.el)
-		this.elo.removeChilds()
+		this.elem = new Elem(this.el)
+		this.elem.removeChilds()
 		this.my.el = this.el
 	}
 	/**
@@ -275,7 +275,7 @@ class Html {
 		}
 
 		this.el = this.my.el
-		this.elo = new Elem(this.el)
+		this.elem = new Elem(this.el)
 		Html.edit(this,this.my,arg,{append: true}) // TODO this.my is not type Html
 		// also involve childs when doming (before change arg)
 		// TODO may integrate List
@@ -376,7 +376,7 @@ class Html {
 		this.htmlChilds.forEach(child => {
 			child.remove()
 		})
-		this.elo.removeChilds()
+		this.elem.removeChilds()
 	}
 	// TODO at id make auto atts to appreviate and overwrite defined from atts
 	// TODO topObj is not Html, but .my or .top
@@ -530,6 +530,7 @@ class Html {
 	 * @property {HTMLElement} el direct address
 	 * @property {string} id id of HTMLElement, optional to el
 	 */
+	// TODO add getEl from event
 	/**
 	 * get el from DOM addressed by an Object of different kind
 	 * - you may use auto detection or attach Object to direct adress properties for faster access
@@ -539,7 +540,6 @@ class Html {
 	 * - null when nothing found
 	 * - undefined if no arguments
 	 */
-	// TODO add getEl from event
 	static getEl(arg) {
 		if (arg == undefined) return undefined
 		let el = null
@@ -578,7 +578,6 @@ class Html {
 	 * @param {string} arg.name name of class member, if given it generate it, so you can use this child as .[name]
 	 * @returns {Html} new produced child of this
 	 */
-	// TODO add test
 	add(arg) {
 		if (arg===undefined) arg={}
 		Obj.put(arg,['parent','obj'],this)
@@ -615,8 +614,15 @@ class Html {
 		return htmlObj
 	}
 	/**
+	 * value of input or textContent of other element types @see {@link Elem.val}
+	 * @returns {string} value
+	 */
+	get val() {
+		return this.elem.val
+	}
+	/**
 	 * get id from DOM, and write it to .my.atts (only if defined) and .my.id
-	 * @param thisObj
+	 * @param {Html} thisObj Html instance to look at
 	 * @returns {string} id as red from DOM, if not given return undefined
 	 * @private
 	 */
@@ -675,6 +681,11 @@ class Html {
 	classStateIncr(cssList) {
 		return Elem.classStateIncr(this.my.el,cssList)
 	}
+	/**
+	 * Adds a timer to the element.
+	 * @param {object} arg - The arguments for the timer.
+	 * @param {number} time_ms - The time in milliseconds for the timer to run
+	 */
 	timer(arg,time_ms) {
 		const self = this
 		// if existing, renew time
@@ -697,6 +708,9 @@ class Html {
 			))
 		}
 	}
+	// TODO merge ids, SVG may use it intensively
+	// TODO move logic to ObjObj, only specialize call here with enrichWith:[{css:' '},{internalName:' '}]}
+	// TODO may use _.merge
 	/**
 	 * merge for HtmlElements
 	 * - merge css linear in whitespace list way to any level like {div:{css:'2ndlevel'}}
@@ -706,9 +720,6 @@ class Html {
 	 * @param {object[]} objs multiple to merge, the last dominates
 	 * @returns {object} result of merging
 	 */
-	// TODO merge ids, SVG may use it intensively
-	// TODO move logic to ObjObj, only specialize call here with enrichWith:[{css:' '},{internalName:' '}]}
-	// eslint-disable-next-line no-unused-vars
 	static mergeDatas(objs) {
 		const ret = {}
 		for (let i = 0; i < arguments.length; i++) {
@@ -742,7 +753,6 @@ class Html {
 	 * @param {object[]} objs multiple to merge, the last dominates
 	 * @returns {object} result of merging, optional as first arg is also modified
 	 */
-	// eslint-disable-next-line no-unused-vars
 	static mergeModDatas(objs) {
 		if (!Vars.is(arguments[0])) return undefined
 		for (let i = 1; i < arguments.length; i++) {
