@@ -53,7 +53,7 @@ class HtmlSelect extends Bits {
 	/**
 	 * essentially call it when DOM-Html are available as prepare
 	 * set all components given in state_items_arg according to actual state
-	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to state_items_arg
+	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to state_items_arg, or array of direct Html instances when using state_item_arg
 	 * - used when state_items_arg is given, if given Html-Object containing children, which are interpolated, via state_items_arg
 	 * @param {object} propsAdd properties, they will be added to object, so you dont need to repeatedly pass them
 	 * @param {string} [prevent] don't call this type of listeners

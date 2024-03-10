@@ -5,7 +5,7 @@ import Html from '../Html/Html.js'
 import HtmlSelect from './HtmlSelect.js'
 import Bits from '../../Bits/Bits.js'
 import Store from '../../Store.js'
-import Ids from '../../Ids.js'
+import Ids from '../../Ids/Ids.js'
 import Model from '../../Model/Model.js'
 
 describe('HtmlSelect',() => {
