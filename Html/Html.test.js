@@ -216,6 +216,53 @@ describe('Html',() => {
 				expect(changed).to.eql(true)
 			})
 		})
+		describe('changeTimed',() => {
+			describe('changeTimed css',() => {
+				const el = create_dom(domContent)
+				const createdEl = new Html({parent:{el},html:'div',css:'citrone'})
+				const changed = createdEl.changeTimed({css:'cherry'},100)
+				const css = createdEl.elem.css
+				it('sets value',() => {
+					expect(css).to.eql('citrone cherry')
+				})
+				it('detect change',() => {
+					expect(changed).to.eql(true)
+				})
+				it('shall have changed back to original after delay',done => {
+					setTimeout(() => {
+						expect(createdEl.elem.css).to.eql('citrone')
+						done()
+					},'250')
+				})
+			})
+			// describe('changeTimed css, with second delay appended',() => {
+			// 	const el = create_dom(domContent)
+			// 	const createdEl = new Html({parent:{el},html:'div',css:'citrone'})
+			// 	const changed = createdEl.changeTimed({css:'cherry'},300)
+			// 	const css = createdEl.elem.css
+			// 	it('sets value',() => {
+			// 		expect(css).to.eql('citrone cherry')
+			// 	})
+			// 	it('detect change',() => {
+			// 		expect(changed).to.eql(true)
+			// 	})
+			// 	setTimeout(() => {
+			// 		const changed2 = createdEl.changeTimed({css:'cherry'},300)
+			// 		expect(createdEl.elem.css).to.eql('citrone')
+			// 		it('at 2nd time: detect no change',() => {
+			// 			expect(changed2).to.eql(false)
+			// 		})
+			// 		// done()
+			// 	},'200')
+			// 	it('shall have changed back to original after delay',done => {
+			// 		setTimeout(() => {
+			// 			expect(createdEl.elem.css).to.eql('citrone')
+			// 			done()
+			// 		},'400')
+			// 	})
+			// })
+			// TODO test set twice and add delay
+		})
 		describe('changed val to original',() => {
 			const el = create_dom(domContent)
 			const createdEl = new Html({parent:{el},html:'div',val:'citrone'})

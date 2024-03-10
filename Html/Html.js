@@ -685,11 +685,14 @@ class Html {
 	 * Adds a timer to the element.
 	 * @param {object} arg - The arguments for the timer.
 	 * @param {number} time_ms - The time in milliseconds for the timer to run
+	 * @returns {boolean} true when html has changed
 	 */
-	timer(arg,time_ms) {
+	changeTimed(arg,time_ms) { // use timeChange as JSDoc dont like functionName timer
 		const self = this
+		const argCopy = Obj.copy(arg)
+		let changed = undefined
 		// if existing, renew time
-		const name = JSON.stringify(arg)
+		const name = JSON.stringify(argCopy)
 		// const existing = time => time.name ===name
 		const timer = Arr.getItemFromArr(this.timers,'name',name)
 
@@ -698,15 +701,16 @@ class Html {
 			timer.set(time_ms)
 		} else {
 			this.timers.push(new Timer(
-				() => self.append(arg),
+				() => changed = self.append(argCopy),
 				() => {
-					self.remove(arg)
+					self.remove(argCopy)
 					Arr.removeItemFromArr(this.timers,'name',name)
 				},
 				time_ms,
 				name
 			))
 		}
+		return changed
 	}
 	// TODO merge ids, SVG may use it intensively
 	// TODO move logic to ObjObj, only specialize call here with enrichWith:[{css:' '},{internalName:' '}]}
