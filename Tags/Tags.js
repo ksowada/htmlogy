@@ -1,7 +1,7 @@
 import Model from '../../logic/Model/Model.js'
 import Html from '../../logic/html/Html/Html.js'
 import HtmlSelect from '../../logic/html/HtmlSelect/HtmlSelect.js'
-import ArrList from '../InputVar/ArrList.js'
+import ArrList from '../../logic/html/comp/ArrList/ArrList.js'
 
 /**
  * @class
