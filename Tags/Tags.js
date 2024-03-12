@@ -46,7 +46,7 @@ class Tags extends HtmlSelect {
 		if (propsAdd.vals) { // only when propsAdd contains new vals, model will be updated
 			this.model.val = propsAdd.vals
 		}
-		this.list.set(this.model.val)
+		this.list.populate(this.model.val)
 		this.refresh(this.list.htmls,props)
 
 		if (props.input) {

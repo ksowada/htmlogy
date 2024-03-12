@@ -4,17 +4,24 @@
  */
 class ArrList {
 /**
- * Create a new ArrList
+ * Create a new ArrList, with val for selected
  * @param {HTMLElement} html - The HTML element to display the list in
  * @param {Function} func function that creates HTML element by setting Html.create arguments for each item in the list
  * - parameter for function is (item, index)
- * @param {Function} funcGet - A function that returns the value of one item
- * @param {Function} funcSet - A function that sets the value of one item
+ * @param {Function} [funcGet] - A function that returns the value (selected state) of parent element, defaults to element.value
+ * @param {Function} [funcSet] - A function that sets the value (selected state) of parent element, defaults to element.value
  * - parameter for function is (value)
  */
 	constructor(html,func,funcGet,funcSet) {
 		this.html = html
 		this.func = func
+
+		if (funcGet===undefined) {
+			funcGet = () => {return this.html.el.value}
+		}
+		if (funcSet===undefined) {
+			funcSet = val => {this.html.el.value = val}
+		}
 		this.funcGet = funcGet
 		this.funcSet = funcSet
 	}
@@ -25,7 +32,7 @@ class ArrList {
 	 * @param {Array} arr - The array of items to set
 	 * @returns {Html[]} Array of Html objects created
 	 */
-	set(arr) {
+	populate(arr) {
 		this.html.removeChilds()
 		/**
 		 * if rendered here are all Html of items
@@ -52,17 +59,15 @@ class ArrList {
 	/**
 	 * Get the value of the list
 	 * @returns {any} the value of the list - unused
-	 * @deprecated unused
 	 */
-	get value() {
+	get val() {
 		return this.funcGet()
 	}
 	/**
 	 * Set the value of the list
 	 * @param {any} val - The new value of the list
-	 * @deprecated unused
 	 */
-	set value(val) {
+	set val(val) {
 		this.funcSet(val)
 	}
 }

@@ -8,7 +8,7 @@ describe('InputVar',() => {
 	const myId = 'myId'
 	const domContent = '<main id="'+myId+'"></main>' // will be surrounded from html/body etc
 
-	describe('dom',() => {
+	describe('dom for kind:range',() => {
 		create_dom(domContent)
 		const inputVar = new InputVar({kind:'range',min:0,val:2})
 		const parentHtml = new Html({parent:{id:myId},html:'div'})
@@ -34,7 +34,7 @@ describe('InputVar',() => {
 			expect(itemFirstHtml.el.classList.length).to.be(2)
 		})
 	})
-	describe('change',() => {
+	describe('change for kind:range',() => {
 		create_dom(domContent)
 		const inputVar = new InputVar({kind:'range',min:0,val:2})
 		const parentHtml = new Html({parent:{id:myId},html:'div'})
@@ -64,7 +64,7 @@ describe('InputVar',() => {
 			expect(itemFirstHtml.el.classList.length).to.be(2)
 		})
 	})
-	describe('set float to empty string',() => {
+	describe('kind:float; set float to empty string',() => {
 		create_dom(domContent)
 		const inputVar = new InputVar({kind:'float'})
 		const parentHtml = new Html({parent:{id:myId},html:'div'})
@@ -79,6 +79,53 @@ describe('InputVar',() => {
 		})
 		it('value of Model',() => {
 			expect(inputVar.val).to.eql('')
+		})
+	})
+	describe('kind:select',() => {
+		describe('state after list populate',() => {
+			localStorage.clear()
+			create_dom(domContent)
+			const inputVar = new InputVar({kind:'select'})
+			const parentHtml = new Html({parent:{id:myId},html:'div'})
+			inputVar.dom(parentHtml)
+			const items = ['house','garden','fence']
+			inputVar.set(items)
+
+			it('inputVar.val show selected',() => {
+				expect(inputVar.val).to.eql('house')
+			})
+			it('inputVar.lists[0].val show selected',() => {
+				expect(inputVar.lists[0].val).to.eql('house')
+			})
+			it('inputVar.htmls[0].val show selected',() => {
+				expect(inputVar.htmls[0].val).to.eql('house')
+			})
+			it('inputVar.htmls[0].el.value show selected',() => {
+				expect(inputVar.htmls[0].el.value).to.eql('house')
+			})
+		})
+		describe('state after list populate and set other item',() => {
+			localStorage.clear()
+			create_dom(domContent)
+			const inputVar = new InputVar({kind:'select'})
+			const parentHtml = new Html({parent:{id:myId},html:'div'})
+			inputVar.dom(parentHtml)
+			const items = ['house','garden','fence']
+			inputVar.set(items)
+			inputVar.set('garden')
+
+			it('inputVar.val show selected',() => {
+				expect(inputVar.val).to.eql('garden')
+			})
+			it('inputVar.lists[0].val show selected',() => {
+				expect(inputVar.lists[0].val).to.eql('garden')
+			})
+			it('inputVar.htmls[0].val show selected',() => {
+				expect(inputVar.htmls[0].val).to.eql('garden')
+			})
+			it('inputVar.htmls[0].el.value show selected',() => {
+				expect(inputVar.htmls[0].el.value).to.eql('garden')
+			})
 		})
 	})
 })

@@ -2,6 +2,7 @@ import ArrList from './ArrList.js'
 import Model from '../../logic/Model/Model.js'
 import Obj from '../../logic/Obj/Obj.js'
 import Html from '../../logic/html/Html/Html.js'
+import Arr from '../../logic/Arr/Arr.js'
 
 /**
  * @class InputVar
@@ -53,6 +54,13 @@ class InputVar extends Model {
 		 */
 		this.htmls = []
 
+		// optional items
+		/**
+		 * all DOM implementations of list, when used
+		 * @type {Html[]}
+		 */
+		this.lists = []
+
 		this.props = Obj.copy(props)
 	}
 	/**
@@ -73,12 +81,28 @@ class InputVar extends Model {
 	}
 	/**
 	 * set actual value, with prevent for some trigger type
-	 * @param {any} val	actual value
+	 * @param {any|any[]} val	actual value
+	 * - for list items: array is for setting list items, primitive is for setting selected
 	 * @param {string} [prevent]	dont call this type of listener
 	 */
 	set(val,prevent) {
-		super.set(val,undefined,prevent)
-		this.setDoms(val)
+		if (this.lists.length > 0) {
+			if (Arr.is(val)) {
+				this.lists.forEach(list => {
+					const preSelect = list.val // selection shall remain after list populate
+					list.populate(val)
+					if (preSelect!=='') list.val = preSelect // previos selection, use only if valid
+				})
+				super.set(this.lists[0].val,undefined,prevent) // only use first list for getting selected after list is populated
+			} else {
+				this.lists.forEach(list => list.val = val)
+				super.set(val,undefined,prevent)
+				this.setDoms(val)
+			}
+		} else {
+			super.set(val,undefined,prevent)
+			this.setDoms(val)
+		}
 	}
 	/**
 	 * creates Html (may be included in additional element) for InputVar and attach it to parent-Html
@@ -118,16 +142,14 @@ class InputVar extends Model {
 			workHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
 			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'select',val:this.val}))
 			// set <select> <option>
-			this.list = new ArrList(
-				myHtml,item => new Html({html:'option',val:item}),
-				() => {return myHtml.el.value},
-				val => {myHtml.el.value = val})
+			const list = new ArrList(myHtml,item => new Html({html:'option',val:item}))
 
 			// if vals defined set list
 			if (props.vals) {
-				this.list.set(props.vals)
+				list.populate(props.vals)
 				if (props.val) myHtml.el.value = props.val
 			}
+			this.lists.push(list)
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
 			const kind = (props.kind==='int'||props.kind==='float')?'number':'text'
 			let val = this.val

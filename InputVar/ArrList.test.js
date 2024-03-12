@@ -13,7 +13,7 @@ describe('ArrList',() => {
 		const parentHtml = new Html({parent:{el:document.getElementById(myId)},html:'div'})
 		const arrList = new ArrList(parentHtml,(item,ix) => {return {html:'span',id:ix,val:item}})
 		const items = ['house','garden','fence']
-		arrList.set(items)
+		arrList.populate(items)
 
 		// have to store vars here in it, it was another content from HtmlSelectTest
 		const itemFirst = document.getElementById(0).innerHTML
