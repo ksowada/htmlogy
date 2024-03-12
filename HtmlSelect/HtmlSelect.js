@@ -56,10 +56,10 @@ class HtmlSelect extends Bits {
 	 * @param {Html[]} htmlArr holds all DOM-item of select as named child according to state_items_arg, or array of direct Html instances when using state_item_arg
 	 * - used when state_items_arg is given, if given Html-Object containing children, which are interpolated, via state_items_arg
 	 * @param {object} propsAdd properties, they will be added to object, so you dont need to repeatedly pass them
-	 * @param {string} [prevent] don't call this type of listeners
+	 * @param {Model~setOptions} [setOpts] options to set Model, concern store & listeners
 	 * @throws {Error} if parent is undefined
 	 */
-	refresh(htmlArr,propsAdd,prevent) {
+	refresh(htmlArr,propsAdd,setOpts) {
 		const props = merge(this.props,propsAdd)
 		this.props = Obj.copy(props) // save props, so refresh can be called later, at many other places, with only htmlArr
 		if (htmlArr == undefined) throw new Error('no parent is given, where shall I render childs?')
@@ -87,7 +87,7 @@ class HtmlSelect extends Bits {
 			}
 		}
 		// set bits and care for mode, by the way HtmlStates will be triggered at bit change, via .onSet() and .onReset()
-		super.refreshBits(htmlArr.length,prevent)
+		super.refreshBits(htmlArr.length,setOpts)
 	}
 	/**
 	 * click on child which is self a HtmlState

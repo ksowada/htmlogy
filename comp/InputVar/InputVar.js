@@ -83,24 +83,25 @@ class InputVar extends Model {
 	 * set actual value, with prevent for some trigger type
 	 * @param {any|any[]} val	actual value
 	 * - for list items: array is for setting list items, primitive is for setting selected
-	 * @param {string} [prevent]	dont call this type of listener
+	 * @param {Model~setOptions} [setOpts] options to set Model, concern store & listeners
 	 */
-	set(val,prevent) {
+	set(val,setOpts={}) {
 		if (this.lists.length > 0) {
 			if (Arr.is(val)) {
 				this.lists.forEach(list => {
-					const preSelect = list.val // selection shall remain after list populate
+					// stored selection or previous selection shall remain after list populate
+					const select = (this.val!==undefined) ? this.val : list.val
 					list.populate(val)
-					if (preSelect!=='') list.val = preSelect // previos selection, use only if valid
+					if (select!=='') list.val = select // previos selection, use only if valid
 				})
-				super.set(this.lists[0].val,undefined,prevent) // only use first list for getting selected after list is populated
+				super.set(this.lists[0].val,undefined,setOpts) // only use first list for getting selected after list is populated
 			} else {
 				this.lists.forEach(list => list.val = val)
-				super.set(val,undefined,prevent)
+				super.set(val,undefined,setOpts)
 				this.setDoms(val)
 			}
 		} else {
-			super.set(val,undefined,prevent)
+			super.set(val,undefined,setOpts)
 			this.setDoms(val)
 		}
 	}
