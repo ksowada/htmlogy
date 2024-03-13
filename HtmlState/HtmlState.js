@@ -1,5 +1,6 @@
 // import Int from '../../Int/Int' // TODO for dev and build: npm run test need .js extension, but not dev...
 import Arr from '../../Arr/Arr.js'
+import Bit from '../../Bit/Bit.js'
 import Int from '../../Int/Int.js' // TODO for test: npm run test need .js extension, but not dev...
 import Str from '../../Str/Str.js'
 
@@ -12,7 +13,6 @@ import Str from '../../Str/Str.js'
 class HtmlState {
 	/**
 	 * @typedef {object} HtmlState~props
-	 * - also pass props to each HtmlState instance @see {@link HtmlState~props}
 	 * @property {object} props properties
 	 * @property {string[]} [props.states]
 	 * - array of names of all available states in sequence with other actions
@@ -23,7 +23,7 @@ class HtmlState {
 	 * - in it you can describe changes to Html-Objects and there actions on Html with each state bundled in Array with size as states
 	 * @property {object} props.state_item_arg contains states and actions on obj, but only .css is implemented
 	 * - in it you can describe changes to Html-Objects and there actions on Html with each state bundled in Array with size as states
-	 * @property {any} [props.state] actual state at reset, when undefined it uses 1st state, either string for named states or number for unnamed states
+	 * @property {any} [props.state] actual state at reset, when undefined or empty string it uses 1st state, either string for named states or number for unnamed states
 	 */
 	/**
 	 * @param {object} master containing the Object whose Html-Object(s) may be changed, may also be Array, containing Objects with one key, used for address in state_items_arg (f.e. like in Html.childs)
@@ -61,11 +61,11 @@ class HtmlState {
 			this.state_cnt = this.props.states.length
 		}
 		// set state if defined
-		if (props.state==undefined) {
+		if (props.state==undefined||props.state==='') {
 			this.set_state_ix(0)
 		} else if (Str.is(props.state)) {
 			this.set_state(props.state)
-		} else if (Int.is(props.state)) {
+		} else if (Int.is(props.state) || Bit.is(props.state)) {
 			this.set_state_ix(props.state)
 		}
 	}
@@ -162,6 +162,7 @@ class HtmlState {
 	 * @param {string} state_ix the wished state index
 	 */
 	set_state_ix(state_ix) { // TODO eliminate refresh for easiness
+		if (Bit.is(state_ix)) state_ix = Bit.toInt(state_ix)
 		this.set_state_ix_only(state_ix)
 		this.refresh()
 	}

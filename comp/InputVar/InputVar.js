@@ -3,6 +3,7 @@ import Model from '../../../Model/Model.js'
 import Obj from '../../../Obj/Obj.js'
 import Html from '../../Html/Html.js'
 import Arr from '../../../Arr/Arr.js'
+import HtmlState from '../../HtmlState/HtmlState.js'
 
 /**
  * @class InputVar
@@ -28,6 +29,8 @@ import Arr from '../../../Arr/Arr.js'
  * - currency
  * - range
  * - select
+ * - evt
+ * - bit use props.states
  * @property {string} [props.label] label for input, or button, (distinct from val, which is the val of this)
  * @property {any} [props.val] default value, when no storage value is available
  * @property {any[]} [props.vals] default values, for list items as select option
@@ -35,6 +38,7 @@ import Arr from '../../../Arr/Arr.js'
  * @property {string} [props.storeEn] f.e. write: prohibit store and disable models listener, default is true
  * @property {number} [props.min] minimum value to bound
  * @property {number} [props.max] maximum value to bound
+ * @property {object} [props.states] supply Html create arg array @see {@link HtmlState~props}, implemented for kind:bit
  */
 class InputVar extends Model {
 	static typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency' || kind==='range')
@@ -60,6 +64,12 @@ class InputVar extends Model {
 		 * @type {Html[]}
 		 */
 		this.lists = []
+
+		/**
+		 * optional field when HtmlState is used
+		 * @type {HtmlSelect[]}
+		 */
+		this.states = []
 
 		this.props = Obj.copy(props)
 	}
@@ -104,6 +114,9 @@ class InputVar extends Model {
 			super.set(val,undefined,setOpts)
 			this.setDoms(val)
 		}
+		if (this.states && this.states.length) {
+			this.states.forEach(state => state.set_state_ix(val))
+		}
 	}
 	/**
 	 * creates Html (may be included in additional element) for InputVar and attach it to parent-Html
@@ -115,7 +128,14 @@ class InputVar extends Model {
 	 * @throws {Error} if kind is not implemented
 	 */
 	dom(parentHtml,propsAdd) {
-		if (propsAdd && propsAdd.val) this.val = propsAdd.val
+		// first set val, for every mode
+		if (propsAdd && propsAdd.val) {
+			if (props.kind==='bit') {
+				this.val = Boolean(propsAdd.val)
+			} else {
+				this.val = propsAdd.val
+			}
+		}
 
 		// prepare html arg
 		const props = Html.mergeDatas(this.props,propsAdd)
@@ -137,8 +157,14 @@ class InputVar extends Model {
 
 		// create html according to kind
 		// evt (button)
-		if (props.kind==='evt') {
+		if (props.kind==='evt'||props.kind==='bit') {
 			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
+			if (props.kind==='bit') {
+				if (this.val===undefined || this.val==='') this.val = false
+				if(props.states!==undefined) {
+					this.states.push(new HtmlState(myHtml,{state_item_arg:props.states,state:this.val}))
+				}
+			}
 		} else if (props.kind==='select') {
 			workHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
 			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'select',val:this.val}))
@@ -170,7 +196,8 @@ class InputVar extends Model {
 
 		// attach events
 		switch (props.kind) {
-		case 'evt': myHtml.append({evts:{'click':this.onChange.bind(this)}}); break
+		case 'evt':
+		case 'bit': myHtml.append({evts:{'click':this.onChange.bind(this)}}); break
 		case 'range': myHtml.append({evts:{'input':this.onChange.bind(this)}}); break
 		default: myHtml.append({evts:{'change':this.onChange.bind(this)}}); break
 		}
@@ -220,6 +247,7 @@ class InputVar extends Model {
 	 * @param {Event} event to identify the event targets value
 	 */
 	onChange(event) {
+		console.log('inputVar.onChange',event)
 		let val = event.target.value
 		if (this.props.kind==='int'||this.props.kind==='float') {
 			if (this.props.kind==='int') val = Number.parseInt(val)
@@ -227,6 +255,8 @@ class InputVar extends Model {
 			const valBound = this.checkBound(val,this.props)
 			if (val!==valBound) event.target.value = valBound
 			val = valBound
+		} else if (this.props.kind === 'bit') {
+			val = !this.val
 		}
 		this.val = val
 	}
