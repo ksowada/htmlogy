@@ -255,18 +255,15 @@ class Elem {
 		for (let ix = 0; ix < foundEls.length; ix++) {
 			const foundEl = foundEls[ix]
 			let found_atts = 0
-			const searchAttsLen = Object.keys(search.atts).length // remember as have to find any atts in foundEl
-			Object.keys(search.atts).forEach(attKey => {
-				const foundElAtt = foundEl.getAttribute(attKey)
-				if (foundElAtt!==null && foundElAtt==search.atts[attKey]) found_atts++
-			})
-			// for (const attKey in search_attsArr) {
-			// 	if (Object.hasOwnProperty.call(search_attsArr,attKey)) {
-			// 		// const element = search_attsArr[attKey]; // TODO only use attKey?
-
-			// 	}
-			// }
-			if (found_atts==searchAttsLen) {
+			let search_atts_len = 0
+			if (search.atts) { // if no search atts, then element is already found by search.html
+				search_atts_len = Object.keys(search.atts).length // remember as have to find any atts in foundEl
+				Object.keys(search.atts).forEach(attKey => {
+					const foundElAtt = foundEl.getAttribute(attKey)
+					if (foundElAtt!==null && foundElAtt==search.atts[attKey]) found_atts++
+				})
+			}
+			if (found_atts==search_atts_len) {
 				Html.edit(undefined,{el:foundEl},edit,'change') // TODO shall change el, but static change is deleted
 				changeCnt++
 			}

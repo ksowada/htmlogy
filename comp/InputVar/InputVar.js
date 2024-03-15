@@ -7,9 +7,9 @@ import HtmlState from '../../HtmlState/HtmlState.js'
 
 /**
  * @class InputVar
+ * @extends Model
  * represents a variable
  * - multiple DOM implementations are available
- * - extends Model
  *   - Storage (with initial,load,save) as extends Model
  *   - multiple events can be triggered on change
  * - direct access to value through get and set of 'val'
