@@ -30,7 +30,7 @@ class Html {
 	 * @typedef {object} Html~createarg common ways to address HTMLElement in DOM, choose only 1 of those
 	 * @property {object} arg contains information about the element	 *
 	 * @property {string} arg.id id of HTMLElement, optional to el
-	 * @property {string} arg.h template syntax, see htm from https://github.com/developit/htm/tree/master
+	 * @property {string} arg.h template syntax, see htm from @see {@link https://github.com/developit/htm}
 	 * - you may deliver a string, valid html or optionally with missing end tag
 	 * - for template syntax, use import {html} from 'htm/preact'
 	 * @property {string} arg.html htmlTagName, div if unused, SVG supported, it adds namespace automatically
@@ -721,10 +721,10 @@ class Html {
 	 * - merge Object atts, evts to any level like {div:{atts:{id:'3'}}}
 	 * - if next obj[key] is undefined overwrite also, so you can disable defaults
 	 * overwrite other
-	 * @param {object[]} objs multiple to merge, the last dominates
+	 * @param {...object} objs multiple to merge, the last dominates
 	 * @returns {object} result of merging
 	 */
-	static mergeDatas(objs) {
+	static mergeDatas(...objs) {
 		const ret = {}
 		for (let i = 0; i < arguments.length; i++) {
 			const arg = arguments[i]
