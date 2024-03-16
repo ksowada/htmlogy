@@ -8,7 +8,7 @@ import Ids from '../../logic/Ids/Ids.js'
 import State from '../../logic/State.js'
 import Trees from '../../logic/Trees.js'
 import HtmlElComp from '../html/HtmlElComp.js'
-import Elem from '../../logic/html/Elem/Elem.js'
+import Elem from '../../htmlogy/Elem/Elem.js'
 
 /**
  * shows an tree from given data. data can be applied by method update

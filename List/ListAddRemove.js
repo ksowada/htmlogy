@@ -1,7 +1,7 @@
 import Str from '../../logic/Str/Str.js'
 import Button from '../Button/Button.js'
-import Html from '../../logic/html/Html/Html.js'
-import HtmlElComp from '../../logic/html/HtmlComp/HtmlElComp.js'
+import Html from '../../htmlogy/Html/Html.js'
+import HtmlElComp from '../../htmlogy/HtmlComp/HtmlElComp.js'
 import List from './List.js'
 import './ListAddRemove.scss'
 /**
