@@ -1,4 +1,4 @@
-import Vars from '../../Vars/Vars'
+import Vars from '../../logic/Vars/Vars'
 import Html from '../Html/Html'
 
 /**

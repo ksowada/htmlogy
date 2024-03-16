@@ -3,7 +3,7 @@ import expect from 'expect.js'
 import {create_dom} from '../../HtmlTest/Html.JSDOM.js'
 import Tags from './Tags.js'
 import Html from '../../Html/Html.js'
-import Bits from '../../../Bits/Bits.js'
+import Bits from '../../../logic/Bits/Bits.js'
 
 describe('Tags',() => {
 	const myId = 'myId'

@@ -1,11 +1,11 @@
-import Arr from '../../../Arr/Arr'
-import HtmlSelect from '../../../html/HtmlSelect/HtmlSelect'
+import Arr from '../../../logic/Arr/Arr'
+import HtmlSelect from '../../HtmlSelect/HtmlSelect'
 import Tags from '../Tags/Tags'
 import InputVar from './InputVar'
 
 /**
- * represents multiple variables
  * @class InputVars
+ * represents multiple variables
  */
 class InputVars {
 /**

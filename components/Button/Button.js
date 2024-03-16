@@ -3,7 +3,7 @@ import Str from '../../logic/Str/Str.js'
 import HtmlComp from '../../html/HtmlComp/HtmlComp.js'
 import Html from '../../html/html/Html/Html.js'
 import Vars from '../../logic/Vars/Vars.js'
-import Elem from '../../htmlogy/Elem/Elem.js'
+import Elem from '../../Elem/Elem.js'
 
 /**
  * @class Button use as HtmlComp

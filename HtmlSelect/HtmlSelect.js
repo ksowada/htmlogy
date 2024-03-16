@@ -1,7 +1,7 @@
 import {merge} from 'lodash-es'
-import Arr from '../../Arr/Arr.js'
-import Bits from '../../Bits/Bits.js'
-import Obj from '../../Obj/Obj.js'
+import Arr from '../../logic/Arr/Arr.js'
+import Bits from '../../logic/Bits/Bits.js'
+import Obj from '../../logic/Obj/Obj.js'
 import HtmlState from '../HtmlState/HtmlState.js'
 
 /**

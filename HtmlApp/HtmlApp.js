@@ -2,7 +2,7 @@
 // import build_datetime from '../../../../build.datetime.json'
 import Html from '../Html/Html.js'
 import HtmlUtils from '../HtmlUtils/HtmlUtils.js'
-import Times from '../../Times.js'
+import Times from '../../logic/Times.js'
 import Elem from '../Elem/Elem.js'
 /**
  * @class
@@ -15,7 +15,7 @@ import Elem from '../Elem/Elem.js'
 // TODO rename Appl => App, remove Html prefix, what for
 // TODO extends HTMLElement (see ACE https://mkslanc.github.io/ace-playground/#shadow-dom)
 // TODO use Appl customElements https://developer.mozilla.org/en-US/docs/Web/API/Window/customElements
-class HtmlApplComp {
+class HtmlApp {
 	static DATE_TIME_FORMAT = 'yyyy-mm-dd HH:MM:ss'
 	/**
 	 * create .app with arg.my
@@ -78,4 +78,4 @@ class HtmlApplComp {
 		return rest
 	}
 }
-export default HtmlApplComp
+export default HtmlApp

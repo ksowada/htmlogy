@@ -1,7 +1,7 @@
-import Arr from '../../../Arr/Arr'
-import Listener from '../../../Listener/Listener'
-import Model from '../../../Model/Model'
-import Obj from '../../../Obj/Obj'
+import Arr from '../../../logic/Arr/Arr'
+import Listener from '../../../logic/Listener/Listener'
+import Model from '../../../logic/Model/Model'
+import Obj from '../../../logic/Obj/Obj'
 import InputVars from './InputVars'
 
 /**

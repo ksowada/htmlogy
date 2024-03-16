@@ -1,7 +1,7 @@
-import Obj from '../../Obj/Obj.js'
+import Obj from '../../logic/Obj/Obj.js'
 import HtmlComp from './HtmlComp.js'
 import Html from '../Html/Html.js'
-import Vars from '../../Vars/Vars.js'
+import Vars from '../../logic/Vars/Vars.js'
 /**
  * @class
  * @augments HtmlComp

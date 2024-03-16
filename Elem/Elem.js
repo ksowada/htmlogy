@@ -1,9 +1,9 @@
-import Arr from '../../Arr/Arr.js'
-import Bit from '../../Bit/Bit.js'
-import Int from '../../Int/Int.js'
-import Obj from '../../Obj/Obj.js'
-import Str from '../../Str/Str.js'
-import Vars from '../../Vars/Vars.js'
+import Arr from '../../logic/Arr/Arr.js'
+import Bit from '../../logic/Bit/Bit.js'
+import Int from '../../logic/Int/Int.js'
+import Obj from '../../logic/Obj/Obj.js'
+import Str from '../../logic/Str/Str.js'
+import Vars from '../../logic/Vars/Vars.js'
 import Html from '../Html/Html.js'
 
 // TODO extends Element may provide easier access to other functions

@@ -2,7 +2,7 @@
 // import Html from '../html/html/Html/Html'
 // import HtmlOpenable from '../Html/HtmlOpenable/HtmlOpenable'
 // import Arr from '../logic/Arr/Arr'
-import Arr from '../../Arr/Arr'
+import Arr from '../../logic/Arr/Arr'
 import Html from '../Html/Html'
 import HtmlOpenable from '../HtmlOpenable/HtmlOpenable'
 import './Menu.scss'

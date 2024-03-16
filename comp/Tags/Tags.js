@@ -1,4 +1,4 @@
-import Model from '../../../Model/Model.js'
+import Model from '../../../logic/Model/Model.js'
 import Html from '../../Html/Html.js'
 import HtmlSelect from '../../HtmlSelect/HtmlSelect.js'
 import ArrList from '../ArrList/ArrList.js'

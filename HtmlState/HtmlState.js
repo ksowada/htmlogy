@@ -1,8 +1,8 @@
-// import Int from '../../Int/Int' // TODO for dev and build: npm run test need .js extension, but not dev...
-import Arr from '../../Arr/Arr.js'
-import Bit from '../../Bit/Bit.js'
-import Int from '../../Int/Int.js' // TODO for test: npm run test need .js extension, but not dev...
-import Str from '../../Str/Str.js'
+// import Int from '../../logic/Int/Int' // TODO for dev and build: npm run test need .js extension, but not dev...
+import Arr from '../../logic/Arr/Arr.js'
+import Bit from '../../logic/Bit/Bit.js'
+import Int from '../../logic/Int/Int.js' // TODO for test: npm run test need .js extension, but not dev...
+import Str from '../../logic/Str/Str.js'
 
 // TODO dont work, as btn may be carry 2 States at once, deactivate (but show other toggle state also ), allow mult master, as many states can involve 1 Html extends is not appropriate (extend container Html and), introduce .toggle() that introduce an event
 /**

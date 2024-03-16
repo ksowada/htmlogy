@@ -1,8 +1,8 @@
 import ArrList from '../ArrList/ArrList.js'
-import Model from '../../../Model/Model.js'
-import Obj from '../../../Obj/Obj.js'
+import Model from '../../../logic/Model/Model.js'
+import Obj from '../../../logic/Obj/Obj.js'
 import Html from '../../Html/Html.js'
-import Arr from '../../../Arr/Arr.js'
+import Arr from '../../../logic/Arr/Arr.js'
 import HtmlState from '../../HtmlState/HtmlState.js'
 
 /**

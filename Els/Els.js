@@ -1,6 +1,6 @@
 import {flattenDeep} from 'lodash-es'
-import Ids from '../../Ids/Ids'
-import Obj from '../../Obj/Obj'
+import Ids from '../../logic/Ids/Ids'
+import Obj from '../../logic/Obj/Obj'
 
 /**
  * @class

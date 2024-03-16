@@ -1,6 +1,6 @@
 import Button from '../Button/Button.js'
-import Html from '../../htmlogy/Html/Html.js'
-import HtmlComp from '../../htmlogy/HtmlComp/HtmlComp.js'
+import Html from '../../Html/Html.js'
+import HtmlComp from '../../HtmlComp/HtmlComp.js'
 import List from '../List/List.js'
 /**
  * @class

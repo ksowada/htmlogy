@@ -1,10 +1,10 @@
 import {html} from 'htm/preact'
-import Arr from '../../Arr/Arr.js'
-import Obj from '../../Obj/Obj.js'
-import ObjObj from '../../Obj/ObjObj.js'
-import Str from '../../Str/Str.js'
-import Timer from '../../Timer/Timer.js'
-import Vars from '../../Vars/Vars.js'
+import Arr from '../../logic/Arr/Arr.js'
+import Obj from '../../logic/Obj/Obj.js'
+import ObjObj from '../../logic/Obj/ObjObj.js'
+import Str from '../../logic/Str/Str.js'
+import Timer from '../../logic/Timer/Timer.js'
+import Vars from '../../logic/Vars/Vars.js'
 import Elem from '../Elem/Elem.js'
 /**
  * @class
