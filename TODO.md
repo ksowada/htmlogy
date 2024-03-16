@@ -1,1 +1,2 @@
-TODO outsource Elements to COMP (like Button, except Html...)
+- TODO outsource Elements to COMP (like Button, except Html...)
+- TODO seperate data from mapping with json layer before js comes special
