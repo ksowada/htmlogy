@@ -1,0 +1,15 @@
+.list-item {
+	cursor:	pointer;
+}
+.selected {		
+	color: var(--col-back);
+	background-color: var(--col-fore);
+	box-shadow: 0vw 0vw 3vw 1vw var(--col-back-accent);
+	transition: background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+}
+.deselected	{		
+	color: var(--col-fore);
+	background-color: unset;
+	box-shadow: 0vw 0vw 0vw 0vw var(--col-back-accent);
+	transition: background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
+}

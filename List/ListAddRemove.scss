@@ -1,0 +1,21 @@
+@import './../../App/Design/Proportions/Proportions.scss';
+
+.tags-bar {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+}
+.tags {
+    display: contents;
+	grid-gap: var(--ui-gap);
+	margin: var(--ui-gap);
+}
+.tags > .tag {
+	display: grid;
+	align-self: center;
+	align-items: center;
+	text-align: center;
+	min-width: var(--ui-height);
+	min-height: var(--ui-width);
+	@include border(var(--col-back-accent),var(--col-back-accent),#0005);
+}
