@@ -139,6 +139,15 @@ class Elem {
 		return textInt.substring(posStart,posEnd).toLowerCase()
 	}
 	/**
+	 * find self-closing tag
+	 * @param {string} text valid HTML/XML string
+	 * @returns {boolean} true when self closing
+	 */
+	static tagSelfClosing(text) {
+		const chars = Str.substringLast(text, 2)
+		return (chars==='/>')
+	}
+	/**
 	 * create text of closing HTML/XML element with lowercase characters
 	 * @param {string} tag HTML/XML Tag name
 	 * @returns {string} text of closing HTML/XML element
@@ -154,6 +163,7 @@ class Elem {
 	static addEndTag(text) {
 		let hText = text.trim()
 		let hTag = Elem.tag(hText)
+		if (Elem.tagSelfClosing(hText)) return hText
 		let hTagEnd = Elem.tagClosing(hTag) //
 		if (!hText.toLowerCase().endsWith(hTagEnd)) hText += hTagEnd
 		return hText
