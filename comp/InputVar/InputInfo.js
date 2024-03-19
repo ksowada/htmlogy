@@ -1,5 +1,4 @@
 // @ts-check
-
 import {icons} from '../../../global'
 import InputVar from './InputVar'
 import Obj from '../../../logic/Obj/Obj'
@@ -73,33 +72,15 @@ class InputInfo extends InputVar {
 		 * @type {any}
 		 */
 		this.ui = {}
-
 		/**
 		 * @type {InputVar[]}
 		 */
 		this.vars_actions = []
-
 		/**
 		 * @type {InputVar[]}
 		 */
 		this.vars_subs = []
-		// actions
-		// this.actions = {}
-		// if (props.actions) {
-		// 	props.actions.forEach(actionKey => {
-		// 		this.actions[actionKey] = this.actionSubs[actionKey]
-		// 	})
-		// }
-		// subs
 
-		// this.subs = {}
-		// if (_props.subs!==undefined) {
-		// 	const keys = Object.keys(_props.subs)
-		// 	// keys.forEach(subKey => this.subs[subKey] = _props.subs?[subKey])
-		// 	for (var attr in _props.subs) {
-		// 		if (_props.subs.hasOwnProperty(attr)) this.subs[attr] = _props.subs[attr]
-		// 	}
-		// }
 	}
 	/**
 	 * creates Html (may be included in additional element) and attach it to parent-Html
@@ -126,7 +107,6 @@ class InputInfo extends InputVar {
 		const en = Obj.defaults(props.en,{en:'bit',val:enVal})
 		this.vars.en = new InputVar(en,[this.ids,'en'])
 		this.vars.en.on('en',this.enChanged.bind(this))
-		// this.vars.en.set()
 
 		if (props.label) {
 			this.vars.en.dom(this.ui.container,{kind:'bit',label:props.label,atts:{disabled:!props.en},...props.en})
@@ -137,13 +117,6 @@ class InputInfo extends InputVar {
 			// this.vars.is = this
 			super.dom(this.ui.form,props)
 		}
-		// for (var actionKey in props.actions) {
-		// 	if (this.actionSubs.hasOwnProperty(actionKey)) {
-		// 		const action = new InputVar({},actionKey)
-		// 		action.dom(this.ui.container,this.actionSubs[actionKey])
-		// 		this.vars_actions.push(action)
-		// 	}
-		// }
 		/** @type string[] */
 		const actions = props.actions
 		if (actions) {
@@ -151,39 +124,29 @@ class InputInfo extends InputVar {
 				this.vars_actions.push(new InputVar({},[this.ids,key]).dom(this.ui.form,this.action_subs[key]))
 			})
 		}
-		// if (props.subs) {
-		// 	Object.keys(props.subs).forEach(key => {
-		// 		this.vars_subs.push(new InputVar({},[this.ids,key]).dom(this.ui.container,{...props.subs[key]}))
-		// 	})
-		// }
 
 		/** @type {any} */
 		const subs = props.subs
 		for (var key in subs) {
-			// if (subs.hasOwnProperty(key)) {
-			// const action = new InputVar({},key)
-			// action.dom(this.ui.container,props.subs[key])
 			this.vars_subs.push(new InputVar({},[this.ids,key]).dom(this.ui.form,props.subs[key]))
-			// }
 		}
 
-		// this.vars_subs = Object.keys(props.subs).map(subKey => new InputVar({},subKey).dom(this.ui.container,{...props.subs[subKey],callback:{props.subs[subKey].callback && props.subCallback.bind(this,props.subs[subKey].callback)}}))
 
 		this.enChanged() // TODO important? or maybe with listener
 		return this
 	}
 	inputsCopy() {
-		navigator.clipboard.writeText(this.vars.is.val)
+		navigator.clipboard.writeText(this.val)
 	}
 	async inputsPaste() {
 		const val = await navigator.clipboard.readText()
-		this.vars.is.val = val
+		this.val = val
 	}
 	inputsClear() {
-		this.vars.is.val = ''
+		this.val = ''
 	}
 	inputsReset() {
-		this.vars.is.reset() // this.reset('is')
+		this.reset() // this.reset('is')
 	}
 	/**
 	 * call callback from info and put return value into value
@@ -193,7 +156,7 @@ class InputInfo extends InputVar {
 	subCallback(subCallbackOrig) {
 		if (subCallbackOrig) {
 			const ret = subCallbackOrig()
-			if (ret!==undefined) this.vars.is.val = ret
+			if (ret!==undefined) this.val = ret
 		}
 	}
 	enChanged() {

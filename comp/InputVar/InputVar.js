@@ -5,6 +5,9 @@ import Html from '../../Html/Html.js'
 import Arr from '../../../logic/Arr/Arr.js'
 import HtmlState from '../../HtmlState/HtmlState.js'
 import Numbers from '../../../logic/Numbers/Numbers.js'
+import Int from '../../../logic/Int/Int.js'
+import Float from '../../../logic/Float/Float.js'
+import Str from '../../../logic/Str/Str.js'
 
 /**
  * @class InputVar
@@ -22,7 +25,7 @@ import Numbers from '../../../logic/Numbers/Numbers.js'
 /**
  * @typedef {object} InputVar~props common ways to address HTMLElement in DOM, choose only 1 of those
  * @property {object} props parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
- * @property {string} props.kind kind of element, important for dom(), also used as CSS-class
+ * @property {string} [props.kind] kind of element, important for dom(), also used as CSS-class, if not given it is adapted to .val attribute or defaults to text
  *
  * supported:
  * - text
@@ -43,9 +46,18 @@ import Numbers from '../../../logic/Numbers/Numbers.js'
  * @property {object} [props.states] supply Html create arg array @see {@link HtmlState~props}, implemented for kind:bit
  * @property {boolean} [props.resize] resize input to containing text
  * @property {string} [props.listen] dom event to change model , f.e. change,input,...
+ * @property {Function} [props.callback] called after set at onChange with parameter(val)
  */
 class InputVar extends Model {
 	static typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency' || kind==='range')
+	static kindGuess = props => {
+		if (props.kind) return props.kind
+		if (Int.is(props.val)) return 'int'
+		if (Float.is(props.val)) return 'float'
+		if (Str.is(props.val)) return 'text'
+		if (Arr.is(props.val)) return 'select'
+		return 'text'
+	}
 	static valueMinSize_ch = 8
 	static valueMaxSize_ch = 55
 	/**
@@ -59,7 +71,7 @@ class InputVar extends Model {
 
 		super(val,ids,storeEn)
 
-		this.props = Obj.defaults(props,{kind:'text'})
+		this.props = Obj.copy(props) // Obj.defaults(props,{kind:InputVar.kindGuess(props)})
 
 		/**
 		 * all DOM implementations of this
@@ -130,7 +142,7 @@ class InputVar extends Model {
 	 *
 	 * may be called multiple times
 	 * @param {Html} parentHtml Html to attach to
-	 * @param {InputVar~props} propsAdd properties to add to element, only for this html, dont change this
+	 * @param {InputVar~props} propsAdd properties to add to element and remember this for next dom() calls
 	 * @returns {InputVar} this for chaining dom when wished
 	 * @throws {Error} if kind is not implemented
 	 */
@@ -230,6 +242,7 @@ class InputVar extends Model {
 		// remember dom implementation, ⚠️ forget propsAdd
 		this.htmls.push(myHtml)
 
+		this.props = props // remember kind and other props
 		return this
 	}
 	/**
@@ -276,7 +289,12 @@ class InputVar extends Model {
 		} else if (this.props.kind === 'bit') {
 			val = !this.val
 		}
-		this.val = val
+		if (this.props.kind === 'evt') {
+			this.changed() // trigger listeners
+		} else {
+			this.val = val 
+		}
+		if (this.props.callback) this.props.callback(val)
 	}
 	/**
 	 * sets the value of the DOM element, if already existing
