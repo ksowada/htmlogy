@@ -15,6 +15,10 @@ class InputVars {
  * @param {object} arg object with variable names as keys and variable objects as values
  */
 	constructor(id,arg) {
+		/** 
+		 * contains every variable 
+		 * @type {Object.<string, InputInfo_props>}
+		 * */
 		this.vars = {}
 		Object.keys(arg).forEach(varName => {
 			this[varName] = this.vars[varName] = InputVars.getInstance(arg[varName].kind,arg[varName],[id,varName]) // TODO as issue with typescript,. vars is the right way, this only appreviation, or mark this.members with _
@@ -60,6 +64,15 @@ class InputVars {
 	 */
 	setAll(key,val) {
 		return this.vars[key] && val && this.vars[key].setAll(val)
+	}
+	/** 
+	 * change or set general properties of all variables
+	 * @param {object} props properties
+	 */
+	setProps(props) {
+		/** additional properties */
+		this.propsAdd = props
+		Object.keys(this.vars).forEach(key => this.vars[key].change(this.propsAdd))
 	}
 	/**
 	 * listens to a dataKey for all infos

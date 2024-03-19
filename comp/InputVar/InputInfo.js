@@ -60,10 +60,10 @@ class InputInfo extends InputVar {
 		 * @type {any}
 		 */
 		this.action_subs = {
-			clear:{kind:'btn',icon:icons('xmark'),label:'clear',callback:this.inputsClear.bind(this)}, // TODO inputs rename to act...
-			paste:{kind:'btn',icon:icons('clipboard'),label:'paste',callback:this.inputsPaste.bind(this)}, // TODO callback rename to fill
-			copy:{kind:'btn',icon:icons('copy'),label:'copy',callback:this.inputsCopy.bind(this)},
-			reset:{kind:'btn',icon:icons('rotate-left'),label:'reset',callback:this.inputsReset.bind(this)},
+			clear:{kind:'evt',icon:icons('xmark'),tooltip:'clear',callback:this.inputsClear.bind(this)}, // TODO inputs rename to act...
+			paste:{kind:'evt',icon:icons('clipboard'),tooltip:'paste',callback:this.inputsPaste.bind(this)}, // TODO callback rename to fill
+			copy:{kind:'evt',icon:icons('copy'),tooltip:'copy',callback:this.inputsCopy.bind(this)},
+			reset:{kind:'evt',icon:icons('rotate-left'),tooltip:'reset',callback:this.inputsReset.bind(this)},
 		}
 		/**
 		 * @type {any}
@@ -114,7 +114,7 @@ class InputInfo extends InputVar {
 		/**
 		 * @type {any}
 		 */
-		const props = Html.mergeDatas(this.props,propsAdd)
+		const props = Html.mergeDatas(this.props,this.propsAdd,propsAdd)
 
 		this.ui.container = html.add({h:'<div class="InputInfo">'})
 
@@ -123,7 +123,7 @@ class InputInfo extends InputVar {
 		 * @type InputVar
 		 */
 		const enVal = (!props.en || props.en.val)
-		const en = Obj.defaults(props,{en:'bit',val:enVal})
+		const en = Obj.defaults(props.en,{en:'bit',val:enVal})
 		this.vars.en = new InputVar(en,[this.ids,'en'])
 		this.vars.en.on('en',this.enChanged.bind(this))
 		// this.vars.en.set()
@@ -135,7 +135,7 @@ class InputInfo extends InputVar {
 
 		if (this.get()!==undefined) {
 			// this.vars.is = this
-			super.dom(this.ui.container,props)
+			super.dom(this.ui.form,props)
 		}
 		// for (var actionKey in props.actions) {
 		// 	if (this.actionSubs.hasOwnProperty(actionKey)) {
@@ -148,7 +148,7 @@ class InputInfo extends InputVar {
 		const actions = props.actions
 		if (actions) {
 			actions.forEach(key => {
-				this.vars_actions.push(new InputVar({},[this.ids,key]).dom(this.ui.container,this.action_subs[key]))
+				this.vars_actions.push(new InputVar({},[this.ids,key]).dom(this.ui.form,this.action_subs[key]))
 			})
 		}
 		// if (props.subs) {
@@ -163,7 +163,7 @@ class InputInfo extends InputVar {
 			// if (subs.hasOwnProperty(key)) {
 			// const action = new InputVar({},key)
 			// action.dom(this.ui.container,props.subs[key])
-			this.vars_subs.push(new InputVar({},[this.ids,key]).dom(this.ui.container,props.subs[key]))
+			this.vars_subs.push(new InputVar({},[this.ids,key]).dom(this.ui.form,props.subs[key]))
 			// }
 		}
 

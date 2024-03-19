@@ -4,10 +4,11 @@ import Obj from '../../../logic/Obj/Obj.js'
 import Html from '../../Html/Html.js'
 import Arr from '../../../logic/Arr/Arr.js'
 import HtmlState from '../../HtmlState/HtmlState.js'
+import Numbers from '../../../logic/Numbers/Numbers.js'
 
 /**
  * @class InputVar
- * @extends Model
+ * @augments Model
  * represents a variable
  * - multiple DOM implementations are available
  * - extends Model
@@ -40,9 +41,13 @@ import HtmlState from '../../HtmlState/HtmlState.js'
  * @property {number} [props.min] minimum value to bound
  * @property {number} [props.max] maximum value to bound
  * @property {object} [props.states] supply Html create arg array @see {@link HtmlState~props}, implemented for kind:bit
+ * @property {boolean} [props.resize] resize input to containing text
+ * @property {string} [props.listen] dom event to change model , f.e. change,input,...
  */
 class InputVar extends Model {
 	static typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency' || kind==='range')
+	static valueMinSize_ch = 8
+	static valueMaxSize_ch = 55
 	/**
 	 * a variable (described by props) get initialized, so it can be mounted multiple times in DOM later, it use Html-Instances
 	 * @param {InputVar~props} [props={}] parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
@@ -51,7 +56,10 @@ class InputVar extends Model {
 	constructor(props={},...ids) {
 		const val = props.val?props.val:InputVar.typeIsNumber(props.kind)?0:''
 		const storeEn = (props.storeEn!==undefined)?props.storeEn:!(props.kind && props.kind==='btn') // true is default, but props.kind=btn
+
 		super(val,ids,storeEn)
+
+		this.props = Obj.defaults(props,{kind:'text'})
 
 		/**
 		 * all DOM implementations of this
@@ -71,8 +79,6 @@ class InputVar extends Model {
 		 * @type {HtmlSelect[]}
 		 */
 		this.states = []
-
-		this.props = Obj.copy(props)
 	}
 	/**
 	 * get actual value
@@ -129,7 +135,7 @@ class InputVar extends Model {
 	 * @throws {Error} if kind is not implemented
 	 */
 	dom(parentHtml,propsAdd) {
-		const props = Html.mergeDatas(this.props,propsAdd)
+		const props = Html.mergeDatas(this.props,this.propsAdd,propsAdd)
 		// first set val, for every mode
 		if (propsAdd && propsAdd.val) {
 			if (props.kind==='bit') {
@@ -158,7 +164,10 @@ class InputVar extends Model {
 		// create html according to kind
 		// evt (button)
 		if (props.kind==='evt'||props.kind==='bit') {
-			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
+			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'button',val:''})) // val is overwritten because of val
+			if (props.icon) myHtml.add({h:`<img class="inline" src=${props.icon} />`})
+			if (props.label) myHtml.add({h:`<span>${props.label}</span>`})
+
 			if (props.kind==='bit') {
 				if (this.val===undefined || this.val==='') this.val = false
 				if(props.states!==undefined) {
@@ -195,17 +204,26 @@ class InputVar extends Model {
 		if (!myHtml) throw new Error('no known kind so extract no HTML')
 
 		// attach events
+		let eventType = ''
 		switch (props.kind) {
 		case 'evt':
-		case 'bit': myHtml.append({evts:{'click':this.onChange.bind(this)}}); break
-		case 'range': myHtml.append({evts:{'input':this.onChange.bind(this)}}); break
-		default: myHtml.append({evts:{'change':this.onChange.bind(this)}}); break
+		case 'bit': eventType='click'; break
+		case 'range': eventType='input'; break
+		default: eventType='change'; break
 		}
+		eventType = props.listen?props.listen:eventType
+		const evts = {}
+		evts[eventType] = this.onChange.bind(this)
+		myHtml.append({evts})
 
 		// attach optional tooltip to Html object
 		if (tooltip) {
 			myHtml.tooltip = tooltip
 			myHtml.tooltip.set = val => myHtml.tooltip.change({atts:{'data-tip':val}})
+		}
+
+		if (props.resize) {
+			this.onTrig(undefined,this.resize.bind(this))
 		}
 
 		/** the generated Html attached here */
@@ -292,6 +310,15 @@ class InputVar extends Model {
 		if (this.props.min!==undefined && valNew < this.props.min) valNew = this.props.min
 		if (this.props.max!==undefined && valNew > this.props.max) valNew = this.props.max
 		return valNew
+	}
+	/**
+	 * resizes the input field to fit the current value
+	 */
+	resize() {
+		if (this.props.kind !== 'text') return // only for inputs
+		const charCnt = this.get(this.model_name) ? this.get(this.model_name).length : 0
+		if (charCnt === null) return
+		this.el.style.width = Numbers.bound(2 + charCnt,this.valueMinSize_ch,this.valueMaxSize_ch) + 'ch' // some kind of broader than only char count for inner padding
 	}
 }
 export default InputVar
