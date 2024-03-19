@@ -7,9 +7,10 @@ import HtmlState from '../../HtmlState/HtmlState.js'
 
 /**
  * @class InputVar
- * @augments Model
+ * @extends Model
  * represents a variable
  * - multiple DOM implementations are available
+ * - extends Model
  *   - Storage (with initial,load,save) as extends Model
  *   - multiple events can be triggered on change
  * - direct access to value through get and set of 'val'
@@ -28,7 +29,7 @@ import HtmlState from '../../HtmlState/HtmlState.js'
  * - float
  * - currency
  * - range
- * - select (when no vals are provided, it is disabled)
+ * - select
  * - evt
  * - bit use props.states
  * @property {string} [props.label] label for input, or button, (distinct from val, which is the val of this)
@@ -44,10 +45,10 @@ class InputVar extends Model {
 	static typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency' || kind==='range')
 	/**
 	 * a variable (described by props) get initialized, so it can be mounted multiple times in DOM later, it use Html-Instances
-	 * @param {InputVar~props} props parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
-	 * @param {string|number} ids (f.e. Storage)
+	 * @param {InputVar~props} [props={}] parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
+	 * @param {any} ids (f.e. Storage)
 	 */
-	constructor(props,...ids) {
+	constructor(props={},...ids) {
 		const val = props.val?props.val:InputVar.typeIsNumber(props.kind)?0:''
 		const storeEn = (props.storeEn!==undefined)?props.storeEn:!(props.kind && props.kind==='btn') // true is default, but props.kind=btn
 		super(val,ids,storeEn)
@@ -82,13 +83,15 @@ class InputVar extends Model {
 	 * set actual value
 	 * @param {any} val	actual value
 	 */
-	set val(val) { // TODO have to use
-		this.set(val)
+	set val(val) {
+		let valIntern = val
+		if (InputVar.typeIsNumber(this.props.kind)) valIntern = Number.parseFloat(val)
+		valIntern = this.checkBound(valIntern)
+		super.val = valIntern
+		this.setDoms(valIntern)
 	}
 	/**
 	 * set actual value, with prevent for some trigger type
-	 *
-	 * at kind=select: you have to dom before set, or set data at dom
 	 * @param {any|any[]} val	actual value
 	 * - for list items: array is for setting list items, primitive is for setting selected
 	 * @param {Model~setOptions} [setOpts] options to set Model, concern store & listeners
@@ -97,7 +100,6 @@ class InputVar extends Model {
 		if (this.lists.length > 0) {
 			if (Arr.is(val)) {
 				this.lists.forEach(list => {
-					this.set_disabled(val.length <2)
 					// stored selection or previous selection shall remain after list populate
 					const select = (this.val!==undefined) ? this.val : list.val
 					list.populate(val)
@@ -110,26 +112,24 @@ class InputVar extends Model {
 				this.setDoms(val)
 			}
 		} else {
-			let valIntern = val
-			if (InputVar.typeIsNumber(this.props.kind)) valIntern = Number.parseFloat(val)
-			valIntern = this.checkBound(valIntern)
-			super.set(valIntern,undefined,setOpts)
-			this.setDoms(valIntern)
-			if (this.states && this.states.length) {
-				this.states.forEach(state => state.set_state_ix(valIntern))
-			}
+			super.set(val,undefined,setOpts)
+			this.setDoms(val)
+		}
+		if (this.states && this.states.length) {
+			this.states.forEach(state => state.set_state_ix(val))
 		}
 	}
 	/**
-	 * creates Html (may be included in additional element) for InputVar and attach it to parent-Html
+	 * creates Html (may be included in additional element) and attach it to parent-Html
 	 *
 	 * may be called multiple times
 	 * @param {Html} parentHtml Html to attach to
 	 * @param {InputVar~props} propsAdd properties to add to element, only for this html, dont change this
-	 * @returns {Html} Html of input or other element connected
+	 * @returns {InputVar} this for chaining dom when wished
 	 * @throws {Error} if kind is not implemented
 	 */
 	dom(parentHtml,propsAdd) {
+		const props = Html.mergeDatas(this.props,propsAdd)
 		// first set val, for every mode
 		if (propsAdd && propsAdd.val) {
 			if (props.kind==='bit') {
@@ -138,9 +138,7 @@ class InputVar extends Model {
 				this.val = propsAdd.val
 			}
 		}
-
 		// prepare html arg
-		const props = Html.mergeDatas(this.props,propsAdd)
 		const arg = Obj.filter(props,Html.ARGS) // use all props that are included in Html
 		let myHtml = null
 
@@ -177,8 +175,6 @@ class InputVar extends Model {
 			if (props.vals) {
 				list.populate(props.vals)
 				if (props.val) myHtml.el.value = props.val
-			} else {
-				this.set_disabled(true,myHtml)
 			}
 			this.lists.push(list)
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
@@ -216,7 +212,7 @@ class InputVar extends Model {
 		// remember dom implementation, ⚠️ forget propsAdd
 		this.htmls.push(myHtml)
 
-		return myHtml
+		return this
 	}
 	/**
 	 * sets the properties of the input variable at all DOM implementations
@@ -283,30 +279,6 @@ class InputVar extends Model {
 	setArg(props,arg) {
 		if (props.min!==undefined) Obj.put(arg,['atts','min'],props.min)
 		if (props.max!==undefined) Obj.put(arg,['atts','max'],props.max)
-	}
-	/**
-	 * sets the disabled state of the input variable at all DOM implementations
-	 * this is called from top-level
-	 * @param {boolean} deactivate - true to disable, false to enable
-	 * @param {Html} [html] when given change this
-	 */
-	set_disabled(deactivate,html) {
-		// eslint-disable-next-line jsdoc/require-param
-		/** change 1 Html */
-		const disable = (_deactivate,_html) => {
-			if (_deactivate) {
-				_html.change({atts:{disabled:'true'}})
-			} else {
-				_html.remove({atts:{disabled:'true'}})
-			}
-		}
-		if (html) {
-			disable(deactivate,html)
-		} else {
-			this.htmls.forEach(htmlInt => {
-				disable(deactivate,htmlInt)
-			})
-		}
 	}
 	/**
 	 * checks value against min and max values, if val is NaN, returns ''
