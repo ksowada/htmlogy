@@ -122,5 +122,8 @@ class InputVars {
 		}
 		return new InputInfo(arg,names)
 	}
+	static propsMerge(...props) {
+		// TODO Obj.mergeJoin planned
+	}
 }
 export default InputVars

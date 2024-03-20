@@ -757,7 +757,7 @@ class Html {
 	 * @param {object[]} objs multiple to merge, the last dominates
 	 * @returns {object} result of merging, optional as first arg is also modified
 	 */
-	static mergeModDatas(objs) {
+	static mergeModDatas(objs) { //  TODO use mergeJoin
 		if (!Vars.is(arguments[0])) return undefined
 		for (let i = 1; i < arguments.length; i++) {
 			const arg = arguments[i]

@@ -17,8 +17,6 @@ describe('InputVar',() => {
 		// have to store vars here in it, it was another content from HtmlSelectTest
 		const itemFirstHtml = inputVar.htmls[0]
 
-		console.log('DOM',itemFirstHtml.el.innerHTML)
-
 		it('value of DOM',() => {
 			expect(itemFirstHtml.el.value).to.eql('2')
 		})
@@ -42,8 +40,6 @@ describe('InputVar',() => {
 
 		// have to store vars here in it, it was another content from HtmlSelectTest
 		const itemFirstHtml = inputVar.htmls[0]
-
-		console.log('DOM',itemFirstHtml.el.innerHTML)
 
 		inputVar.change({max:1})
 		it('value of DOM',() => {

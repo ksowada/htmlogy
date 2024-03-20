@@ -9,6 +9,32 @@ import Int from '../../../logic/Int/Int.js'
 import Float from '../../../logic/Float/Float.js'
 import Str from '../../../logic/Str/Str.js'
 
+
+/**
+ * @typedef InputVarprops common ways to address HTMLElement in DOM, choose only 1 of those, parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
+ * @prop {string} [kind] kind of element, important for dom(), also used as CSS-class, if not given it is adapted to .val attribute or defaults to text
+ *
+ * supported:
+ * - text
+ * - int
+ * - float
+ * - currency
+ * - range
+ * - select
+ * - evt
+ * - bit use states
+ * @prop {string} [label] label for input, or button, (distinct from val, which is the val of this)
+ * @prop {any} [val] default value, when no storage value is available
+ * @prop {any[]} [vals] default values, for list items as select option
+ * @prop {object} [tooltip] optional object containing Html args @see {@link Html~createarg}, you may find it in .htmls[ix].tooltip for access and manipulation, and there is function set(val) implemented
+ * @prop {string} [storeEn] f.e. write: prohibit store and disable models listener, default is true
+ * @prop {number} [min] minimum value to bound
+ * @prop {number} [max] maximum value to bound
+ * @prop {object} [states] supply Html create arg array @see {@link HtmlState~props}, implemented for kind:bit
+ * @prop {boolean} [resize] resize input to containing text
+ * @prop {string} [listen] dom event to change model , f.e. change,input,...
+ * @prop {Function} [callback] called after set at onChange with parameter(val)
+ */
 /**
  * @class InputVar
  * @augments Model
@@ -21,32 +47,6 @@ import Str from '../../../logic/Str/Str.js'
  * - read only or read-write text-fields
  * - Buttons with edge (simple) or state (toggle)
  * - min, max handling
- */
-/**
- * @typedef {object} InputVar~props common ways to address HTMLElement in DOM, choose only 1 of those
- * @property {object} props parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
- * @property {string} [props.kind] kind of element, important for dom(), also used as CSS-class, if not given it is adapted to .val attribute or defaults to text
- *
- * supported:
- * - text
- * - int
- * - float
- * - currency
- * - range
- * - select
- * - evt
- * - bit use props.states
- * @property {string} [props.label] label for input, or button, (distinct from val, which is the val of this)
- * @property {any} [props.val] default value, when no storage value is available
- * @property {any[]} [props.vals] default values, for list items as select option
- * @property {object} [props.tooltip] optional object containing Html args @see {@link Html~createarg}, you may find it in .htmls[ix].tooltip for access and manipulation, and there is function set(val) implemented
- * @property {string} [props.storeEn] f.e. write: prohibit store and disable models listener, default is true
- * @property {number} [props.min] minimum value to bound
- * @property {number} [props.max] maximum value to bound
- * @property {object} [props.states] supply Html create arg array @see {@link HtmlState~props}, implemented for kind:bit
- * @property {boolean} [props.resize] resize input to containing text
- * @property {string} [props.listen] dom event to change model , f.e. change,input,...
- * @property {Function} [props.callback] called after set at onChange with parameter(val)
  */
 class InputVar extends Model {
 	static typeIsNumber = kind => (kind==='int' || kind==='float' || kind==='currency' || kind==='range')

@@ -7,21 +7,26 @@ import Html from '../../Html/Html'
 
 /**
  * @typedef InputInfo_props
- * @property {any} [subs]
- * @property {string[]} [actions]
- * @property {string} [label]
- * @property {InputVar_props} [en] enable of this
+ * @prop {any} [subs]
+ * @prop {string[]} [actions]
+ * @prop {string} [label]
+ * @prop {InputVar_props} [en] enable of this
  */
 /**
- * @typedef Action_props
- * @property {Function} callback
- * @property {string} [label]
- * @property {string} [icon]
- * @property {string} kind kind of InputVar
+ * @typedef Action_props2
+ * @prop {Function} callback
+ * @prop {string} [label]
+ * @prop {string} [icon]
+ * @prop {string} kind kind of InputVar
+ * @extends import("./InputVar").InputVarprops
  */
+/**
+ * @typedef {Action_props2 & import("./InputVar").InputVarprops} Action_props
+ */
+
 /**
  * @typedef InputVar_props
- * @property {any} val
+ * @prop {any} val
  */
 
 /**
@@ -56,7 +61,9 @@ class InputInfo extends InputVar {
 		 */
 		this.renderSequence = ['en','label','this','actions','actionsUser']
 		/**
-		 * @type {any}
+		 * A map-like object that maps arbitrary `string` properties to `number`s.
+		 *
+		 * @type {Object.<string, Action_props>}
 		 */
 		this.action_subs = {
 			clear:{kind:'evt',icon:icons('xmark'),tooltip:'clear',callback:this.inputsClear.bind(this)}, // TODO inputs rename to act...
