@@ -20,9 +20,14 @@ class InputVarsArr extends Listener {
 	constructor(id,arg) {
 		super()
 		this.id = id
+		/**
+		 * contains all variables
+		 * @type {Object.<string, object>}
+		 */
+		this.vars = {}
 		this.varsName = Arr.copy(Object.keys(arg))
 		this.varsName.forEach(varName => {
-			this[varName] = []
+			this.vars[varName] = []
 		})
 		this.argCreate = Obj.copy(arg)
 	}
@@ -39,10 +44,10 @@ class InputVarsArr extends Listener {
 	 */
 	set len(len) {
 		this.varsName.forEach(varName => {
-			while (this[varName].length > len) { this[varName].pop() }
-			while (this[varName].length < len) {
-				this[varName].push(InputVars.getInstance(this.argCreate[varName].kind,this.argCreate[varName],[this.id,varName,this[varName].length]))
-				this[varName][this[varName].length-1].on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this[varName].length))}
+			while (this.vars[varName].length > len) { this.vars[varName].pop() }
+			while (this.vars[varName].length < len) {
+				this.vars[varName].push(InputVars.getInstance(this.argCreate[varName].kind,this.argCreate[varName],[this.id,varName,this.vars[varName].length]))
+				this.vars[varName][this.vars[varName].length-1].on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this.vars[varName].length-1))}
 		})
 		this.size = len
 	}
@@ -53,6 +58,15 @@ class InputVarsArr extends Listener {
 	 */
 	onChange(varName,ix) {
 		this.changed(Model.DEFAULT_KEY)
+	}
+	/**
+	 * 
+	 * @param {Html} html parent Html to mount 1 row of all variables
+	 */
+	dom(html,ix) {
+		Object.keys(this.vars).forEach(varName => {
+			this.vars[varName][ix].dom(html)
+		})
 	}
 }
 export default InputVarsArr
