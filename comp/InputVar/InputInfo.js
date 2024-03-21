@@ -1,23 +1,23 @@
 // @ts-check
-import {icons} from '../../../global'
-import InputVar from './InputVar'
-import Obj from '../../../logic/Obj/Obj'
-import Elem from '../../Elem/Elem'
-import Html from '../../Html/Html'
+import {icons} from '../../../global.js'
+import InputVar from './InputVar.js'
+import Obj from '../../../logic/Obj/Obj.js'
+import Elem from '../../Elem/Elem.js'
+import Html from '../../Html/Html.js'
 
 /**
  * @typedef InputInfo_props
- * @prop {any} [subs]
- * @prop {string[]} [actions]
- * @prop {string} [label]
- * @prop {InputVar_props} [en] enable of this
+ * @property {InputVar_props} [en] enable of this
+ * @property {string} [label]
+ * @property {string[]} [actions]
+ * @property {any} [subs]
  */
 /**
  * @typedef Action_props2
- * @prop {Function} callback
- * @prop {string} [label]
- * @prop {string} [icon]
- * @prop {string} kind kind of InputVar
+ * @property {string} kind kind of InputVar
+ * @property {string} [icon]
+ * @property {string} [label]
+ * @property {Function} callback
  * @extends import("./InputVar").InputVarprops
  */
 /**
@@ -26,7 +26,7 @@ import Html from '../../Html/Html'
 
 /**
  * @typedef InputVar_props
- * @prop {any} val
+ * @property {any} val
  */
 
 /**
@@ -62,7 +62,6 @@ class InputInfo extends InputVar {
 		this.renderSequence = ['en','label','this','actions','actionsUser']
 		/**
 		 * A map-like object that maps arbitrary `string` properties to `number`s.
-		 *
 		 * @type {Object.<string, Action_props>}
 		 */
 		this.action_subs = {
@@ -87,7 +86,6 @@ class InputInfo extends InputVar {
 		 * @type {InputVar[]}
 		 */
 		this.vars_subs = []
-
 	}
 	/**
 	 * creates Html (may be included in additional element) and attach it to parent-Html
@@ -100,12 +98,17 @@ class InputInfo extends InputVar {
 	 */
 	dom(html,propsAdd) {
 		/**
+		 * when no further elements are mounted, there will be no surrounding div element, parentHtml jumps in used div
+		 */
+		let parentHtml = html
+		/**
 		 * @type {any}
 		 */
-		const props = Html.mergeDatas(this.props,this.propsAdd,propsAdd)
+		const props = Html.mergeDatas(this.props,propsAdd)
 
-		this.ui.container = html.add({h:'<div class="InputInfo">'})
-
+		if ((props.subs && Object.keys(props.subs).length > 0) || (props.actions && props.actions.length > 0)) {
+			parentHtml = this.ui.container = html.add({h:'<div class="InputInfo">'})
+		}
 		// TODO en is used even if not domed???
 		/**
 		 * @type InputVar
@@ -115,43 +118,59 @@ class InputInfo extends InputVar {
 		this.vars.en = new InputVar(en,[this.ids,'en'])
 		this.vars.en.on('en',this.enChanged.bind(this))
 
-		if (props.label) {
-			this.vars.en.dom(this.ui.container,{kind:'bit',label:props.label,atts:{disabled:!props.en},...props.en})
+		let args = Obj.copy(props)
+		if (props.en && props.label) {
+			this.vars.en.dom(parentHtml,{kind:'bit',label:props.label,atts:{disabled:!props.en},...props.en})
+			parentHtml = this.ui.form = parentHtml.add({h:'<div>'})
+			args = Obj.omit(args, 'label') // label is already mounted here
 		}
-		this.ui.form = this.ui.container.add({h:'<div>'})
 
 		if (this.get()!==undefined) {
 			// this.vars.is = this
-			super.dom(this.ui.form,props)
+			super.dom(parentHtml,args)
 		}
 		/** @type string[] */
 		const actions = props.actions
 		if (actions) {
 			actions.forEach(key => {
-				this.vars_actions.push(new InputVar({},[this.ids,key]).dom(this.ui.form,this.action_subs[key]))
+				this.vars_actions.push(new InputVar({},[this.ids,key]).dom(parentHtml,this.action_subs[key]))
 			})
 		}
 
 		/** @type {any} */
 		const subs = props.subs
 		for (var key in subs) {
-			this.vars_subs.push(new InputVar({},[this.ids,key]).dom(this.ui.form,props.subs[key]))
+			if (Object.hasOwn(subs,key)) {
+				this.vars_subs.push(new InputVar({},[this.ids,key]).dom(parentHtml,props.subs[key]))
+			}
 		}
 
-
-		this.enChanged() // TODO important? or maybe with listener
+		// this.enChanged() // TODO important? or maybe with listener
 		return this
 	}
+	/**
+	 * Copies the current value of the input to the system clipboard.
+	 */
 	inputsCopy() {
 		navigator.clipboard.writeText(this.val)
 	}
+	/**
+	 * Reads the contents of the system clipboard as text.
+	 * @returns {Promise<string>} A Promise that resolves to the text on the system clipboard.
+	 */
 	async inputsPaste() {
 		const val = await navigator.clipboard.readText()
 		this.val = val
 	}
+	/**
+	 * Clears the input value.
+	 */
 	inputsClear() {
 		this.val = ''
 	}
+	/**
+	 * Resets the input value.
+	 */
 	inputsReset() {
 		this.reset() // this.reset('is')
 	}

@@ -9,24 +9,8 @@ import Int from '../../../logic/Int/Int.js'
 import Float from '../../../logic/Float/Float.js'
 import Str from '../../../logic/Str/Str.js'
 
-
 /**
  * @typedef InputVarprops common ways to address HTMLElement in DOM, choose only 1 of those, parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
- * @prop {string} [kind] kind of element, important for dom(), also used as CSS-class, if not given it is adapted to .val attribute or defaults to text
- *
- * supported:
- * - text
- * - int
- * - float
- * - currency
- * - range
- * - select
- * - evt
- * - bit use states
- * @prop {string} [label] label for input, or button, (distinct from val, which is the val of this)
- * @prop {any} [val] default value, when no storage value is available
- * @prop {any[]} [vals] default values, for list items as select option
- * @prop {object} [tooltip] optional object containing Html args @see {@link Html~createarg}, you may find it in .htmls[ix].tooltip for access and manipulation, and there is function set(val) implemented
  * @prop {string} [storeEn] f.e. write: prohibit store and disable models listener, default is true
  * @prop {number} [min] minimum value to bound
  * @prop {number} [max] maximum value to bound
@@ -34,6 +18,21 @@ import Str from '../../../logic/Str/Str.js'
  * @prop {boolean} [resize] resize input to containing text
  * @prop {string} [listen] dom event to change model , f.e. change,input,...
  * @prop {Function} [callback] called after set at onChange with parameter(val)
+ * @property {object} [tooltip] optional object containing Html args @see {@link Html~createarg}, you may find it in .htmls[ix].tooltip for access and manipulation, and there is function set(val) implemented
+ * @property {any[]} [vals] default values, for list items as select option
+ * @property {any} [val] default value, when no storage value is available
+ * @property {string} [label] label for input, or button, (distinct from val, which is the val of this)
+ * @property {string} [kind] kind of element, important for dom(), also used as CSS-class, if not given it is adapted to .val attribute or defaults to text
+ *
+ * supported:
+ * - text
+ * - int
+ * - float
+ * - currency
+ * - range
+ * - select (use val for selected and vals for items)
+ * - evt
+ * - bit use states
  */
 /**
  * @class InputVar
@@ -75,6 +74,7 @@ class InputVar extends Model {
 
 		/**
 		 * all DOM implementations of this
+		 * as label,tooltip,icon, etc produce surrounding elements, here may be only the inner fucntion element as input, select, button, etc
 		 * @type {Html[]}
 		 */
 		this.htmls = []
@@ -101,15 +101,13 @@ class InputVar extends Model {
 	 * set actual value
 	 * @param {any} val	actual value
 	 */
-	set val(val) {
-		let valIntern = val
-		if (InputVar.typeIsNumber(this.props.kind)) valIntern = Number.parseFloat(val)
-		valIntern = this.checkBound(valIntern)
-		super.val = valIntern
-		this.setDoms(valIntern)
+	set val(val) { // TODO have to use
+		this.set(val)
 	}
 	/**
 	 * set actual value, with prevent for some trigger type
+	 *
+	 * at kind=select: you have to dom before set, or set data at dom
 	 * @param {any|any[]} val	actual value
 	 * - for list items: array is for setting list items, primitive is for setting selected
 	 * @param {Model~setOptions} [setOpts] options to set Model, concern store & listeners
@@ -118,6 +116,7 @@ class InputVar extends Model {
 		if (this.lists.length > 0) {
 			if (Arr.is(val)) {
 				this.lists.forEach(list => {
+					this.set_disabled(val.length === 0)
 					// stored selection or previous selection shall remain after list populate
 					const select = (this.val!==undefined) ? this.val : list.val
 					list.populate(val)
@@ -130,15 +129,18 @@ class InputVar extends Model {
 				this.setDoms(val)
 			}
 		} else {
-			super.set(val,undefined,setOpts)
-			this.setDoms(val)
-		}
-		if (this.states && this.states.length) {
-			this.states.forEach(state => state.set_state_ix(val))
+			let valIntern = val
+			if (InputVar.typeIsNumber(this.props.kind)) valIntern = Number.parseFloat(val)
+			valIntern = this.checkBound(valIntern)
+			super.set(valIntern,undefined,setOpts)
+			this.setDoms(valIntern)
+			if (this.states && this.states.length) {
+				this.states.forEach(state => state.set_state_ix(valIntern))
+			}
 		}
 	}
 	/**
-	 * creates Html (may be included in additional element) and attach it to parent-Html
+	 * creates Html (may be included in additional element) for InputVar and attach it to parent-Html
 	 *
 	 * may be called multiple times
 	 * @param {Html} parentHtml Html to attach to
@@ -147,7 +149,7 @@ class InputVar extends Model {
 	 * @throws {Error} if kind is not implemented
 	 */
 	dom(parentHtml,propsAdd) {
-		const props = Html.mergeDatas(this.props,this.propsAdd,propsAdd)
+		const props = Html.mergeDatas(this.props,propsAdd)
 		// first set val, for every mode
 		if (propsAdd && propsAdd.val) {
 			if (props.kind==='bit') {
@@ -186,8 +188,15 @@ class InputVar extends Model {
 					this.states.push(new HtmlState(myHtml,{state_item_arg:props.states,state:this.val}))
 				}
 			}
-		} else if (props.kind==='select') {
-			workHtml.add(Html.mergeDatas(arg,{html:'button',val:props.label}))
+		} else {
+			// add surrounding things as icon and label for input or select
+			if (props.icon || props.label) {
+				if (!props.tooltip) workHtml = workHtml.add({}) // if no surrounding div is done
+				if (props.icon) workHtml.add({h:`<img class="inline" src=${props.icon} />`})
+				if (props.label) workHtml.add({h:`<span>${props.label}</span>`})
+			}
+		}
+		if (props.kind==='select') {
 			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'select',val:this.val}))
 			// set <select> <option>
 			const list = new ArrList(myHtml,item => new Html({html:'option',val:item}))
@@ -196,6 +205,8 @@ class InputVar extends Model {
 			if (props.vals) {
 				list.populate(props.vals)
 				if (props.val) myHtml.el.value = props.val
+			} else {
+				this.set_disabled(true,myHtml)
 			}
 			this.lists.push(list)
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
@@ -203,17 +214,10 @@ class InputVar extends Model {
 			let val = this.val
 			if (kind==='currency') val = val.toLocaleString(undefined,{style: 'currency',currency: 'EUR'})
 			const argType = {html:'input',atts:{type:kind},val}
-			if (!props.label) {
-				myHtml = workHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
-			} else {
-				const join = workHtml.add({html:'div',css:'flex items-center'})
-				join.add({html:'button',css:'btn w-24 text-right pr-4',val:props.label})
-				myHtml = join.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered w-24'}))
-			}
-		} else {
-			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'input',val:this.val,atts:{type:props.kind},css:props.kind}))
+			myHtml = workHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
 		}
-		if (!myHtml) throw new Error('no known kind so extract no HTML')
+		// other not implmented kind will be handled direct as <input type>
+		if (!myHtml) myHtml = workHtml.add(Html.mergeDatas(arg,{html:'input',val:this.val,atts:{type:props.kind},css:props.kind}))
 
 		// attach events
 		let eventType = ''
@@ -292,7 +296,7 @@ class InputVar extends Model {
 		if (this.props.kind === 'evt') {
 			this.changed() // trigger listeners
 		} else {
-			this.val = val 
+			this.val = val
 		}
 		if (this.props.callback) this.props.callback(val)
 	}
@@ -315,6 +319,30 @@ class InputVar extends Model {
 	setArg(props,arg) {
 		if (props.min!==undefined) Obj.put(arg,['atts','min'],props.min)
 		if (props.max!==undefined) Obj.put(arg,['atts','max'],props.max)
+	}
+	/**
+	 * sets the disabled state of the input variable at all DOM implementations
+	 * this is called from top-level
+	 * @param {boolean} deactivate - true to disable, false to enable
+	 * @param {Html} [html] when given change this
+	 */
+	set_disabled(deactivate,html) {
+		// eslint-disable-next-line jsdoc/require-param
+		/** change 1 Html */
+		const disable = (_deactivate,_html) => {
+			if (_deactivate) {
+				_html.change({atts:{disabled:'true'}})
+			} else {
+				_html.remove({atts:{disabled:'true'}})
+			}
+		}
+		if (html) {
+			disable(deactivate,html)
+		} else {
+			this.htmls.forEach(htmlInt => {
+				disable(deactivate,htmlInt)
+			})
+		}
 	}
 	/**
 	 * checks value against min and max values, if val is NaN, returns ''
