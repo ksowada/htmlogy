@@ -13,7 +13,7 @@ class InputVarsArr extends Listener {
 	/**
 	 * initialize all variables and set name gathered from keys for further purposes (f.e. Store)
 	 * @param {string} id - unique identifier for Storage, to store more than one App in 1 domain
-	 * @param {ArrObj} struct structure with id and other properties may be hierarchical 
+	 * @param {ArrObj} struct structure with id and other properties may be hierarchical, you may find the inputvar at _var
 	 * - .kind determines the kind @see {@link InputVar}, or use the class name of an implementated class @see {@link InputVars#getInstance}
 	 * - .arg is parameter if other Class shall be instantiated
 	 */
@@ -66,8 +66,10 @@ class InputVarsArr extends Listener {
 			while (this.vars[varName].length > len) { this.vars[varName].pop() }
 			while (this.vars[varName].length < len) {
 				this.vars[varName].push(InputVars.getInstance(this.argCreate[varName].kind,Obj.omit(this.argCreate[varName],Match.startsWith('_')),[this.id,varName,this.vars[varName].length]))
-				Obj.put(this.varsStruct,this.argCreate[varName]._ids,this.vars[varName][this.vars[varName].length - 1])
-				this.vars[varName][this.vars[varName].length - 1].on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this.vars[varName].length - 1))
+				const _var = this.vars[varName][this.vars[varName].length - 1]
+				Obj.put(this.varsStruct,this.argCreate[varName]._ids,_var)
+				this.argCreate[varName].var = _var // maps the inputVar into original struct
+				_var.on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this.vars[varName].length - 1))
 			}
 		})
 		this.size = len
