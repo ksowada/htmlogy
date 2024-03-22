@@ -1,5 +1,5 @@
-import Arr from '../../../logic/Arr/Arr'
 import Listener from '../../../logic/Listener/Listener'
+import Match from '../../../logic/Match'
 import Model from '../../../logic/Model/Model'
 import Obj from '../../../logic/Obj/Obj'
 import InputVars from './InputVars'
@@ -10,14 +10,14 @@ import InputVars from './InputVars'
  * @augments Listener for easy adaption of multiple listeners for all items in array
  */
 class InputVarsArr extends Listener {
-/**
- * initialize all variables and set name gathered from keys for further purposes (f.e. Store)
- * @param {string} id - unique identifier for Storage, to store more than one App in 1 domain
- * @param {object[]} arg - object with variable names as keys and variable objects as values
- * - .kind determines the kind @see {@link InputVar}, or use the class name of an implementated class @see {@link InputVars#getInstance}
- * - .arg is parameter if other Class shall be instantiated
- */
-	constructor(id,arg) {
+	/**
+	 * initialize all variables and set name gathered from keys for further purposes (f.e. Store)
+	 * @param {string} id - unique identifier for Storage, to store more than one App in 1 domain
+	 * @param {ArrObj} struct structure with id and other properties may be hierarchical 
+	 * - .kind determines the kind @see {@link InputVar}, or use the class name of an implementated class @see {@link InputVars#getInstance}
+	 * - .arg is parameter if other Class shall be instantiated
+	 */
+	constructor(id,struct) {
 		super()
 		this.id = id
 		/**
@@ -25,11 +25,30 @@ class InputVarsArr extends Listener {
 		 * @type {Object.<string, object>}
 		 */
 		this.vars = {}
-		this.varsName = Arr.copy(Object.keys(arg))
-		this.varsName.forEach(varName => {
-			this.vars[varName] = []
+
+		/**
+		 * contains all variables, in structured object
+		 * @type any
+		 */
+		this.varsStruct = {}
+
+		/**
+		 * contains all props of each object
+		 * @type any
+		 */
+		this.argCreate = {}
+
+		this.varsName = []
+		Obj.crawl(struct,{
+			onObj: obj => {
+				if (obj.kind) {
+					const varName = obj._id
+					this.varsName.push(varName)
+					this.vars[varName] = []
+					this.argCreate[varName] = obj
+				}
+			}
 		})
-		this.argCreate = Obj.copy(arg)
 	}
 	/**
 	 * length of array of every InputVar
@@ -46,8 +65,10 @@ class InputVarsArr extends Listener {
 		this.varsName.forEach(varName => {
 			while (this.vars[varName].length > len) { this.vars[varName].pop() }
 			while (this.vars[varName].length < len) {
-				this.vars[varName].push(InputVars.getInstance(this.argCreate[varName].kind,this.argCreate[varName],[this.id,varName,this.vars[varName].length]))
-				this.vars[varName][this.vars[varName].length-1].on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this.vars[varName].length-1))}
+				this.vars[varName].push(InputVars.getInstance(this.argCreate[varName].kind,Obj.omit(this.argCreate[varName],Match.startsWith('_')),[this.id,varName,this.vars[varName].length]))
+				Obj.put(this.varsStruct,this.argCreate[varName]._ids,this.vars[varName][this.vars[varName].length - 1])
+				this.vars[varName][this.vars[varName].length - 1].on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this.vars[varName].length - 1))
+			}
 		})
 		this.size = len
 	}
@@ -60,12 +81,13 @@ class InputVarsArr extends Listener {
 		this.changed(Model.DEFAULT_KEY)
 	}
 	/**
-	 * 
+	 * mount a row of all variables into dom, if a variable has dom() function
 	 * @param {Html} html parent Html to mount 1 row of all variables
+	 * @param [number} ix index of row
 	 */
 	dom(html,ix) {
-		Object.keys(this.vars).forEach(varName => {
-			this.vars[varName][ix].dom(html)
+		this.varsName.forEach(varName => {
+			if (this.vars[varName][ix].dom) this.vars[varName][ix].dom(html) // some InputVars may have no dom as HtmlSelect
 		})
 	}
 }
