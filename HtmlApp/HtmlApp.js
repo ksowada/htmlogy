@@ -32,7 +32,7 @@ class HtmlApp {
 		this.app = new Html(arg)
 		/** use log for relative time measures, and other issues */
 		/** rest has URLParts from query results */
-		this.rest = this.queryREST() // the only data input
+		this.rest = HtmlApp.queryREST() // the only data input
 		/** url of this webapp red from window */
 		this.webappUrl = window.location.href
 		Times.log(`url:${this.webappUrl}`)
