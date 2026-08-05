@@ -1,12 +1,12 @@
 /* eslint-disable no-new */
-import Numbers from '$/logic/Numbers/Numbers.js'
-import Obj from '$/logic/Obj/Obj.js'
+import Numbers from '../../../logic/Numbers/Numbers.js'
+import Obj from '../../../logic/Obj/Obj.js'
 import Html from '../html/Html/Html.js'
 import Toolbar from '../Toolbar/Toolbar.js'
 import './Tree.scss'
-import Ids from '$/logic/Ids/Ids.js'
-import State from '$/logic/State.js'
-import Trees from '$/logic/Trees.js'
+import Ids from '../../../logic/Ids/Ids.js'
+import State from '../../../logic/State.js'
+import Trees from '../../../logic/Trees.js'
 import HtmlElComp from '../html/HtmlElComp.js'
 import Elem from '../../Elem/Elem.js'
 

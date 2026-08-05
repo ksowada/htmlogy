@@ -1,5 +1,5 @@
 import Combo from '../Combo/Combo.js'
-import Store from '$/logic/Store.js'
+import Store from '../../../logic/Store.js'
 import HtmlElComp from '../../html/HtmlComp/HtmlElComp.js'
 import Html from '../../html/html/Html/Html.js'
 /**

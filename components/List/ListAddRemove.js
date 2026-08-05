@@ -1,4 +1,4 @@
-import Str from '$/logic/Str/Str.js'
+import Str from '../../../logic/Str/Str.js'
 import Button from '../Button/Button.js'
 import Html from '../../Html/Html.js'
 import HtmlElComp from '../../HtmlComp/HtmlElComp.js'

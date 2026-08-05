@@ -1,7 +1,7 @@
 // @ts-check
 import {icons} from '../../../global.js'
 import InputVar from './InputVar.js'
-import Obj from '$/logic/Obj/Obj.js'
+import Obj from '../../../logic/Obj/Obj.js'
 import Elem from '../../Elem/Elem.js'
 import Html from '../../Html/Html.js'
 

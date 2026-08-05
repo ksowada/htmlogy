@@ -2,7 +2,7 @@ import Html from '../html/Html/Html.js'
 import './Combo.scss'
 import HtmlElComp from '../html/HtmlElComp.js'
 import ListLite from '../List/ListLite.js'
-import Arr from '$/logic/Arr/Arr.js'
+import Arr from '../../../logic/Arr/Arr.js'
 // TODO have similar spell logic to merge tiperrs
 // TODO remove, if unusable
 /**

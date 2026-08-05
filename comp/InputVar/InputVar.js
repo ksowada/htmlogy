@@ -1,13 +1,13 @@
 import ArrList from '../ArrList/ArrList.js'
-import Model from '$/logic/Model/Model.js'
-import Obj from '$/logic/Obj/Obj.js'
+import Model from '../../../logic/Model/Model.js'
+import Obj from '../../../logic/Obj/Obj.js'
 import Html from '../../Html/Html.js'
-import Arr from '$/logic/Arr/Arr.js'
+import Arr from '../../../logic/Arr/Arr.js'
 import HtmlState from '../../HtmlState/HtmlState.js'
-import Numbers from '$/logic/Numbers/Numbers.js'
-import Int from '$/logic/Int/Int.js'
-import Float from '$/logic/Float/Float.js'
-import Str from '$/logic/Str/Str.js'
+import Numbers from '../../../logic/Numbers/Numbers.js'
+import Int from '../../../logic/Int/Int.js'
+import Float from '../../../logic/Float/Float.js'
+import Str from '../../../logic/Str/Str.js'
 
 /**
  * @typedef InputVarprops common ways to address HTMLElement in DOM, choose only 1 of those, parameter; all attributes of Html are directly inherited @see {@link Html~createarg}

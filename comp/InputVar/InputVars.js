@@ -2,7 +2,7 @@
 import InputInfo from './InputInfo'
 import HtmlSelect from '../../HtmlSelect/HtmlSelect'
 import Tags from '../Tags/Tags'
-import Arr from '$/logic/Arr/Arr'
+import Arr from '../../../logic/Arr/Arr'
 
 /**
  * represents multiple variables

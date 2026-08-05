@@ -2,7 +2,7 @@
 // import build_datetime from '../../../../build.datetime.json'
 import Html from '../Html/Html.js'
 import HtmlUtils from '../HtmlUtils/HtmlUtils.js'
-import Times from '$/logic/Times.js'
+import Times from '../../logic/Times.js'
 import Elem from '../Elem/Elem.js'
 /**
  * @class
