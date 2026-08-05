@@ -1,7 +1,7 @@
-import Listener from '../../../logic/Listener/Listener'
-import Match from '../../../logic/Match'
-import Model from '../../../logic/Model/Model'
-import Obj from '../../../logic/Obj/Obj'
+import Listener from '$/logic/Listener/Listener'
+import Match from '$/logic/Match'
+import Model from '$/logic/Model/Model'
+import Obj from '$/logic/Obj/Obj'
 import InputVars from './InputVars'
 
 /**

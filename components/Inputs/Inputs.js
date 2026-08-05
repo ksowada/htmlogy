@@ -1,6 +1,6 @@
 import InputUrl from './InputUrl.js'
 import InputText from './InputText.js'
-import Obj from '../../logic/Obj/Obj.js'
+import Obj from '$/logic/Obj/Obj.js'
 import HtmlElComp from '../html/HtmlElComp.js'
 
 /**

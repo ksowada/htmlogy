@@ -1,8 +1,8 @@
-import Store from '../../logic/Store.js'
-import Obj from '../../logic/Obj/Obj.js'
+import Store from '$/logic/Store.js'
+import Obj from '$/logic/Obj/Obj.js'
 import Html from '../html/Html/Html.js'
 import './Outputs.css'
-import Arr from '../../logic/Arr/Arr.js'
+import Arr from '$/logic/Arr/Arr.js'
 import HtmlElComp from '../html/HtmlElComp.js'
 import Button from '../Button/Button.js'
 /**

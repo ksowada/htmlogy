@@ -4,7 +4,7 @@ import Modal from '../Modal/Modal.js'
 import Toolbar from '../Toolbar/Toolbar.js'
 import HtmlElComp from '../../HtmlComp/HtmlElComp.js'
 import List from '../List/List.js'
-import Arr from '../../logic/Arr/Arr.js'
+import Arr from '$/logic/Arr/Arr.js'
 // TODO have similar spell logic to merge tiperrs
 
 /**

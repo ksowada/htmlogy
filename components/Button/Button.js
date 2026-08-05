@@ -1,8 +1,8 @@
-import Obj from '../../logic/Obj/Obj.js'
-import Str from '../../logic/Str/Str.js'
+import Obj from '$/logic/Obj/Obj.js'
+import Str from '$/logic/Str/Str.js'
 import HtmlComp from '../../html/HtmlComp/HtmlComp.js'
 import Html from '../../html/html/Html/Html.js'
-import Vars from '../../logic/Vars/Vars.js'
+import Vars from '$/logic/Vars/Vars.js'
 import Elem from '../../Elem/Elem.js'
 
 /**
