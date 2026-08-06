@@ -286,6 +286,7 @@ class Html {
 		}
 		this.domed = true
 		this.doming = false
+		this.domLater = false // if rendered, it is no longer domLater, even if it was set before
 	}
 	// eslint-disable-next-line jsdoc/require-param
 	/**
