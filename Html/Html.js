@@ -457,7 +457,8 @@ class Html {
 				if (Object.hasOwnProperty.call(arg.evts,key)) {
 					const cbk = arg.evts[key]
 					if (inDOM) elem.el.addEventListener(key,cbk)
-					elem.evts.push({key,cbk})
+					Obj.assure(elem.obj.arg,'evts',{}) // assure evts array exists
+					elem.obj.arg.evts[key] = cbk
 				}
 			}
 		}
