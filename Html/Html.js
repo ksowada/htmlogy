@@ -467,7 +467,7 @@ class Html {
 		if (Obj.hasDefined(arg,item = 'valhtml')) { // FEATURE plural-arr
 			/** subelement given at create or change with valhtml and val */
 			if (mode.change && thisObj.my.subElement !== undefined) thisObj.my.subElement.remove()
-			thisObj.my.subElement = new Html({parent: {el: elem.el},html: arg.valhtml,val: arg.val})
+			elem.el.innerHTML = arg.valhtml
 		// you can use either valhtml or val so else
 		} else if (Obj.hasDefined(arg,item = 'val')) { // FEATURE plural-arr
 			if (inDOM && Html.ELS_USE_VALUE.includes(elem.el.localName)) elem.el.value = arg.val
