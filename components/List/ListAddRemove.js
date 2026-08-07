@@ -59,7 +59,7 @@ class ListAddRemove extends HtmlElComp {
 		this.list.selection()
 	}
 	hdl_add() {
-		this.list.add(Str.pickCharRandom(this.fruits))
+		this.list.addNext(Str.pickCharRandom(this.fruits))
 	}
 	hdl_del() {
 		this.list.removeSelections()

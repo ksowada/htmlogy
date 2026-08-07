@@ -10,6 +10,7 @@ import Html from '../../Html/Html.js'
  * - container is an optional main element holding other props (when no html is given it will use <span>)
  * - you may strip container, but be aware when elements later are appended
  * - items may be Object with data for Html, or explicit HtmlComp (el and attach will be created here)
+ * - use selectCare() after construction when inner.select is given
  * @class
  * @augments Html
  */
@@ -46,12 +47,6 @@ class List extends Html {
 		this.inner = (arg.inner!==undefined) ? arg.inner : {} // clone to keep original data
 		this.selectStates = ['deselected','selected']
 		this.selectModes = ['none','single','singleForce','multi']
-	}
-	/**
-	 * call after constructor, will create items and add them to container
-	 * if constructor is added to a parent, it is undomed, so call dom() later
-	 */
-	dom() {
 		
 		/** need objects of List in itemsMirrored for add and remove */
 		this.itemsMirrored = []
@@ -68,12 +63,12 @@ class List extends Html {
 					if (Object.hasOwnProperty.call(this.inner.valsObj,valKey)) {
 						++ix
 						const valObj = this.inner.valsObj[valKey]
-						this.addItem(valObj,ix,valKey)
+						this.addNext(valObj)
 					}
 				}
 			} else if (this.inner.vals) { // vals given as Array
 				this.inner.vals.forEach((val,ix) => {
-					this.addItem(val,ix)
+					this.addNext(val)
 				})
 			}
 			if (this.inner.select) {
@@ -116,49 +111,40 @@ class List extends Html {
 			}
 		}
 		Html.mergeModDatas(this,arg) // remember changes
-	}
+	}	
 	/**
 	 * iterate over one item in list
 	 * @param {object|HtmlComp} item an Object considered to be 1 list item
 	 * @param {number} pos the ix of sequence in list
 	 * @param {string} name the name of item in list, this is recommended if vals is given by valsObj
 	 */
-	addItem(item,pos,name) {
+	addNext(item,name) {
 		if (item==undefined) return
-		if (pos==undefined) pos=this.itemsMirrored.length
-		pos = Arr.boundIx(pos,this.itemsMirrored)
+		const pos=this.itemsMirrored.length
 		// merge inner and use optional select for further atts
-		const inner = Html.mergeDatas(this.inner)
-		Obj.assure(inner,'atts',{})
-		if (inner.select && inner.select.atts) {
-			if (pos==inner.select.ix) {
-				Html.mergeModDatas(inner,{atts:inner.select.atts,css:'selected'})
+		// const inner = Html.mergeDatas(this.inner)
+		Obj.assure(this.inner,'atts',{})
+		if (this.inner.select && this.inner.select.atts) {
+			if (pos==this.inner.select.ix) {
+				Html.mergeModDatas(this.inner,{atts:this.inner.select.atts,css:'selected'})
 			} else {
 				Html.mergeModDatas(inner,{css:'deselected'})
 			}
 		}
-		inner.css = Str.enrichList(' ',inner.css,this.selectStates[0],'list-item')
-		Obj.assure(inner,'evts',{})
-		Obj.mergeModOverwrite(inner,{evts:{'click':this.evtSelect.bind(this)}})
+		this.inner.css = Str.enrichList(' ',this.inner.css,this.selectStates[0],'list-item')
+		Obj.assure(this.inner,'evts',{})
+		Obj.mergeModOverwrite(this.inner,{evts:{'click':this.evtSelect.bind(this)}})
 		// decide how item will be instantiated
-		const itemClassHier = Vars.typeHier(item)
+		// const itemClassHier = Vars.typeHier(item)
 		let htmlObj = undefined
-		if (itemClassHier.includes('HtmlComp')) {
-			item.dom(inner,item,{parent:{el:this.my.el}})
+		if (Vars.typeHier(item).includes('Html')) {
 			htmlObj = item
+			htmlObj.change(this.inner)
 		} else {
-			htmlObj = new Html({...inner,parent:{el:this.my.el},val:item})
-		}
-		// decide how to attach to DOM
-		if (pos==this.itemsMirrored.length) {
-			this.my.el.appendChild(getEl(htmlObj)) // append item on div
-		} else {
-			this.my.el.insertBefore(getEl(this.itemsMirrored[pos]),getEl(htmlObj)) // insert before succesor
+			htmlObj = this.add({...this.inner,val:item})
 		}
 		// refresh mirror
-		this.itemsMirrored.splice(pos,0,htmlObj)
-		if (name && this.itemsMirroredNames!==undefined) this.itemsMirroredNames.splice(pos,0,name)
-		this.selectCare()
+		this.itemsMirrored.push(htmlObj)
 	}
 	edit(val,pos) {
 		if (pos==undefined) {
@@ -211,8 +197,7 @@ class List extends Html {
 	getSelecteds() {
 		const selectedsIx = []
 		this.itemsMirrored.forEach((item,ix) => {
-			const el = getEl(this.itemsMirrored[ix])
-			const selectState = Elem.classStateGet(el,this.selectStates)
+			const selectState = Elem.classStateGet(this.itemsMirrored[ix].el,this.selectStates)[0].name
 			if (selectState=='selected') selectedsIx.push(ix)
 		})
 		selectedsIx.sort((a,b) => b - a) // sort from behind to top
@@ -228,8 +213,7 @@ class List extends Html {
 		if (this.inner.select==undefined) return
 		if (this.inner.select.mode=='none') return
 		if (this.inner.select.mode=='single') this.removeSelection()
-		const itemMirroredEl = getEl(this.itemsMirrored[ix])
-		Elem.classStateSet(itemMirroredEl,'selected',this.selectStates)
+		Elem.classStateSet(this.itemsMirrored[ix].el,'selected',this.selectStates)
 	}
 	// eslint-disable-next-line jsdoc/require-param
 	/**
@@ -238,8 +222,8 @@ class List extends Html {
 	evtSelect(evt) {
 		if (this.inner.select==undefined) return
 		if (this.inner.select.mode=='none') return
-		const el = Elem.findParent(evt.target,undefined,1)
-		const selectState = Elem.classStateGet(el,this.selectStates)[0]
+		const el = evt.target
+		const selectState = Elem.classStateGet(el,this.selectStates)[0].name
 		if (this.inner.select.mode=='single'||this.inner.select.mode=='singleForce') this.removeSelection(0,el)
 		if (selectState==undefined || selectState=='deselected') {
 			Elem.classStateSet(el,'selected',this.selectStates)
@@ -248,16 +232,5 @@ class List extends Html {
 		}
 		if (this.selection) this.selection()
 	}
-}
-/**
- * @param {HtmlComp|Html} htmlObj input
- * @returns {HTMLElement} get element of object
- * @private
- */
-function getEl(htmlObj) {
-	const itemClassHier = Vars.typeHier(htmlObj)
-	if (itemClassHier.includes('HtmlComp')) return htmlObj.div
-	if (itemClassHier.includes('Html')) return htmlObj.my.el
-	return undefined
 }
 export default List
