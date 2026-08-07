@@ -50,12 +50,12 @@ class ListLite extends HtmlElComp {
 					if (Object.hasOwnProperty.call(this.inner.valsObj,valKey)) {
 						++ix
 						const valObj = this.inner.valsObj[valKey]
-						this.add(valObj,ix,valKey) // TODO valKey is not used in function
+						this.addItem(valObj,ix,valKey) // TODO valKey is not used in function
 					}
 				}
 			} else if (this.inner.vals) { // vals given as Array
 				this.inner.vals.forEach((val,ix) => {
-					this.add(val,ix)
+					this.addItem(val,ix)
 				})
 			}
 		}
@@ -71,7 +71,7 @@ class ListLite extends HtmlElComp {
 			if (obj.inner.vals) { // vals given as Array
 				this.removeChilds()
 				obj.inner.vals.forEach((val,ix) => {
-					this.add(val,ix)
+					this.addItem(val,ix)
 				})
 			}
 		}

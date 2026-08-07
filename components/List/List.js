@@ -4,8 +4,6 @@ import Str from '../../../logic/Str/Str.js'
 import Vars from '../../../logic/Vars/Vars.js'
 import Elem from '../../Elem/Elem.js'
 import Html from '../../Html/Html.js'
-import HtmlElComp from '../../HtmlComp/HtmlElComp.js'
-import './List.scss'
 /**
  * dynamic Container for Lists
  * - builds Html for each item
@@ -13,14 +11,14 @@ import './List.scss'
  * - you may strip container, but be aware when elements later are appended
  * - items may be Object with data for Html, or explicit HtmlComp (el and attach will be created here)
  * @class
- * @augments HtmlElComp
+ * @augments Html
  */
-class List extends HtmlElComp {
+class List extends Html {
 	/**
 	 * inner multiple items that are included in the list
 	 * @typedef {object} List~inner
 	 * @property {List~select} select if missing no selection
-	 * @property {object[]|HtmlComp[]} vals items, these HtmlComp shall implement this.div
+	 * @property {object[]|HtmlComp[]} vals items, these HtmlComp shall implement this.my.el
 	 * @property {object} valsObj items with name as key, for use when single update is essential, better to address as with index
 	 */
 	/**
@@ -41,21 +39,20 @@ class List extends HtmlElComp {
 	// TODO att container focus , use key to autocomplete items
 	// TODO use processes to amplify speed when creating childs and wait for them
 	constructor(arg) {
-		super(arg)
+		if (arg.container!==undefined) { // if container not given from arguments, dont install one
+			arg.container = Html.mergeDatas({container:{html:'span'}},arg.container,{container:{css:'list'}},{name:arg.name}) // add 'list' css-class when container is already given, and use span (when not given) for item wrap instead of div (is a block)
+		}
+		super(arg.container) // defaults to div, but may be given as span or other
+		this.inner = (arg.inner!==undefined) ? arg.inner : {} // clone to keep original data
 		this.selectStates = ['deselected','selected']
 		this.selectModes = ['none','single','singleForce','multi']
-		super.constructed()
 	}
 	/**
-	 * @param {object} arg same as constructor {@link List}
-	 * @private
+	 * call after constructor, will create items and add them to container
+	 * if constructor is added to a parent, it is undomed, so call dom() later
 	 */
-	dom(arg) {
-		Html.mergeModDatas(this,arg)
-		if (this.container!==undefined) { // if container not given from arguments, dont install one
-			Html.mergeModDatas({container:{html:'span'}},this,{container:{css:'list'}}) // add 'list' css-class when container is already given, and use span (when not given) for item wrap instead of div (is a block)
-		}
-		super.domCreate(this)
+	dom() {
+		
 		/** need objects of List in itemsMirrored for add and remove */
 		this.itemsMirrored = []
 		this.itemsMirroredNames = []
@@ -71,12 +68,12 @@ class List extends HtmlElComp {
 					if (Object.hasOwnProperty.call(this.inner.valsObj,valKey)) {
 						++ix
 						const valObj = this.inner.valsObj[valKey]
-						this.add(valObj,ix,valKey)
+						this.addItem(valObj,ix,valKey)
 					}
 				}
 			} else if (this.inner.vals) { // vals given as Array
 				this.inner.vals.forEach((val,ix) => {
-					this.add(val,ix)
+					this.addItem(val,ix)
 				})
 			}
 			if (this.inner.select) {
@@ -126,7 +123,7 @@ class List extends HtmlElComp {
 	 * @param {number} pos the ix of sequence in list
 	 * @param {string} name the name of item in list, this is recommended if vals is given by valsObj
 	 */
-	add(item,pos,name) {
+	addItem(item,pos,name) {
 		if (item==undefined) return
 		if (pos==undefined) pos=this.itemsMirrored.length
 		pos = Arr.boundIx(pos,this.itemsMirrored)
@@ -147,16 +144,16 @@ class List extends HtmlElComp {
 		const itemClassHier = Vars.typeHier(item)
 		let htmlObj = undefined
 		if (itemClassHier.includes('HtmlComp')) {
-			item.dom(inner,item,{parent:{el:this.div}})
+			item.dom(inner,item,{parent:{el:this.my.el}})
 			htmlObj = item
 		} else {
-			htmlObj = new Html({...inner,parent:{el:this.div},val:item})
+			htmlObj = new Html({...inner,parent:{el:this.my.el},val:item})
 		}
 		// decide how to attach to DOM
 		if (pos==this.itemsMirrored.length) {
-			this.div.appendChild(getEl(htmlObj)) // append item on div
+			this.my.el.appendChild(getEl(htmlObj)) // append item on div
 		} else {
-			this.div.insertBefore(getEl(this.itemsMirrored[pos]),getEl(htmlObj)) // insert before succesor
+			this.my.el.insertBefore(getEl(this.itemsMirrored[pos]),getEl(htmlObj)) // insert before succesor
 		}
 		// refresh mirror
 		this.itemsMirrored.splice(pos,0,htmlObj)
@@ -260,7 +257,7 @@ class List extends HtmlElComp {
 function getEl(htmlObj) {
 	const itemClassHier = Vars.typeHier(htmlObj)
 	if (itemClassHier.includes('HtmlComp')) return htmlObj.div
-	if (itemClassHier.includes('Html')) return htmlObj.top.el
+	if (itemClassHier.includes('Html')) return htmlObj.my.el
 	return undefined
 }
 export default List
