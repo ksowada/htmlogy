@@ -1,5 +1,5 @@
 
-@import './../../../App/Design/Proportions/Proportions.scss';
+@use './../../../App/Design/Proportions/Proportions.scss' as proportions;
 .btns {
 	margin: var(--ui-gap);
 	display: flex;
@@ -19,7 +19,7 @@
 	color: var(--col-fore-primary);
 	cursor:	pointer;
 	// box-shadow: 0 0 1vw 1vw inset #0005;
-	@include border(var(--col-back-accent),var(--col-back-accent),#0005);
+	@include proportions.border(var(--col-back-accent),var(--col-back-accent),#0005);
 }
 .active	{
 	border:	3px	solid gray;

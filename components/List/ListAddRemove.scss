@@ -1,4 +1,4 @@
-@import './../../App/Design/Proportions/Proportions.scss';
+@use './../../../App/Design/Proportions/Proportions.scss' as proportions;
 
 .tags-bar {
 	display: flex;
@@ -17,5 +17,5 @@
 	text-align: center;
 	min-width: var(--ui-height);
 	min-height: var(--ui-width);
-	@include border(var(--col-back-accent),var(--col-back-accent),#0005);
+	@include proportions.border(var(--col-back-accent),var(--col-back-accent),#0005);
 }

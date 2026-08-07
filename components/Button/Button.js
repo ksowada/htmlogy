@@ -1,7 +1,7 @@
 import Obj from '../../../logic/Obj/Obj.js'
 import Str from '../../../logic/Str/Str.js'
-import HtmlComp from '../../html/HtmlComp/HtmlComp.js'
-import Html from '../../html/html/Html/Html.js'
+import HtmlComp from '../../HtmlComp/HtmlComp.js'
+import Html from '../../Html/Html.js'
 import Vars from '../../../logic/Vars/Vars.js'
 import Elem from '../../Elem/Elem.js'
 
@@ -55,7 +55,7 @@ class Button extends HtmlComp {
 			this.a.classList.add('dragout')
 		} else {
 			// updated if not already created
-			if (!this.btn) this.btn = new Html(this,{html:'button',css:css})
+			if (!this.btn) this.btn = new Html({parent:this.parent,html:'button',css:css})
 			else this.btn.change({...this,css:css})
 			this.div = this.btn.my.el
 		}

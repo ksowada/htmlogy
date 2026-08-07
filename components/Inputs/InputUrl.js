@@ -1,6 +1,6 @@
 import Button from '../Button/Button.js'
-import HtmlElComp from '../html/HtmlElComp.js'
-import Html from '../html/Html/Html.js'
+import HtmlElComp from '../../HtmlComp/HtmlElComp.js'
+import Html from '../../Html/Html.js'
 
 /**
  * @class
