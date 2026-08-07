@@ -142,9 +142,6 @@ describe('Html',() => {
 		it('check for html content in .my.el',() => {
 			expect(createdHtml.my.el.textContent).to.be('citrone')
 		})
-		it('check for html content in .top.el',() => {
-			expect(createdHtml.top.el.textContent).to.be('citrone')
-		})
 		it('check for css class "a"',() => {
 			// expect(createdEl.my.el.getAttribute('class')).to.be('a new test')
 			expect(createdHtml.my.el.classList.contains('a')).to.be(true)
@@ -286,20 +283,6 @@ describe('Html',() => {
 			createdEl.change({css:'style2',val:'cherry'})
 			expect(createdEl.my.el.classList.contains('style1')).to.be(false)
 			expect(createdEl.my.el.classList.contains('style2')).to.be(true)
-		})
-		it('created & changed icon',() => {
-			const el = create_dom(domContent)
-			const createdEl = new Html({parent:{el},html:'div',icon:'star',val:'citrone'})
-			expect(createdEl.my.el.firstChild.localName=='span').to.be(true)
-			expect(createdEl.my.el.firstChild.firstChild.localName=='i').to.be(true)
-			expect(createdEl.my.el.firstChild.firstChild.classList.contains('star')).to.be(true)
-			expect(createdEl.my.el.firstChild.firstChild.classList.length==1).to.be(true)
-
-			createdEl.change({icon:'galaxy',val:'cherry'})
-			expect(createdEl.my.el.firstChild.localName=='span').to.be(true)
-			expect(createdEl.my.el.firstChild.firstChild.localName=='i').to.be(true)
-			expect(createdEl.my.el.firstChild.firstChild.classList.contains('galaxy')).to.be(true)
-			expect(createdEl.my.el.firstChild.firstChild.classList.length==1).to.be(true)
 		})
 		it ('change atts=""',() => {
 			const el = create_dom(domContent)
@@ -584,15 +567,6 @@ describe('Html',() => {
 			const retEl = Elem.findParent(el1_1.my.el,el1_2.my.el)
 			it('returns undefined, as parentEl is not parent of el ',() => {
 				expect(retEl).to.be(undefined)
-			})
-		})
-		describe('call with no parentDepth',() => {
-			create_dom(domContent)
-			const testEl = document.getElementById(myId)
-			const createdEl = new Html({parent:{el: testEl},container:{id:'div-lvl-1'},html:'div',val:'grapefruit'})
-			const parentEl = Elem.findParent(createdEl.my.el)
-			it('returns parent',() => {
-				expect(Elem.equalEl(parentEl,createdEl.top.el)).to.be(true)
 			})
 		})
 		describe('call with parentDepth:0',() => {

@@ -20,7 +20,6 @@ class Html {
 	// TODO extend constructor to support string from HTM close JSX https://github.com/developit/htm
 	// TODO extends HTMLElement (see ACE https://mkslanc.github.io/ace-playground/#shadow-dom)
 	// TODO extend constructor to add child elements in array
-	// TODO eliminate .top and .container through sub-class or in render (split it up) that enables this, causes trouble with htmlNamespace
 	// TODO what about operations that are not supported without rendered element, f.e. classStateSet, see doc
 	// TODO optimize member names .arg duplicates as argument
 
@@ -63,17 +62,7 @@ class Html {
 		 */
 		this.arg = arg
 
-		/** if container in use, this is top created item, else it is usual Element created and equal this.my */
-		// TODO .top.obj sometimes unfilled @html.test.create2 alternative
-		this.top = {}
-
-		/**
-		 * stores all added events in an array, for removing or dispatching later in time
-		 * @private
-		 */
-		this.top.evts = []
-
-		/** fills in .el | .obj | .id of constructed Html-Object, and other created obj as icon and other things to remember */
+		/** fills in .el | .obj | .id of constructed Html-Object, and other things to remember */
 		// TODO circular reference when this. is included in this.my.obj, problems with JSON.stringify
 		this.my = {} // create my only after create, overwise this gets unused my
 
@@ -141,6 +130,13 @@ class Html {
 		 * @type {boolean}
 		 */
 		this.domLater = undefined
+
+
+		/**
+		 * name is used to attach parent object the new object, so remember it
+		 * @type {String}
+		 */
+		this.name = arg.name
 
 		// if arg my is given, only use this element for later add() or as parent
 		if (arg.my !== undefined) {
@@ -256,22 +252,9 @@ class Html {
 			this.htmlNamespace = 'http://www.w3.org/2000/svg' // will also inherit to child elements
 		}
 		this.createEl(this.my,arg,this.htmlNamespace)
-		// TODO container may be unused or duplicate with HtmlElComp.container
-		// TODO use new Html for Container creation
-		if (arg.container) {
-			if (!arg.container.html) arg.container.html = 'div' // if html not given create a div
-			if (arg.container.html === 'svg') { // auto build svg namespace
-				arg.container.htmlNamespace = 'http://www.w3.org/2000/svg' // will also inherit to child elements
-			}
-			this.createEl(this.top,arg.container,arg.container.htmlNamespace)
-			this.top.el.appendChild(this.my.el)
-			if (arg.el) arg.el.appendChild(this.top.el)
-			Html.edit(this,this.top,arg.container,{append: true})
-		} else {
-			this.top.el = this.my.el
-			if (arg.el) {
-				arg.el.appendChild(this.my.el)
-			}
+		
+		if (arg.el) {
+			arg.el.appendChild(this.my.el)
 		}
 
 		this.el = this.my.el
@@ -334,8 +317,6 @@ class Html {
 	/**
 	 * remove HTMLElement or if given in argument, some item of it
 	 * - removeEventHandler before remove from DOM
-	 * - remove optional icon
-	 * - remove optional top
 	 * @param {object} arg arguments so you can Html.obj.parameters as .atts, .val, .evts, see @link {Html#edit}
 	 */
 	remove(arg) {
@@ -355,18 +336,9 @@ class Html {
 				})
 				this.my.evts = [] // empty array at once
 
-				this.top.evts.forEach(evt => {
-					this.top.el.removeEventListener(evt.key,evt.cbk)
-				})
-				this.top.evts = [] // empty array at once
-
-				// remove elements in my and top
-				if (this.my.iconObj !== undefined) this.my.iconObj.remove()
+				// remove elements in my
 				if (this.my.subElement !== undefined) this.my.subElement.remove()
 				this.my.el.remove() // removes the element from the DOM
-				if (this.top.iconObj !== undefined) this.top.iconObj.remove() // maybe unused at the moment
-				if (this.top.subElement !== undefined) this.top.subElement.remove() // maybe unused at the moment
-				if (this.top.el !== undefined) this.top.el.remove()
 			}
 		}
 	}
@@ -380,7 +352,6 @@ class Html {
 		this.elem.removeChilds()
 	}
 	// TODO at id make auto atts to appreviate and overwrite defined from atts
-	// TODO topObj is not Html, but .my or .top
 	// TODO remove not implemented for any item, just css
 	/**
 	 * edit given HTMLElement, may attach to new, change or remove,
@@ -390,7 +361,6 @@ class Html {
 	 * - style from .styles: at change: enrich given style
 	 * - various attributes from .atts: at change: enrich given HTMLElement
 	 * - events from .evts: at change: enrich given events
-	 * - i from .icon: at change: replace given icon
 	 * - subHTMLElement from .valhtml: at change: remove and add new
 	 * in mode remove
 	 * @param {object} thisObj usually this when called non-static, if leaved off major Html-Feature as later doming or parent and children gathering is impossible, but staic DOM-create,edit or remove is possible
@@ -491,12 +461,6 @@ class Html {
 				}
 			}
 		}
-		// than attach additional elements
-		if (Obj.hasDefined(arg,item = 'icon')) { // FEATURE handle multiple icon when array
-			if (mode.change && elem.iconObj !== undefined) elem.iconObj.remove()
-			/** holds optional icon @private, but in container as fontawesome, comment <i> out and add svg */
-			elem.iconObj = new Html({parent: {obj: elem.obj},container: {html: 'span'},html: 'i',css: arg.icon}) // TODO dont care about existing icons at update
-		}
 		// than change elements contents, may be either sub element given by valhtml and val or just a textcontent in val
 		// TODO valhtml is this used, otherwise remove it, do not work properly as valhtml is given as html
 		if (Obj.hasDefined(arg,item = 'valhtml')) { // FEATURE plural-arr
@@ -595,6 +559,7 @@ class Html {
 
 		// add as child, when .name is given
 		if (Str.is(arg.name)) this[arg.name] = htmlObj
+		else if (Str.is(htmlObj.name)) this[htmlObj.name] = htmlObj // if name is given in Html, use it as well
 		return htmlObj
 	}
 	/**
