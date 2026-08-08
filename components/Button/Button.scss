@@ -44,3 +44,7 @@
 	box-shadow:	0vw	0vw	3vw	1vw	var(--col-back-accent);
 	transition:	background-color 0.5s ease-in-out, box-shadow 0.5s ease-in-out;
 }
+button > svg {	
+	width: var(--ui-height-text);
+	height: var(--ui-height-text);
+}

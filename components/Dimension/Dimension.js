@@ -33,7 +33,7 @@ class Dimension extends HtmlElComp {
 		const selRow = Store.get(this.id)
 		const selRows = Store.get(this.ids)
 		const btnTree = {icon:'fa-solid fa-tree',title:'open Hierarchy',evts:{click:this.handleTreeClick.bind(this)}}
-		this.select = new Combo({parent:{obj:this.containerObj},selection:this.handleSelect.bind(this),list:this.handleList.bind(this),delete:this.handleDelete.bind(this),rename:this.handleRename.bind(this),rows:selRows,row:selRow,idEn:true,placeholder:this.label,extraBtns:{btnTree:btnTree}})
+		this.select = new Combo({parent:{obj:this.containerObj},selection:this.handleSelect.bind(this),list:this.handleList.bind(this),delete:this.handleDelete.bind(this),rename:this.handleRename.bind(this),rows:selRows,row:selRow,placeholder:this.label,extraBtns:{btnTree:btnTree}})
 	}
 	getSelected() {
 		return this.select.getSelected()
