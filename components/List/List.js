@@ -30,7 +30,7 @@ class List extends Html {
 	 */
 	/**
 	 * @param {object} arg carries properties {@link Html~createarg}
-	 * @param {object} arg.container optional container for inner, if not given there will not be a common top div with given parameters like css see {@link HtmlElComp}
+	 * @param {object} arg.container optional container for inner, if not given there will not be a common top span with given parameters like css see {@link HtmlElComp}
 	 * @param {List~inner} arg.inner additional info for item-html
 	 * @param {Function} arg.selection optional: called when selection in List changes, or when list items removed or added
 	 * - you may add it after dom(), because it may need this list getSelecteds implementation
@@ -48,6 +48,18 @@ class List extends Html {
 		this.selectStates = ['deselected','selected']
 		this.selectModes = ['none','single','singleForce','multi']
 		
+		this.update(arg)
+	}
+	/**
+	 * update given items, when not already added don't change or create
+	 * @param {object} arg object carrying changes
+	 * @param {object} arg.inner holds values that are meant to change
+	 * @param {object} arg.inner.valObj update or create items within object
+	 */
+	update(arg) {
+		Html.mergeModDatas(this,arg) // remember changes
+		this.removeChilds() // remove all items, because we don't know if they are still valid, f.e. when valsObj is given and some keys are removed^
+
 		/** need objects of List in itemsMirrored for add and remove */
 		this.itemsMirrored = []
 		this.itemsMirroredNames = []
@@ -77,40 +89,7 @@ class List extends Html {
 				}
 			}
 		}
-	}
-	/**
-	 * update given items, when not already added don't change or create
-	 * @param {object} arg object carrying changes
-	 * @param {object} arg.inner holds values that are meant to change
-	 * @param {object} arg.inner.valObj update or create items within object
-	 */
-	update(arg) {
-		if (arg.inner) {
-			// TODO if used change select.mode and force selections here, but right now not used
-			// TODO determine if Object or Array
-			if (arg.inner.valsObj) {
-				for (const itemName in arg.inner.valsObj) {
-					if (Object.hasOwnProperty.call(arg.inner.valsObj,itemName)) {
-						const itemObj = arg.inner.valsObj[itemName]
-						// get ix of key
-						const itemIx = this.itemsMirroredNames.indexOf(itemName)
-						// call update of item
-						// if ix not found, it was not created, so not update it, just neglect
-						if (itemIx!==-1) {
-							const itemMirroredType = Vars.typeHier(this.itemsMirrored[itemIx])
-							if (itemMirroredType.includes('Html')) {
-								this.itemsMirrored[itemIx].change(itemObj)
-							} else if (itemMirroredType.includes('HtmlComp')) {
-								this.itemsMirrored[itemIx].update(itemObj)
-							} else {
-								console.error('not implemented yet in other way')
-							}
-						}
-					}
-				}
-			}
-		}
-		Html.mergeModDatas(this,arg) // remember changes
+
 	}	
 	/**
 	 * iterate over one item in list
@@ -128,10 +107,13 @@ class List extends Html {
 			if (pos==this.inner.select.ix) {
 				Html.mergeModDatas(this.inner,{atts:this.inner.select.atts,css:'selected'})
 			} else {
-				Html.mergeModDatas(inner,{css:'deselected'})
+				Html.mergeModDatas(this.inner,{css:'deselected'})
 			}
 		}
-		this.inner.css = Str.enrichList(' ',this.inner.css,this.selectStates[0],'list-item')
+		this.inner.css = Str.enrichList(' ',this.inner.css,'list-item')
+		if (this.inner.select) {
+			this.inner.css = Str.enrichList(' ',this.inner.css,this.selectStates[0])
+		}
 		Obj.assure(this.inner,'evts',{})
 		Obj.mergeModOverwrite(this.inner,{evts:{'click':this.evtSelect.bind(this)}})
 		// decide how item will be instantiated
