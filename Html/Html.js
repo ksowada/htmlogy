@@ -48,7 +48,7 @@ class Html {
 	 * usage:
 	 * - to instantly create element in parent given as .el[element], .id, or .obj[Html]
 	 * - for parent, use with .my without creation of element but use existing element
-	 * - you may render later, also you can define the parent element later at render(), you can even add childs after creation and render them later, some operations are not supported without rendered element, f.e. classStateSet
+	 * - you may render later, also you can define the parent element later at render(), you can even add childs after creation and render them later, some operations are not supported without rendered element, f.e. classStateSet, after rendered domedCall is called, f.e. for List to select the given item
 	 * @param {Html~createarg} arg supply create()-like arg @see {@link this.create}
 	 * @param {boolean} arg.domLater if non-existent or false, don't render() directly
 	 * @param {Html~domadr} arg.my if given, don't render(), just use as parent
@@ -270,6 +270,9 @@ class Html {
 		this.domed = true
 		this.doming = false
 		this.domLater = false // if rendered, it is no longer domLater, even if it was set before
+
+		// call subclass domedCall() when it is defined, f.e. for List to select the given item
+		if (this.domedCall) this.domedCall()
 	}
 	// eslint-disable-next-line jsdoc/require-param
 	/**
@@ -349,7 +352,7 @@ class Html {
 		this.htmlChilds.forEach(child => {
 			child.remove()
 		})
-		this.elem.removeChilds()
+		if (this.elem) this.elem.removeChilds()
 	}
 	// TODO at id make auto atts to appreviate and overwrite defined from atts
 	// TODO remove not implemented for any item, just css
