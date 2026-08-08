@@ -6,7 +6,7 @@ import HtmlElComp from '../../HtmlComp/HtmlElComp.js'
 import List from '../List/List.js'
 import Arr from '../../../logic/Arr/Arr.js'
 // TODO have similar spell logic to merge tiperrs
-
+// TODO remove, as unused, you may use ComboLite instead
 /**
  * @class create a Combo element with some major features, like select , rename and delete
  * @augments HtmlElComp

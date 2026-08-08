@@ -21,26 +21,26 @@ class ComboLite extends List {
 	/**
 	 * @param {object} arg to construct base-class
 	 * @param {ComboLite#selection} arg.selection callback, called when selection change, also on update
-	 * @param {Function} arg.list callback if sth in rows changed like delete and rename
+	 * @param {Function} arg.list callback if sth in vals changed like delete and rename
 	 * @param {Function} arg.delete callback
 	 * @param {Function} arg.rename callback
-	 * @param {string[]} arg.rows items to select
+	 * @param {string[]} arg.vals items to select
 	 * @param {string} arg.row optional: item from items selected
 	 * @param {string} arg.placeholder placeholder at start
 	 * @param {object} arg.extraBtns create info of additional buttons to add
 	 */
 	constructor(arg={}) {
 		
-		if (arg.rows==undefined) arg.rows = []
+		if (arg.vals==undefined) arg.vals = []
 		if (arg.placeholder==undefined) arg.placeholder = ''
-		if (arg.row==undefined) arg.row = arg.rows[0]
-		arg.selIx = arg.rows.findIndex(e => e==arg.row)
+		if (arg.row==undefined) arg.row = arg.vals[0]
+		arg.selIx = arg.vals.findIndex(e => e==arg.row)
 		if (arg.selIx === undefined || arg.selIx==-1) arg.selIx=0
 		
 		// TODO autocomplete may use mechanism keys as bash
-		super({container:{html:'select'},inner:{vals:arg.rows,html:'option',css:'combo-item'}})
+		super({container:{html:'select'},inner:{vals:arg.vals,html:'option',css:'combo-item'}})
 
-		this.rows = arg.rows
+		this.vals = arg.vals
 		if (arg.selection) this.selection = arg.selection
 		this.change({evts:{'change':this.handleChange.bind(this)}})
 	}
@@ -63,15 +63,6 @@ class ComboLite extends List {
 		const selIx = this.el.selectedIndex
 		const selVal = (selIx==-1) ? undefined : this.el[selIx].innerText // if nothing selected, call back with val=undefined
 		return {ix:selIx,val:selVal}
-	}
-	/**
-	 * complete set of Combo content
-	 * @param {Array} arr a array that take the content
-	 */
-	setData(arr) {
-		this.rows = []
-		if (!Arr.is(arr)) return
-		this.rows = arr.slice() // copy array
 	}
 	/**
 	 * internal handler for select events
