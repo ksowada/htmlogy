@@ -5,6 +5,8 @@ import Obj from '../../../logic/Obj/Obj.js'
 import Elem from '../../Elem/Elem.js'
 import Html from '../../Html/Html.js'
 
+
+
 /**
  * @typedef InputInfo_props
  * @property {InputVar_props} [en] enable of this
@@ -47,7 +49,7 @@ class InputInfo extends InputVar {
 		 * @type InputInfo_props
 		 */
 		let _props = Obj.defaults(props,{kind:'text'})
-		super(Obj.omit(_props,InputInfo.propsMine),...ids)
+		super(Obj.omit(_props,InputInfo.propsMine),undefined,...ids)
 		/**
 		 * @type string[]
 		 */
@@ -115,13 +117,15 @@ class InputInfo extends InputVar {
 		 */
 		const enVal = (!props.en || props.en.val)
 		const en = Obj.defaults(props.en,{en:'bit',val:enVal})
-		this.vars.en = new InputVar(en,[this.ids,'en'])
-		this.vars.en.on('en',this.enChanged.bind(this))
+		this.vars.en = new InputVar(en,this,[this.ids,'en'])
+		this.vars.en.on(undefined,this.enChanged.bind(this))
 
 		let args = Obj.copy(props)
 		if (props.en && props.label) {
-			this.vars.en.dom(parentHtml,{kind:'bit',label:props.label,atts:{disabled:!props.en},...props.en})
-			parentHtml = this.ui.form = parentHtml.add({h:'<div>'})
+			let btnAtts = {}
+			if (props.en == false) btnAtts = {atts:{disabled:'true'}}
+			this.vars.en.dom(parentHtml,{kind:'bit',label:props.label,...props.en,...btnAtts})
+			parentHtml = this.ui.form = parentHtml.add({html:'span',css:'enableble'})
 			args = Obj.omit(args, 'label') // label is already mounted here
 		}
 
@@ -133,7 +137,7 @@ class InputInfo extends InputVar {
 		const actions = props.actions
 		if (actions) {
 			actions.forEach(key => {
-				this.vars_actions.push(new InputVar({},[this.ids,key]).dom(parentHtml,this.action_subs[key]))
+				this.vars_actions.push(new InputVar({},this,[this.ids,key]).dom(parentHtml,this.action_subs[key]))
 			})
 		}
 
@@ -141,7 +145,7 @@ class InputInfo extends InputVar {
 		const subs = props.subs
 		for (var key in subs) {
 			if (Object.hasOwn(subs,key)) {
-				this.vars_subs.push(new InputVar({},[this.ids,key]).dom(parentHtml,props.subs[key]))
+				this.vars_subs.push(new InputVar({},this,[this.ids,key]).dom(parentHtml,props.subs[key]))
 			}
 		}
 
@@ -175,18 +179,14 @@ class InputInfo extends InputVar {
 		this.reset() // this.reset('is')
 	}
 	/**
-	 * call callback from info and put return value into value
-	 * @param {Function} subCallbackOrig Callback from TOP component to call at value changes
-	 * @private
+	 * set main InputInfo, from sub vars, f.e. actions and subs
+	 * @param {any} val value to set in InputInfo
 	 */
-	subCallback(subCallbackOrig) {
-		if (subCallbackOrig) {
-			const ret = subCallbackOrig()
-			if (ret!==undefined) this.val = ret
-		}
+	infoSet(val) {
+		this.val = val
 	}
 	enChanged() {
-		Elem.classStateSet(this.ui.form.el,this.get('en'),['hidden',''])
+		Elem.classStateSet(this.ui.form.el,this.vars['en'].val,['hidden',''])
 	}
 }
 

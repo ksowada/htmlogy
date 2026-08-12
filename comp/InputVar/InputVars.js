@@ -88,7 +88,14 @@ class InputVars {
 	 */
 	onAll(callback) {
 		Object.keys(this.vars).forEach(key => {
-			if (!this.vars[key].disabled===true) this.vars[key].onAll(callback) // dont listen to disabled inputs
+			if (!this.vars[key].disabled===true) {
+				this.vars[key].onAll(callback) // dont listen to disabled inputs
+
+				// also sub vars of InputInfo
+				Object.keys(this.vars[key].vars).forEach(modelKey => {
+					this.vars[key].vars[modelKey].onAll(callback)
+				})
+			}
 		})
 	}
 	// /**

@@ -1,0 +1,15 @@
+.InputSingle {
+	padding:--var(b1);
+	margin:0em;
+	margin-top:--var(b1);
+	margin-bottom:--var(b1);
+}
+
+.InputSingle .toggle-on {
+	background-color: --var(col-back-primary-on);
+}
+
+.InputSingle :disabled {
+	background-color: --var(col-back-primary-disabled);
+}
+	

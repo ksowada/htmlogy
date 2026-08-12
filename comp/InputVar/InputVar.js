@@ -64,11 +64,13 @@ class InputVar extends Model {
 	 * @param {InputVar~props} [props={}] parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
 	 * @param {any} ids (f.e. Storage)
 	 */
-	constructor(props={},...ids) {
+	constructor(props={},infoVar,...ids) {
 		const val = props.val?props.val:InputVar.typeIsNumber(props.kind)?0:''
 		const storeEn = (props.storeEn!==undefined)?props.storeEn:!(props.kind && props.kind==='btn') // true is default, but props.kind=btn
-
+		
 		super(val,ids,storeEn)
+
+		this.infoVar = infoVar // store main InputInfo, for changes on it, f.e. in callback
 
 		this.props = Obj.copy(props) // Obj.defaults(props,{kind:InputVar.kindGuess(props)})
 
@@ -150,6 +152,7 @@ class InputVar extends Model {
 	 */
 	dom(parentHtml,propsAdd) {
 		const props = Html.mergeDatas(this.props,propsAdd)
+		// const props = (propsAdd!==undefined)?propsAdd:{} //Html.mergeDatas(this.props,propsAdd)
 		// first set val, for every mode
 		if (propsAdd && propsAdd.val) {
 			if (props.kind==='bit') {
@@ -298,7 +301,10 @@ class InputVar extends Model {
 		} else {
 			this.val = val
 		}
-		if (this.props.callback) this.props.callback(val)
+		if (this.props.callback) {
+			const callbackVal = this.props.callback(val)
+			if (callbackVal!==undefined && this.infoVar) this.infoVar.set(callbackVal)
+		}
 	}
 	/**
 	 * sets the value of the DOM element, if already existing
