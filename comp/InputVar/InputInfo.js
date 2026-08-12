@@ -186,7 +186,9 @@ class InputInfo extends InputVar {
 		this.val = val
 	}
 	enChanged() {
-		Elem.classStateSet(this.ui.form.el,this.vars['en'].val,['hidden',''])
+		if (this.ui.form) { // maybe closed at startup
+			Elem.classStateSet(this.ui.form.el,this.vars['en'].val,['hidden',''])
+		}
 	}
 }
 
