@@ -107,7 +107,9 @@ class InputInfo extends InputVar {
 		 * @type {any}
 		 */
 		const props = Html.mergeDatas(this.props,propsAdd)
-
+		if (props.vals) {
+			if (props.vals instanceof Array) { props.kind = 'select' }
+		}
 		if ((props.subs && Object.keys(props.subs).length > 0) || (props.actions && props.actions.length > 0)) {
 			parentHtml = this.ui.container = html.add({h:'<div class="InputInfo">'})
 		}

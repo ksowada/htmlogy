@@ -68,7 +68,7 @@ class InputVar extends Model {
 		const val = props.val?props.val:InputVar.typeIsNumber(props.kind)?0:''
 		const storeEn = (props.storeEn!==undefined)?props.storeEn:!(props.kind && props.kind==='btn') // true is default, but props.kind=btn
 		
-		super(val,ids,storeEn)
+		super(val,ids,storeEn) // Model stores val, only access it after that with this.val
 
 		this.infoVar = infoVar // store main InputInfo, for changes on it, f.e. in callback
 
@@ -207,7 +207,7 @@ class InputVar extends Model {
 			// if vals defined set list
 			if (props.vals) {
 				list.populate(props.vals)
-				if (props.val) myHtml.el.value = props.val
+				if (this.val) myHtml.el.value = this.val
 			} else {
 				this.set_disabled(true,myHtml)
 			}
