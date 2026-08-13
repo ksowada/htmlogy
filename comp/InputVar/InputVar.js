@@ -146,13 +146,14 @@ class InputVar extends Model {
 	 *
 	 * may be called multiple times
 	 * @param {Html} parentHtml Html to attach to
-	 * @param {InputVar~props} propsAdd properties to add to element and remember this for next dom() calls
+	 * @param {InputVar~props} propsAdd properties to add to element and remember this for next dom() calls, exclude val, val comes from Model
 	 * @returns {InputVar} this for chaining dom when wished
 	 * @throws {Error} if kind is not implemented
 	 */
 	dom(parentHtml,propsAdd) {
-		const props = Html.mergeDatas(this.props,propsAdd)
-		// const props = (propsAdd!==undefined)?propsAdd:{} //Html.mergeDatas(this.props,propsAdd)
+		// const props = Html.mergeDatas(this.props,propsAdd)
+		const props = (propsAdd!==undefined)?propsAdd:{} //Html.mergeDatas(this.props,propsAdd)
+		props.val = this.val // value comes from constructor and store
 		// first set val, for every mode
 		if (propsAdd && propsAdd.val) {
 			if (props.kind==='bit') {
