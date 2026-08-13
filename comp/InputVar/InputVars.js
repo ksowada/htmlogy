@@ -34,7 +34,7 @@ class InputVars {
 	 */
 	get(key,modelKey) {
 		if (modelKey===undefined) return this.vars[key].val
-		return this.vars[key].get(modelKey)
+		return this.vars[key].getSubVal(modelKey)
 	}
 	/**
 	 * Returns all the values of the given info

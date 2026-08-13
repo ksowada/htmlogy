@@ -1,11 +1,8 @@
-// @ts-check
 import {icons} from '../../../global.js'
 import InputVar from './InputVar.js'
 import Obj from '../../../logic/Obj/Obj.js'
 import Elem from '../../Elem/Elem.js'
 import Html from '../../Html/Html.js'
-
-
 
 /**
  * @typedef InputInfo_props
@@ -80,14 +77,8 @@ class InputInfo extends InputVar {
 		 * @type {any}
 		 */
 		this.ui = {}
-		/**
-		 * @type {InputVar[]}
-		 */
-		this.vars_actions = []
-		/**
-		 * @type {InputVar[]}
-		 */
-		this.vars_subs = []
+		this.vars_actions = {}
+		this.vars_subs = {}
 	}
 	/**
 	 * creates Html (may be included in additional element) and attach it to parent-Html
@@ -139,7 +130,7 @@ class InputInfo extends InputVar {
 		const actions = props.actions
 		if (actions) {
 			actions.forEach(key => {
-				this.vars_actions.push(new InputVar({},this,[this.ids,key]).dom(parentHtml,this.action_subs[key]))
+				this.vars_actions[key] = (new InputVar({},this,[this.ids,key]).dom(parentHtml,this.action_subs[key]))
 			})
 		}
 
@@ -147,12 +138,21 @@ class InputInfo extends InputVar {
 		const subs = props.subs
 		for (var key in subs) {
 			if (Object.hasOwn(subs,key)) {
-				this.vars_subs.push(new InputVar({},this,[this.ids,key]).dom(parentHtml,props.subs[key]))
+				this.vars_subs[key] = (new InputVar({},this,[this.ids,key]).dom(parentHtml,props.subs[key]))
 			}
 		}
 
 		// this.enChanged() // TODO important? or maybe with listener
 		return this
+	}
+
+	/** 
+	 * get val from this or if modelKey specifies, from subs or actions
+	*/
+	getSubVal(key) {
+		if (Object.hasOwn(this.vars_actions, key)) return this.vars_actions[key].get()
+		if (Object.hasOwn(this.vars_subs, key)) return this.vars_subs[key].get()
+		return this.get(key)
 	}
 	/**
 	 * Copies the current value of the input to the system clipboard.
