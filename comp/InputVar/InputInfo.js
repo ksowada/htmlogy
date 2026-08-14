@@ -101,9 +101,7 @@ class InputInfo extends InputVar {
 		if (props.vals) {
 			if (props.vals instanceof Array) { props.kind = 'select' }
 		}
-		if ((props.subs && Object.keys(props.subs).length > 0) || (props.actions && props.actions.length > 0)) {
-			parentHtml = this.ui.container = html.add({h:'<div class="InputInfo">'})
-		}
+		parentHtml = html.add({h:'<div class="InputInfo">'})
 		// TODO en is used even if not domed???
 		/**
 		 * @type InputVar
@@ -142,7 +140,7 @@ class InputInfo extends InputVar {
 			}
 		}
 
-		// this.enChanged() // TODO important? or maybe with listener
+		this.enChanged() // TODO important? or maybe with listener
 		return this
 	}
 
