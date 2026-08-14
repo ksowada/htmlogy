@@ -208,7 +208,11 @@ class InputVar extends Model {
 			// if vals defined set list
 			if (props.vals) {
 				list.populate(props.vals)
-				if (this.val) myHtml.el.value = this.val
+				if (this.val) {
+					myHtml.el.value = this.val
+				} else {
+					this.val = myHtml.el.value
+				}
 			} else {
 				this.set_disabled(true,myHtml)
 			}
