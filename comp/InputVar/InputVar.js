@@ -197,7 +197,7 @@ class InputVar extends Model {
 			if (props.icon || props.label) {
 				if (!props.tooltip) workHtml = workHtml.add({}) // if no surrounding div is done
 				if (props.icon) workHtml.add({h:`<img class="inline" src=${props.icon} />`})
-				if (props.label) workHtml.add({h:`<span>${props.label}</span>`})
+				if (props.label) workHtml.add({h:`<span class="label">${props.label}</span>`})
 			}
 		}
 		if (props.kind==='select') {

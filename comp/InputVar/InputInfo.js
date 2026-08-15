@@ -120,7 +120,7 @@ class InputInfo extends InputVar {
 			args = Obj.omit(args, 'label') // label is already mounted here
 		}
 
-		if (this.get()!==undefined) {
+		if (this.get()!==undefined && props.val!==null) {
 			// this.vars.is = this
 			super.dom(parentHtml,args)
 		}
