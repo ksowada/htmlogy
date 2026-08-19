@@ -290,7 +290,6 @@ class InputVar extends Model {
 	 * @param {Event} event to identify the event targets value
 	 */
 	onChange(event) {
-		console.log('inputVar.onChange',event)
 		let val = event.target.value
 		if (this.props.kind==='int'||this.props.kind==='float') {
 			if (this.props.kind==='int') val = Number.parseInt(val)

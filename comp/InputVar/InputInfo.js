@@ -121,7 +121,6 @@ class InputInfo extends InputVar {
 		}
 
 		if (this.get()!==undefined && props.val!==null) {
-			// this.vars.is = this
 			super.dom(parentHtml,args)
 		}
 		/** @type string[] */
@@ -150,7 +149,7 @@ class InputInfo extends InputVar {
 	getSubVal(key) {
 		if (Object.hasOwn(this.vars_actions, key)) return this.vars_actions[key].get()
 		if (Object.hasOwn(this.vars_subs, key)) return this.vars_subs[key].get()
-		if (key='en') return this.vars['en'].get()
+		if (key=='en') return this.vars['en'].get()
 		return this.get(key)
 	}
 	/**
