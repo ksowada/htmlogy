@@ -21,3 +21,6 @@
 .InputInfo .label {
 	padding: 0.4rem;
 }
+.InputInfo input , .InputInfo select {
+	border-radius: var(--b1);
+}
