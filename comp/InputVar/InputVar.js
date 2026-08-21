@@ -81,19 +81,12 @@ class InputVar extends Model {
 		 */
 		this.htmls = []
 
-		// optional items
-		/**
-		 * all DOM implementations of list, when used
-		 * @type {Html[]}
-		 */
-		this.lists = []
-
 		/**
 		 * optional field when HtmlState is used
 		 * @type {HtmlSelect[]}
 		 */
 		this.states = []
-	}
+	}	
 	/**
 	 * get actual value
 	 * @returns {any}	actual value
@@ -115,30 +108,13 @@ class InputVar extends Model {
 	 * @param {Model~setOptions} [setOpts] options to set Model, concern store & listeners
 	 */
 	set(val,setOpts={}) {
-		if (this.lists.length > 0) {
-			if (Arr.is(val)) {
-				this.lists.forEach(list => {
-					this.set_disabled(val.length === 0)
-					// stored selection or previous selection shall remain after list populate
-					const select = (this.val!==undefined) ? this.val : list.val
-					list.populate(val)
-					if (select!=='') list.val = select // previos selection, use only if valid
-				})
-				super.set(this.lists[0].val,undefined,setOpts) // only use first list for getting selected after list is populated
-			} else {
-				this.lists.forEach(list => list.val = val)
-				super.set(val,undefined,setOpts)
-				this.setDoms(val)
-			}
-		} else {
-			let valIntern = val
-			if (InputVar.typeIsNumber(this.props.kind)) valIntern = Number.parseFloat(val)
-			valIntern = this.checkBound(valIntern)
-			super.set(valIntern,undefined,setOpts)
-			this.setDoms(valIntern)
-			if (this.states && this.states.length) {
-				this.states.forEach(state => state.set_state_ix(valIntern))
-			}
+		let valIntern = val
+		if (InputVar.typeIsNumber(this.props.kind)) valIntern = Number.parseFloat(val)
+		valIntern = this.checkBound(valIntern)
+		super.set(valIntern,undefined,setOpts)
+		this.setDoms(valIntern)
+		if (this.states && this.states.length) {
+			this.states.forEach(state => state.set_state_ix(valIntern))
 		}
 	}
 	/**
@@ -202,12 +178,14 @@ class InputVar extends Model {
 		}
 		if (props.kind==='select') {
 			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'select',val:this.val}))
-			// set <select> <option>
-			const list = new ArrList(myHtml,item => new Html({html:'option',val:item}))
 
-			// if vals defined set list
+			// if vals are defined, build list as set <select>/<option>
 			if (props.vals) {
-				list.populate(props.vals)
+				props.vals.forEach(valItem => {
+					myHtml.add({html:'option',val:valItem})
+				})
+
+				// set <select value="">
 				if (this.val) {
 					myHtml.el.value = this.val
 				} else {
@@ -216,7 +194,6 @@ class InputVar extends Model {
 			} else {
 				this.set_disabled(true,myHtml)
 			}
-			this.lists.push(list)
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
 			const kind = (props.kind==='int'||props.kind==='float')?'number':'text'
 			let val = this.val

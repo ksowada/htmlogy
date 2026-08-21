@@ -98,19 +98,6 @@ class InputVars {
 			}
 		})
 	}
-	// /**
-	//  * stores the current state of the infos in the storage, if not disabled
-	//  */
-	// store() {
-	// 	Object.keys(this.vars).forEach(key => {
-	// 		if (!this.vars[key].disabled===false) Store.set([this.storageId,key],this.getAll(key))})
-	// }
-	// /**
-	//  * loads the stored data from the storage, if you use reset() you may set the model first to have valid init values
-	//  */
-	// load() {
-	// 	Object.keys(this.vars).forEach(key => this.setAll(key,Store.get([this.storageId,key])))
-	// }
 	/**
 	 * Returns an instance of the specified class based on the given arguments.
 	 *
