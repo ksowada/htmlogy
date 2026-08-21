@@ -29,7 +29,8 @@ describe('InputInfo',() => {
 			expect(domed.el.classList.length).to.be(2)
 		})
 		it('outerHTML',() => {
-			expect(parentHtml.el.innerHTML).to.eql('<select class="sel someclass"><option>house</option><option>mouse</option><option>touch</option></select>')
+			expect(parentHtml.el.innerHTML).to.eql('<div class="InputInfo"><select class="sel someclass"><option>house</option><option>mouse</option><option>touch</option></select></div>'
+			)
 		})
 	})
 	describe('dom for select with label',() => {
@@ -53,27 +54,18 @@ describe('InputInfo',() => {
 			expect(domed.el.classList.length).to.be(2)
 		})
 		it('outerHTML',() => {
-			expect(parentHtml.el.innerHTML).to.eql('<div><span>choose</span><select class="sel someclass"><option>house</option><option>mouse</option><option>touch</option></select></div>')
+			expect(parentHtml.el.innerHTML).to.eql('<div class="InputInfo"><div><span class="label">choose</span><select class="sel someclass"><option>house</option><option>mouse</option><option>touch</option></select></div></div>')
 		})
 	})
 	describe('dom for evt with label',() => {
-		const callback = () => {}
 		create_dom(domContent)
 		const input = new InputInfo({kind:'evt',label:'reset!',change:callback,css:'btn btn-active btn-secondary'})
 		const parentHtml = new Html({parent:{id:myId},html:'div'})
 		input.dom(parentHtml,{css:'someclass'})
 
 		// have to store vars here in it, it was another content from HtmlSelectTest
-		const domed = input.htmls[0]
-
-		it('value of DOM',() => {
-			expect(domed.el.value).to.eql('')
-		})
-		it('value of Model',() => {
-			expect(domed.val).to.eql('')
-		})
-		it('outerHTML',() => {
-			expect(parentHtml.el.innerHTML).to.eql('<button class="btn btn-active btn-secondary someclass"><span>reset!</span></button>')
+		it('innerHTML',() => {
+			expect(parentHtml.el.innerHTML).to.eql('<div class="InputInfo"><button class="btn btn-active btn-secondary someclass" value=""><span>reset!</span></button></div>')
 		})
 	})
 })

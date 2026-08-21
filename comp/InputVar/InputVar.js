@@ -1,4 +1,3 @@
-import ArrList from '../ArrList/ArrList.js'
 import Model from '../../../logic/Model/Model.js'
 import Obj from '../../../logic/Obj/Obj.js'
 import Html from '../../Html/Html.js'
@@ -10,7 +9,7 @@ import Float from '../../../logic/Float/Float.js'
 import Str from '../../../logic/Str/Str.js'
 
 /**
- * @typedef InputVarprops common ways to address HTMLElement in DOM, choose only 1 of those, parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
+ * @typedef InputVar~props common ways to address HTMLElement in DOM, choose only 1 of those, parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
  * @prop {string} [storeEn] f.e. write: prohibit store and disable models listener, default is true
  * @prop {number} [min] minimum value to bound
  * @prop {number} [max] maximum value to bound
@@ -62,12 +61,13 @@ class InputVar extends Model {
 	/**
 	 * a variable (described by props) get initialized, so it can be mounted multiple times in DOM later, it use Html-Instances
 	 * @param {InputVar~props} [props={}] parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
+	 * @param {InputInfo} [infoVar] main InputInfo that composes this InputVar for callback at value change
 	 * @param {any} ids (f.e. Storage)
 	 */
 	constructor(props={},infoVar,...ids) {
 		const val = props.val?props.val:InputVar.typeIsNumber(props.kind)?0:''
 		const storeEn = (props.storeEn!==undefined)?props.storeEn:!(props.kind && props.kind==='btn') // true is default, but props.kind=btn
-		
+
 		super(val,ids,storeEn) // Model stores val, only access it after that with this.val
 
 		this.infoVar = infoVar // store main InputInfo, for changes on it, f.e. in callback
