@@ -1,6 +1,11 @@
-.InputInfo {
-	display: flex;
-	padding:var(--b1);
+.InputInfo, .enableble {
+	/* display: flex;
+	padding:var(--b1); */
+
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+	margin-bottom: var(--b1);
 }
 .InputInfo .title {
 	min-width: 8rem
@@ -15,12 +20,15 @@
 .InputInfo .inline .warn {
 	filter: invert(30%) sepia(66%) saturate(3340%) hue-rotate(347deg) brightness(88%) contrast(98%); 
 }
-.InputInfo .enableble {
+/* .InputInfo .enableble {
 	display:flex;
-}
+} */
 .InputInfo .label {
 	padding: 0.4rem;
 }
 .InputInfo input , .InputInfo select {
 	border-radius: var(--b1);
+}
+.InputInfo button {
+	height: stretch;
 }
