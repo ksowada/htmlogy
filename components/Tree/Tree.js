@@ -6,7 +6,7 @@ import Toolbar from '../Toolbar/Toolbar.js'
 import './Tree.scss'
 import Ids from '../../../logic/Ids/Ids.js'
 import State from '../../../logic/State.js'
-import Trees from '../../../logic/Trees.js'
+import Trees from '../../../logic/Trees/Trees.js'
 import HtmlElComp from '../../HtmlComp/HtmlElComp.js'
 import Elem from '../../Elem/Elem.js'
 
@@ -18,7 +18,7 @@ import Elem from '../../Elem/Elem.js'
 // TODO maintain sel state at restart
 // TODO use all items of tree_info like descr
 // TODO mode select only one, instead of multiple select as implemented
-class Tree extends HtmlElComp {
+class Tree extends Html {
 	/**
 	 * @param {object} arg tree creation parameters
 	 * @param {string} arg.dataIxId default to id
@@ -36,7 +36,9 @@ class Tree extends HtmlElComp {
 	 */
 	constructor(arg) {
 		// supply some defaults when not applied by callee
-		super({dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:true,editable:true,...arg})
+
+		super(arg)
+		Html.mergeModDatas(this,{dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:true,editable:true,...arg})
 		console.log('Tree:constructor')
 		this.icons = {
 			'selection': 'fa-solid fa-section red',
@@ -55,13 +57,12 @@ class Tree extends HtmlElComp {
 		if (this.selectable) this.nodeSelStates.push('sel')
 		if (this.editable) this.nodeSelStates.push('edit')
 		this.nodeExpStates = ['show','hide']
-		super.constructed()
 	}
 	/**
 	 * @private
 	 */
 	dom() {
-		super.domCreate(Html.mergeDatas.apply(null,arguments))
+		// super.domCreate(Html.mergeDatas.apply(null,arguments))
 		console.log('Tree:dom')
 		// const searchGroup = new Html({parent:{obj:this.containerObj},html:'div',css:'input-group',atts:{'role':'group','aria-label':'tree-search-group'}})
 		// TODO color search icon use btn Style
@@ -72,9 +73,8 @@ class Tree extends HtmlElComp {
 		// TODO use Ctrl+C etc as keys
 		// TODO btns for copy/paste
 		// TODO DBG lines
-		this.dbgInput = new Html({parent:{obj:this.containerObj},html:'input',css:'show-inline',id:'dbg',val:'hihi-dbg'}) // root is founded in ul
 
-		this.tree = new Html({parent:{obj:this.containerObj},html:'ul',css:'node show root'}) // root is founded in ul
+		this.tree = new Html({parent:{obj:this},html:'ul',css:'node show root'}) // root is founded in ul
 		// deactivate if not possible
 		const toolbarItems = {} // TODO color them
 		toolbarItems['create'] = {icon:'fa-solid fa-plus',evts:{click:this.btnCreate.bind(this)}}
@@ -84,7 +84,7 @@ class Tree extends HtmlElComp {
 		toolbarItems['dn'] = {icon:'fa-solid fa-caret-down',evts:{click:this.btnDn.bind(this)}}
 		// TODO duplicate, and clipboard commands
 		Obj.mergeModOverwrite(toolbarItems,this.extraBtns)
-		this.toolContainer = new Html({parent:{obj:this.containerObj},html:'div'})
+		this.toolContainer = new Html({parent:{obj:this},html:'div'})
 		this.btns = new Toolbar({parent:{obj:this.toolContainer},items:toolbarItems})
 		if (this.data) this.update()
 	}
