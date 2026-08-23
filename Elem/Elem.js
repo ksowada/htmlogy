@@ -371,8 +371,7 @@ class Elem {
 		const childNodes = el.childNodes
 		if (childNodes==undefined) return childs
 		childNodes.forEach(e => {
-			const eType = Vars.typeHier(e) // may be more specialiced of Element
-			if (eType.includes('HTMLElement')) {
+			if (e instanceof HTMLElement) {
 				if (tag==undefined || e.localName==tag) childs.push(e)
 			}
 		})

@@ -94,9 +94,8 @@ class ListLite extends HtmlElComp {
 		}
 		inner.css = Str.enrichList(' ',inner.css,'list-item')
 		Obj.assure(inner,'evts',{})
-		const itemClassHier = Vars.typeHier(item)
 		let htmlObj = undefined
-		if (itemClassHier.includes('HtmlComp')) {
+		if (itemClassHier instanceof HtmlComp)) {
 			item.dom(inner,item,{parent:{el:this.div}})
 			htmlObj = item
 		} else {

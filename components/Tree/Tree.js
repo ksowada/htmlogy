@@ -151,7 +151,7 @@ class Tree extends Html {
 		}
 	}
 	createNodeInt(parent_ul_el,data,nodeType,type,id,collapsible) {
-		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:State.initial(this.nodeSelStates),atts:{id},evts:{'contextmenu':this.contextmenu.bind(this,data)}})
+		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:State.initial(this.nodeSelStates),atts:{id}})
 		this.mapElData.set(li_el,data)
 		if (collapsible) {
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
@@ -161,7 +161,7 @@ class Tree extends Html {
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'icon'})
 		}
 
-		new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.itemClicked.bind(this)}})
+		new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.contextmenu.bind(this,data)}})
 		if (this.editable) new Html({parent:{obj:li_el},html:'input',val:data[this.dataNameId],css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
 		return li_el
 	}

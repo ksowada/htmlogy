@@ -15,8 +15,20 @@ class Popup extends Html {
 		if (items) {
 			items.forEach(item => {
 				this.add(Html.mergeDatas(item,{css:'popup-item'}))
+				console.log('Popup.constructor.item:',item.val)
 			})
 		}
+		// };
+		// Schließen bei Klick außerhalb
+		// document.addEventListener("click", (evt) => {
+		// if (!this.el.contains(evt.target)) {
+		// 	this.close();
+		// }
+		// });
 	}
+	// close() {
+	// 	this.remove()
+	// }
+
 }
 export default Popup

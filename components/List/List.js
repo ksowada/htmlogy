@@ -117,9 +117,8 @@ class List extends Html {
 		Obj.assure(this.inner,'evts',{})
 		Obj.mergeModOverwrite(this.inner,{evts:{'click':this.evtSelect.bind(this)}})
 		// decide how item will be instantiated
-		// const itemClassHier = Vars.typeHier(item)
 		let htmlObj = undefined
-		if (Vars.typeHier(item).includes('Html')) {
+		if (item instanceof Html) {
 			htmlObj = item
 			htmlObj.change(this.inner)
 		} else {

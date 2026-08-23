@@ -6,6 +6,7 @@ import Str from '../../logic/Str/Str.js'
 import Timer from '../../logic/Timer/Timer.js'
 import Vars from '../../logic/Vars/Vars.js'
 import Elem from '../Elem/Elem.js'
+import HtmlElComp from '../HtmlComp/HtmlElComp.js'
 /**
  * @class
  * Virtual DOM tree - handles easy programmatic DOM creation, manipulation and removement
@@ -521,9 +522,13 @@ class Html {
 	static getEl(arg) {
 		if (arg == undefined) return undefined
 		let el = null
-		const objType = Vars.type(arg)
-		const objHier = Vars.typeHier(arg)
-		if (objHier.includes('Object')) { // faster access with no type detection // usual obj with multiple defined ways to adress Element in DOM
+		if (arg instanceof HtmlElComp) { // as it may extend Html use this sequence before matiching with Html
+			el = arg.div
+		} else if (arg instanceof Html) {
+			el = arg.my.el
+		} else if (arg instanceof Element) { // direct element may be special
+			el = arg
+		} if (arg instanceof Object) { // faster access with no type detection // usual obj with multiple defined ways to adress Element in DOM
 			if (!arg.el) { // find by other means, as el is not given
 				if (arg.obj) {
 					if (arg.obj.containerObj) el = arg.obj.containerObj.my.el // used for HtmlElComp
@@ -537,16 +542,10 @@ class Html {
 			} else {
 				el = arg.el // given as el, so use it
 			}
-		} else if (objHier.includes('Element')) { // direct element may be special
-			el = arg
-		} else if (objType == 'Number') { // consider it as id
+		} else if (typeof arg === 'number') { // consider it as id
 			el = document.getElementById(arg.toString())
-		} else if (objType == 'String') { // consider it as id
+		} else if (typeof arg == 'string') { // consider it as id
 			el = document.getElementById(arg)
-		} else if (objHier.includes('HtmlElComp')) { // as it may extend Html use this sequence before matiching with Html
-			el = arg.div
-		} else if (objHier.includes('Html')) {
-			el = arg.my.el
 		}
 		return el
 	}
@@ -560,7 +559,7 @@ class Html {
 		if (arg===undefined) arg={}
 		Obj.put(arg,['parent','obj'],this)
 		let htmlObj = undefined
-		if (Vars.typeHier(arg).includes('Html')) {
+		if (arg instanceof Html) {
 			htmlObj = arg
 			// if parent is rendered, render now
 			if (arg.parent.obj.domLater!==true) htmlObj.render({parent:{obj:this}}) // only give parent, as arg already contain populated arg in form of Html
@@ -767,11 +766,13 @@ class Html {
 	 * @returns {boolean} true, when merge is possible
 	 */
 	static mergeAvailable(arg) {
-		const argItemType = Vars.type(arg)
-		const argItemClasses = Vars.typeHier(arg)
-		// console.log('Vars.type:'+argItemType+' Vars.typeHier:'+argItemClasses)
-		const isAvailable = ((argItemType === 'Object' && argItemClasses[0] === 'Object') || argItemType === 'Function') // not merge foreign Class except Html
-		return isAvailable
+		if (typeof arg === 'function') {
+			return true;
+		}
+		if (arg === null || typeof arg !== 'object') {
+			return false;
+		}
+		return Object.getPrototypeOf(arg) === Object.prototype;
 	}
 }
 export default Html

@@ -30,7 +30,7 @@ class HtmlOpenable extends Html {
 	 */
 	// TODO move to Html, but use addLater
 	add() {
-		if (Vars.typeHier(arguments[0]).includes('Html')) {
+		if (arguments[0] instanceof Html) {
 			this.add(arguments[0])
 		} else {
 			this.add(new Html({...arguments,...this.domArgAddition}))

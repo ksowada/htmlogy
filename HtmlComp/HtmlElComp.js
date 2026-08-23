@@ -22,11 +22,7 @@ class HtmlElComp extends HtmlComp {
 		* @type {object} 
 		*/
 		this.container = undefined
-
-		const thisTypeHier = Vars.typeHier(this) // test if this is BaseClass
-		if (thisTypeHier.indexOf('HtmlElComp')==0) {
-			this.constructed()
-		}
+		this.constructed()
 	}
 	/**
 	 * creates container (if given), heading (if given) for component
