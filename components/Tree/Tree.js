@@ -140,7 +140,7 @@ class Tree extends Html {
 				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:[ulShowState,'lvl'+lvl]})
 				for (let ix = 0; ix < data[this.dataChildId].length; ix++) {
 					const dataChild = data[this.dataChildId][ix]
-					this.inflateLvl(ul_el,dataChild,++lvl)
+					this.inflateLvl(ul_el,dataChild,++lvl,lvlToShow)
 				}
 			}
 		}
