@@ -108,10 +108,13 @@ class Tree extends Html {
 
 			// check for initially open or close
 			const ulShowState = (lvl>=lvlToShow) ? 'hide' : 'show'
-			let nodeType = 'default'
+			let nodeType = 'none'
+			let collapsible = false
 			if (!data[this.dataChildId] || data[this.dataChildId].length==0) {
 				nodeType = 'none'
+				collapsible = false
 			} else {
+				collapsible = true
 				if (lvl>=lvlToShow) {
 					nodeType = 'hide'
 				} else {
@@ -135,7 +138,7 @@ class Tree extends Html {
 				if (!data.type) data.type = 'default'
 			}
 			data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
-			let li_el = this.createNodeInt(htmlObj,data[this.dataNameId],nodeType,data.type,data.id)
+			let li_el = this.createNodeInt(htmlObj,data[this.dataNameId],nodeType,data.type,data.id,collapsible)
 			if (data[this.dataChildId]) {
 				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:[ulShowState,'lvl'+lvl]})
 				for (let ix = 0; ix < data[this.dataChildId].length; ix++) {
@@ -145,10 +148,15 @@ class Tree extends Html {
 			}
 		}
 	}
-	createNodeInt(parent_ul_el,text,nodeType,type,id) {
+	createNodeInt(parent_ul_el,text,nodeType,type,id,collapsible) {
 		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:State.initial(this.nodeSelStates),atts:{id}})
-		new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
-		new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+		if (collapsible) {
+			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+		} else {
+			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'icon'})
+			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'icon'})
+		}
 
 		// new Html({parent:{obj:li_el},html:'i',css:[this.icons[nodeType],'collapse-btn'],evts:{'click':this.itemCollapse.bind(this)},atts:{draggable:'true'}})
 		// new Html({parent:{obj:li_el},html:'span',css:'icon-between',evts:{'click':this.itemClicked.bind(this)}})
