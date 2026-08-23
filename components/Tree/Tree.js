@@ -40,6 +40,8 @@ class Tree extends Html {
 
 		super(arg)
 		Html.mergeModDatas(this,{dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:true,editable:false,...arg})
+
+		this.mapElData = new WeakMap();
 		console.log('Tree:constructor')
 		this.icons = {
 			'selection': 'section',
@@ -138,7 +140,7 @@ class Tree extends Html {
 				if (!data.type) data.type = 'default'
 			}
 			data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
-			let li_el = this.createNodeInt(htmlObj,data[this.dataNameId],nodeType,data.type,data.id,collapsible)
+			let li_el = this.createNodeInt(htmlObj,data,nodeType,data.type,data.id,collapsible)
 			if (data[this.dataChildId]) {
 				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:[ulShowState,'lvl'+lvl]})
 				for (let ix = 0; ix < data[this.dataChildId].length; ix++) {
@@ -148,8 +150,9 @@ class Tree extends Html {
 			}
 		}
 	}
-	createNodeInt(parent_ul_el,text,nodeType,type,id,collapsible) {
-		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:State.initial(this.nodeSelStates),atts:{id}})
+	createNodeInt(parent_ul_el,data,nodeType,type,id,collapsible) {
+		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:State.initial(this.nodeSelStates),atts:{id},evts:{'contextmenu':this.contextmenu.bind(this,data)}})
+		this.mapElData.set(li_el,data)
 		if (collapsible) {
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
@@ -158,11 +161,8 @@ class Tree extends Html {
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'icon'})
 		}
 
-		// new Html({parent:{obj:li_el},html:'i',css:[this.icons[nodeType],'collapse-btn'],evts:{'click':this.itemCollapse.bind(this)},atts:{draggable:'true'}})
-		// new Html({parent:{obj:li_el},html:'span',css:'icon-between',evts:{'click':this.itemClicked.bind(this)}})
-		// new Html({parent:{obj:li_el},html:'i',css:[this.icons[type],'node-icon'],evts:{'click':this.itemCollapse.bind(this)},atts:{draggable:'true'}})
-		new Html({parent:{obj:li_el},html:'span',val:text,css:'node-value',evts:{'click':this.itemClicked.bind(this)}})
-		if (this.editable) new Html({parent:{obj:li_el},html:'input',val:text,css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
+		new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.itemClicked.bind(this)}})
+		if (this.editable) new Html({parent:{obj:li_el},html:'input',val:data[this.dataNameId],css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
 		return li_el
 	}
 	itemCollapse(evt) {

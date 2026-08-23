@@ -1,0 +1,20 @@
+  .popup {
+    position: absolute;
+    background: #222;
+    color: #fff;
+    padding: 8px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 9999;
+    user-select: none;
+  }
+  .popup.hidden {
+    display: none;
+  }
+  .popup-item {
+    padding: 6px 10px;
+    cursor: pointer;
+  }
+  .popup-item:hover {
+    background: #444;
+  }
