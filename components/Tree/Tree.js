@@ -9,6 +9,7 @@ import State from '../../../logic/State.js'
 import Trees from '../../../logic/Trees/Trees.js'
 import HtmlElComp from '../../HtmlComp/HtmlElComp.js'
 import Elem from '../../Elem/Elem.js'
+import {icons} from '../../../global'
 
 /**
  * shows an tree from given data. data can be applied by method update
@@ -38,20 +39,20 @@ class Tree extends Html {
 		// supply some defaults when not applied by callee
 
 		super(arg)
-		Html.mergeModDatas(this,{dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:true,editable:true,...arg})
+		Html.mergeModDatas(this,{dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:true,editable:false,...arg})
 		console.log('Tree:constructor')
 		this.icons = {
-			'selection': 'fa-solid fa-section red',
-			'link': 'fa-solid fa-square-up-right blue',
-			'page': 'fa-solid fa-bookmark green',
-			'show': 'fa-solid fa-caret-right blue',
-			'hide': 'fa-solid fa-caret-down blue',
-			'leaf': 'fa-solid fa-leaf green',
-			'root': 'fa-solid fa-globe blue',
-			'date': 'fa-solid fa-calendar red',
-			'datetime': 'fa-solid fa-clock red',
-			'string': 'fa-solid fa-text red',
-			'default' : 'fa-solid fa-location-pin gray'
+			'selection': 'section',
+			'link': 'square-up-right',
+			'page': 'bookmark',
+			'show': 'caret-right',
+			'hide': 'caret-down',
+			'leaf': 'leaf',
+			'root': 'globe',
+			'directory' : 'folder-closed',
+			'file': 'file',
+			'string': 'font',
+			'default' : 'location'
 		}
 		this.nodeSelStates = ['unsel']
 		if (this.selectable) this.nodeSelStates.push('sel')
@@ -59,7 +60,7 @@ class Tree extends Html {
 		this.nodeExpStates = ['show','hide']
 		// const searchGroup = new Html({parent:{obj:this.containerObj},html:'div',css:'input-group',atts:{'role':'group','aria-label':'tree-search-group'}})
 		// TODO color search icon use btn Style
-		// new Html({parent:{obj:searchGroup},html:'div',css:'input-group-text',icon:'fa-solid fa-magnifying-glass',evts:{'click':this.btnCreate.bind(this)}})
+		// new Html({parent:{obj:searchGroup},html:'div',css:'input-group-text',icon:'magnifying-glass',evts:{'click':this.btnCreate.bind(this)}})
 		// TODO not needed when keytype (find by popup, but also use in parent navigation)
 		// this.searchEl = new Html({parent:{obj:searchGroup},html:'input',css:'form-control',atts:{type:'text',placeholder:'search term'},evts:{'change':this.searchChange.bind(this)}})
 		// TODO double-click, may rename node
@@ -69,11 +70,11 @@ class Tree extends Html {
 		this.tree = new Html({parent:{obj:this},html:'ul',css:'node show root'}) // root is founded in ul
 		// deactivate if not possible
 		const toolbarItems = {} // TODO color them
-		toolbarItems['create'] = {icon:'fa-solid fa-plus',evts:{click:this.btnCreate.bind(this)}}
-		toolbarItems['rename'] = {icon:'fa-solid fa-pen',evts:{click:this.btnRename.bind(this)}}
-		toolbarItems['remove'] = {icon:'fa-solid fa-xmark',evts:{click:this.btnRemove.bind(this)}}
-		toolbarItems['up'] = {icon:'fa-solid fa-caret-up',evts:{click:this.btnUp.bind(this)}}
-		toolbarItems['dn'] = {icon:'fa-solid fa-caret-down',evts:{click:this.btnDn.bind(this)}}
+		toolbarItems['create'] = {icon:'plus',evts:{click:this.btnCreate.bind(this)}}
+		toolbarItems['rename'] = {icon:'pen',evts:{click:this.btnRename.bind(this)}}
+		toolbarItems['remove'] = {icon:'xmark',evts:{click:this.btnRemove.bind(this)}}
+		toolbarItems['up'] = {icon:'caret-up',evts:{click:this.btnUp.bind(this)}}
+		toolbarItems['dn'] = {icon:'caret-down',evts:{click:this.btnDn.bind(this)}}
 		// TODO duplicate, and clipboard commands
 		Obj.mergeModOverwrite(toolbarItems,this.extraBtns)
 		this.toolContainer = new Html({parent:{obj:this},html:'div'})
@@ -103,6 +104,18 @@ class Tree extends Html {
 		if (data[this.dataNameId]) {
 			data.el = htmlObj.my.el
 			data.id = this.ids.next() // TODO is this necessary?
+			if (!data.type) {
+				// use custom nodeTypes for data.type icon by data attributes given from top
+				if (this.nodeTypes) {
+					Object.keys(this.nodeTypes).forEach((nodeType => {
+						const [key, value] = Object.entries(this.nodeTypes[nodeType])[0];
+						if (key in data && data[key] == value) {
+							data.type = nodeType
+						}
+					}))
+				}
+				if (!data.type) data.type = 'default'
+			}
 			data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
 			const nodeType = (data[this.dataChildId]) ? 'show' : 'leaf' // default: opened branch if it has childs
 			let li_el = this.createNodeInt(htmlObj,data[this.dataNameId],nodeType,data.type,data.id)
@@ -117,9 +130,12 @@ class Tree extends Html {
 	}
 	createNodeInt(parent_ul_el,text,nodeType,type,id) {
 		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:State.initial(this.nodeSelStates),atts:{id}})
-		new Html({parent:{obj:li_el},html:'i',css:[this.icons[nodeType],'collapse-btn'],evts:{'click':this.itemCollapse.bind(this)},atts:{draggable:'true'}})
-		new Html({parent:{obj:li_el},html:'span',css:'icon-between',evts:{'click':this.itemClicked.bind(this)}})
-		new Html({parent:{obj:li_el},html:'i',css:[this.icons[type],'node-icon'],evts:{'click':this.itemCollapse.bind(this)},atts:{draggable:'true'}})
+		new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+		new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+
+		// new Html({parent:{obj:li_el},html:'i',css:[this.icons[nodeType],'collapse-btn'],evts:{'click':this.itemCollapse.bind(this)},atts:{draggable:'true'}})
+		// new Html({parent:{obj:li_el},html:'span',css:'icon-between',evts:{'click':this.itemClicked.bind(this)}})
+		// new Html({parent:{obj:li_el},html:'i',css:[this.icons[type],'node-icon'],evts:{'click':this.itemCollapse.bind(this)},atts:{draggable:'true'}})
 		new Html({parent:{obj:li_el},html:'span',val:text,css:'node-value',evts:{'click':this.itemClicked.bind(this)}})
 		if (this.editable) new Html({parent:{obj:li_el},html:'input',val:text,css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
 		return li_el
@@ -129,14 +145,14 @@ class Tree extends Html {
 		const liEl = Elem.findParent(evt.target,undefined,1) // find parent of <i> icon, should be li
 		if (liEl==undefined) return
 		const ulEl = Elem.getChilds(liEl,'ul')[0]
-		const iEl = Elem.getChilds(liEl,'i')[0] // clickable collapse btn or icon is first child in li
+		const nodeTypeEl = Elem.getChilds(liEl,'img')[0] // clickable collapse btn or icon is first child in li
 		if (ulEl) {
 			if (ulEl.classList.contains('show')) {
 				Elem.classStateSet(ulEl,'hide',this.nodeExpStates)
-				Html.change({node:{el:iEl},css:[this.icons.hide,'collapse-btn']})
+				new Html({my:{el:nodeTypeEl}}).change({atts:{src:icons(this.icons['show'])},css:['icon',this.icons.hide,'collapse-btn']})
 			} else {
 				Elem.classStateSet(ulEl,'show',this.nodeExpStates)
-				Html.change({node:{el:iEl},css:[this.icons.show,'collapse-btn']})
+				new Html({my:{el:nodeTypeEl}}).change({atts:{src:icons(this.icons['hide'])},css:['icon',this.icons.show,'collapse-btn']})
 			}
 		}
 	}
