@@ -45,8 +45,8 @@ class Tree extends Html {
 			'selection': 'section',
 			'link': 'square-up-right',
 			'page': 'bookmark',
-			'show': 'caret-right',
-			'hide': 'caret-down',
+			'show': 'caret-down',
+			'hide': 'caret-right',
 			'leaf': 'leaf',
 			'root': 'globe',
 			'directory' : 'folder-closed',
@@ -108,6 +108,7 @@ class Tree extends Html {
 			// check for initially open or close
 			const ulShowState = (lvl>=lvlToShow) ? 'hide' : 'show'
 			const nodeType = (lvl>=lvlToShow) ? 'hide' : 'show'
+			console.log('inflateLvl:name:',data[this.dataNameId],' nodeType:',nodeType)
 			// const nodeType = (data[this.dataChildId]) ? 'show' : 'leaf' // default: opened branch if it has childs
 
 			if (!data.type) {
@@ -154,10 +155,10 @@ class Tree extends Html {
 		if (ulEl) {
 			if (ulEl.classList.contains('show')) {
 				Elem.classStateSet(ulEl,'hide',this.nodeExpStates)
-				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['show'])},css:['icon',this.icons.hide,'collapse-btn']})
+				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['hide'])},css:['icon',this.icons.hide,'collapse-btn']})
 			} else {
 				Elem.classStateSet(ulEl,'show',this.nodeExpStates)
-				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['hide'])},css:['icon',this.icons.show,'collapse-btn']})
+				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['show'])},css:['icon',this.icons.show,'collapse-btn']})
 			}
 		}
 	}
