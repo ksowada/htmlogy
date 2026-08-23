@@ -1,4 +1,4 @@
-/* eslint-disable no-new */
+/* eslint-disable no-new, require-jsdoc, jsdoc/require-param-description */
 import Numbers from '../../../logic/Numbers/Numbers.js'
 import Obj from '../../../logic/Obj/Obj.js'
 import Html from '../../Html/Html.js'
@@ -57,13 +57,6 @@ class Tree extends Html {
 		if (this.selectable) this.nodeSelStates.push('sel')
 		if (this.editable) this.nodeSelStates.push('edit')
 		this.nodeExpStates = ['show','hide']
-	}
-	/**
-	 * @private
-	 */
-	dom() {
-		// super.domCreate(Html.mergeDatas.apply(null,arguments))
-		console.log('Tree:dom')
 		// const searchGroup = new Html({parent:{obj:this.containerObj},html:'div',css:'input-group',atts:{'role':'group','aria-label':'tree-search-group'}})
 		// TODO color search icon use btn Style
 		// new Html({parent:{obj:searchGroup},html:'div',css:'input-group-text',icon:'fa-solid fa-magnifying-glass',evts:{'click':this.btnCreate.bind(this)}})
@@ -73,7 +66,6 @@ class Tree extends Html {
 		// TODO use Ctrl+C etc as keys
 		// TODO btns for copy/paste
 		// TODO DBG lines
-
 		this.tree = new Html({parent:{obj:this},html:'ul',css:'node show root'}) // root is founded in ul
 		// deactivate if not possible
 		const toolbarItems = {} // TODO color them
