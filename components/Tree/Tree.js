@@ -52,7 +52,8 @@ class Tree extends Html {
 			'directory' : 'folder-closed',
 			'file': 'file',
 			'string': 'font',
-			'default' : 'location'
+			'default' : 'location',
+			'none' : 'none'
 		}
 		this.nodeSelStates = ['unsel']
 		if (this.selectable) this.nodeSelStates.push('sel')
@@ -107,8 +108,18 @@ class Tree extends Html {
 
 			// check for initially open or close
 			const ulShowState = (lvl>=lvlToShow) ? 'hide' : 'show'
-			const nodeType = (lvl>=lvlToShow) ? 'hide' : 'show'
+			let nodeType = 'default'
+			if (!data[this.dataChildId] || data[this.dataChildId].length==0) {
+				nodeType = 'none'
+			} else {
+				if (lvl>=lvlToShow) {
+					nodeType = 'hide'
+				} else {
+					nodeType = 'show'
+				}
+			}
 			console.log('inflateLvl:name:',data[this.dataNameId],' nodeType:',nodeType)
+			// const nodeType = (lvl>=lvlToShow) ? 'hide' : 'show'
 			// const nodeType = (data[this.dataChildId]) ? 'show' : 'leaf' // default: opened branch if it has childs
 
 			if (!data.type) {
