@@ -306,6 +306,15 @@ class Html {
 		return false
 	}
 	/**
+	 * change element with Html attributes
+	 * @param {Element} el DOM-element to change
+	 * @param {any} atts attributes to set
+	 * @returns {boolean} true, if changed something; false, if already equals the value
+	 */
+	static changeEl(el,atts) {
+		return new Html({my:{el:el}}).change(atts)
+	}
+	/**
 	 * append Html, this create or add given parameters to existing
 	 * see details for change {@link Html#edit}
 	 * @param {object} arg same arguments as create @see {@link this.create}

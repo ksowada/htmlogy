@@ -85,7 +85,7 @@ class Tree extends Html {
 		Obj.mergeModOverwrite(this,Html.mergeDatas.apply(null,arguments))
 		if (this.data) {
 			this.ids = new Ids('n_')
-			this.inflateLvl(this.tree,this.data,0) // iteratively develop all nodes of given tree in data
+			this.inflateLvl(this.tree,this.data,0,0) // iteratively develop all nodes of given tree in data
 			if (this.selectable) this.selectNodeId(this.ids.first())
 			// TODO comissioning lines:
 			// this.nodeEditSet({el:document.getElementById(this.ids.first()),edit:true})
@@ -100,10 +100,16 @@ class Tree extends Html {
 	 * @param {number} lvl actual iterationLevel incrementing beginning at 0
 	 * @private
 	 */
-	inflateLvl(htmlObj,data,lvl) {
+	inflateLvl(htmlObj,data,lvl,lvlToShow) {
 		if (data[this.dataNameId]) {
 			data.el = htmlObj.my.el
 			data.id = this.ids.next() // TODO is this necessary?
+
+			// check for initially open or close
+			const ulShowState = (lvl>=lvlToShow) ? 'hide' : 'show'
+			const nodeType = (lvl>=lvlToShow) ? 'hide' : 'show'
+			// const nodeType = (data[this.dataChildId]) ? 'show' : 'leaf' // default: opened branch if it has childs
+
 			if (!data.type) {
 				// use custom nodeTypes for data.type icon by data attributes given from top
 				if (this.nodeTypes) {
@@ -117,10 +123,9 @@ class Tree extends Html {
 				if (!data.type) data.type = 'default'
 			}
 			data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
-			const nodeType = (data[this.dataChildId]) ? 'show' : 'leaf' // default: opened branch if it has childs
 			let li_el = this.createNodeInt(htmlObj,data[this.dataNameId],nodeType,data.type,data.id)
 			if (data[this.dataChildId]) {
-				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:['show','lvl'+lvl]})
+				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:[ulShowState,'lvl'+lvl]})
 				for (let ix = 0; ix < data[this.dataChildId].length; ix++) {
 					const dataChild = data[this.dataChildId][ix]
 					this.inflateLvl(ul_el,dataChild,++lvl)
@@ -149,10 +154,10 @@ class Tree extends Html {
 		if (ulEl) {
 			if (ulEl.classList.contains('show')) {
 				Elem.classStateSet(ulEl,'hide',this.nodeExpStates)
-				new Html({my:{el:nodeTypeEl}}).change({atts:{src:icons(this.icons['show'])},css:['icon',this.icons.hide,'collapse-btn']})
+				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['show'])},css:['icon',this.icons.hide,'collapse-btn']})
 			} else {
 				Elem.classStateSet(ulEl,'show',this.nodeExpStates)
-				new Html({my:{el:nodeTypeEl}}).change({atts:{src:icons(this.icons['hide'])},css:['icon',this.icons.show,'collapse-btn']})
+				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['hide'])},css:['icon',this.icons.show,'collapse-btn']})
 			}
 		}
 	}
