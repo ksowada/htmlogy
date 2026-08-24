@@ -3,7 +3,7 @@ import Numbers from '../../../logic/Numbers/Numbers.js'
 import Obj from '../../../logic/Obj/Obj.js'
 import Html from '../../Html/Html.js'
 import Toolbar from '../Toolbar/Toolbar.js'
-import './Tree.scss'
+import './Tree.css'
 import Ids from '../../../logic/Ids/Ids.js'
 import State from '../../../logic/State.js'
 import Trees from '../../../logic/Trees/Trees.js'
@@ -92,7 +92,7 @@ class Tree extends Html {
 		Obj.mergeModOverwrite(this,Html.mergeDatas.apply(null,arguments))
 		if (this.data) {
 			this.ids = new Ids('n_')
-			this.inflateLvl(this.tree,this.data,0,(initially)?0:undefined) // iteratively develop all nodes of given tree in data
+			this.inflateLvl(this.tree,this.data,0,(initially)?1:undefined) // iteratively develop all nodes of given tree in data
 			if (this.selectable) this.selectNodeId(this.ids.first())
 			// TODO comissioning lines:
 			// this.nodeEditSet({el:document.getElementById(this.ids.first()),edit:true})
@@ -155,9 +155,9 @@ class Tree extends Html {
 				if (!data.type) data.type = 'default'
 			}
 			data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
-			let li_el = this.createNodeInt(htmlObj,data,nodeType,data.type,data.id,collapsible)
+			let li_el = this.createNodeInt(htmlObj,data,nodeType,data.type,data.id,collapsible,nodeType)
 			if (data[this.dataChildId] && data[this.dataChildId].length>0) {
-				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:[ulShowState,'lvl'+lvl]})
+				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:'lvl'+lvl})
 				for (let ix = 0; ix < data[this.dataChildId].length; ix++) {
 					const dataChild = data[this.dataChildId][ix]
 					this.inflateLvl(ul_el,dataChild,++lvl,lvlToShow)
@@ -165,8 +165,8 @@ class Tree extends Html {
 			}
 		}
 	}
-	createNodeInt(parent_ul_el,data,nodeType,type,id,collapsible) {
-		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:State.initial(this.nodeSelStates),atts:{id}})
+	createNodeInt(parent_ul_el,data,nodeType,type,id,collapsible,ulShowState) {
+		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:[ulShowState,State.initial(this.nodeSelStates)],atts:{id}})
 		// this.mapElData.set(li_el,data)
 		if (collapsible) {
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
@@ -185,14 +185,14 @@ class Tree extends Html {
 		const liEl = Elem.findParent(evt.target,undefined,1) // find parent of <i> icon, should be li
 		// const liElId = liEl.id
 		if (liEl==undefined) return
-		const ulEl = Elem.getChilds(liEl,'ul')[0]
+		const ulEl = Elem.getChilds(liEl,'ul')[0] // check for ul for child collection
 		const nodeTypeEl = Elem.getChilds(liEl,'img')[0] // clickable collapse btn or icon is first child in li
 		if (ulEl) {
-			if (ulEl.classList.contains('show')) {
-				Elem.classStateSet(ulEl,'hide',this.nodeExpStates)
+			if (liEl.classList.contains('show')) {
+				Elem.classStateSet(liEl,'hide',this.nodeExpStates)
 				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['hide'])},css:['icon',this.icons.hide,'collapse-btn']})
 			} else {
-				Elem.classStateSet(ulEl,'show',this.nodeExpStates)
+				Elem.classStateSet(liEl,'show',this.nodeExpStates)
 				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['show'])},css:['icon',this.icons.show,'collapse-btn']})
 			}
 		}
@@ -278,25 +278,25 @@ class Tree extends Html {
 			this.setSelected(undefined)
 		}
 	}
-	createNode(parent,text,type) {
-		console.log('Tree: createNode')
-		console.log(parent)
-		if (type===undefined) type='default'
-		const ulEl = Elem.getChildsAssured(parent,'ul',{el:parent,html:'ul',css:'node show'})[0]
-		// TODO fetch into data to find parent, need to attach type
-		const newId = this.ids.next()
-		this.createNodeInt(ulEl,text,'leaf',type,newId)
-		Trees.parse({
-			action:'create',
-			childsId:this.dataChildId,
-			key:this.dataIxId,
-			keyVal:parent.id,
-			newNode:{name:text,type:type,id:newId}
-		},this.data)
-		this.selectNodeId(newId)
-		// TODO open parent and change icon from leaf to caret
-		this.handleChange()
-	}
+	// createNode(parent,text,type) {
+	// 	console.log('Tree: createNode')
+	// 	console.log(parent)
+	// 	if (type===undefined) type='default'
+	// 	const ulEl = Elem.getChildsAssured(parent,'ul',{el:parent,html:'ul',css:'node show'})[0]
+	// 	// TODO fetch into data to find parent, need to attach type
+	// 	const newId = this.ids.next()
+	// 	this.createNodeInt(ulEl,text,'leaf',type,newId)
+	// 	Trees.parse({
+	// 		action:'create',
+	// 		childsId:this.dataChildId,
+	// 		key:this.dataIxId,
+	// 		keyVal:parent.id,
+	// 		newNode:{name:text,type:type,id:newId}
+	// 	},this.data)
+	// 	this.selectNodeId(newId)
+	// 	// TODO open parent and change icon from leaf to caret
+	// 	this.handleChange()
+	// }
 	editNode(el) {
 		this.nodeEditSet({el:el,edit:true})
 	}
@@ -388,7 +388,7 @@ class Tree extends Html {
 	btnCreate() {
 		console.log('Tree:btnCreate')
 		let el = this.getSelected()
-		this.createNode(el,'node')
+		// this.createNode(el,'node') // createNode to remake
 		this.editNode(el)
 	}
 	btnRename() {
