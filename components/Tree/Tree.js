@@ -63,7 +63,7 @@ class Tree extends Html {
 			this.nodeSelStates.push('unsel')
 		}
 		if (this.editable) this.nodeSelStates.push('edit')
-		this.nodeExpStates = ['show','hide']
+		this.nodeExpStates = ['show','hide','none']
 		// const searchGroup = new Html({parent:{obj:this.containerObj},html:'div',css:'input-group',atts:{'role':'group','aria-label':'tree-search-group'}})
 		// TODO color search icon use btn Style
 		// new Html({parent:{obj:searchGroup},html:'div',css:'input-group-text',icon:'magnifying-glass',evts:{'click':this.btnCreate.bind(this)}})
@@ -111,39 +111,30 @@ class Tree extends Html {
 	inflateLvl(htmlObj,data,lvl,lvlToShow=undefined) {
 		if (data[this.dataNameId]) {
 			data.el = htmlObj.my.el
-			data.id = this.ids.next() // TODO is this necessary?
+			data.id = this.ids.next()
 
-			// check for initially open or close
-			// let ulShowState = 'hide'
-			// if (lvlToShow==undefined) {
-			// 	const nodeState = this.nodeIdsState.get(data.id)
-			// 	if (nodeState) {
-			// 		ulShowState = nodeState
-			// 	}
-			// } else {
-			// 	ulShowState = (lvl>=lvlToShow) ? 'hide' : 'show'
-			// }
-			
-			const ulShowState = (lvl>=lvlToShow) ? 'hide' : 'show'
 			let nodeType = 'none'
 			let collapsible = false
-			if (!data[this.dataChildId] || data[this.dataChildId].length==0) {
-				nodeType = 'none'
-				collapsible = false
+			if (lvlToShow==undefined) { // no initial routine, so check for open or close in map
+				nodeType = this.nodeIdsState.get(data.id)
+				collapsible = !(nodeType=='none')
 			} else {
-				collapsible = true
-				if (lvl>=lvlToShow) {
-					nodeType = 'hide'
+				if (!data[this.dataChildId] || data[this.dataChildId].length==0) {
+					nodeType = 'none'
+					collapsible = false
 				} else {
-					nodeType = 'show'
+					collapsible = true
+					if (lvl>=lvlToShow) {
+						nodeType = 'hide'
+					} else {
+						nodeType = 'show'
+					}
 				}
 			}
-			console.log('inflateLvl:name:',data[this.dataNameId],' nodeType:',nodeType)
-			// const nodeType = (lvl>=lvlToShow) ? 'hide' : 'show'
-			// const nodeType = (data[this.dataChildId]) ? 'show' : 'leaf' // default: opened branch if it has childs
+			this.nodeIdsState.set(data.id,nodeType)
 
+			// use custom nodeTypes for data.type icon by data attributes given from top
 			if (!data.type) {
-				// use custom nodeTypes for data.type icon by data attributes given from top
 				if (this.nodeTypes) {
 					Object.keys(this.nodeTypes).forEach((nodeType => {
 						const [key, value] = Object.entries(this.nodeTypes[nodeType])[0];
@@ -155,46 +146,38 @@ class Tree extends Html {
 				if (!data.type) data.type = 'default'
 			}
 			data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
-			let li_el = this.createNodeInt(htmlObj,data,nodeType,data.type,data.id,collapsible,nodeType)
+			const li_el = new Html({parent:{obj:htmlObj},html:'li',css:['lvl'+lvl,nodeType,State.initial(this.nodeSelStates)],id:data.id})
+			if (collapsible) {
+				new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+				new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[data.type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+			} else {
+				new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'icon'})
+				new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[data.type]),draggable:'true'},css:'icon'})
+			}
+			new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.contextmenu.bind(this,data)}})
+			if (this.editable) new Html({parent:{obj:li_el},html:'input',val:data[this.dataNameId],css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
+
 			if (data[this.dataChildId] && data[this.dataChildId].length>0) {
-				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:'lvl'+lvl})
+				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul'})
 				for (let ix = 0; ix < data[this.dataChildId].length; ix++) {
 					const dataChild = data[this.dataChildId][ix]
-					this.inflateLvl(ul_el,dataChild,++lvl,lvlToShow)
+					this.inflateLvl(ul_el,dataChild,lvl+1,lvlToShow)
 				}
 			}
 		}
 	}
-	createNodeInt(parent_ul_el,data,nodeType,type,id,collapsible,ulShowState) {
-		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:[ulShowState,State.initial(this.nodeSelStates)],atts:{id}})
-		// this.mapElData.set(li_el,data)
-		if (collapsible) {
-			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
-			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
-		} else {
-			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'icon'})
-			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'icon'})
-		}
-
-		new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.contextmenu.bind(this,data)}})
-		if (this.editable) new Html({parent:{obj:li_el},html:'input',val:data[this.dataNameId],css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
-		return li_el
-	}
 	itemCollapse(evt) {
 		console.log('itemCollapse')
 		const liEl = Elem.findParent(evt.target,undefined,1) // find parent of <i> icon, should be li
-		// const liElId = liEl.id
 		if (liEl==undefined) return
+
 		const ulEl = Elem.getChilds(liEl,'ul')[0] // check for ul for child collection
 		const nodeTypeEl = Elem.getChilds(liEl,'img')[0] // clickable collapse btn or icon is first child in li
 		if (ulEl) {
-			if (liEl.classList.contains('show')) {
-				Elem.classStateSet(liEl,'hide',this.nodeExpStates)
-				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['hide'])},css:['icon',this.icons.hide,'collapse-btn']})
-			} else {
-				Elem.classStateSet(liEl,'show',this.nodeExpStates)
-				Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons['show'])},css:['icon',this.icons.show,'collapse-btn']})
-			}
+			const showState = liEl.classList.contains('show') ? 'hide' : 'show'
+			Elem.classStateSet(liEl,showState,this.nodeExpStates)
+			Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons[showState])},css:['icon',this.icons.show,'collapse-btn']})
+			this.nodeIdsState.set(liEl.id,showState)
 		}
 	}
 	itemClicked(evt) { // TODO use mode1 selected, mode2 edit (: achieve key < > v n)
