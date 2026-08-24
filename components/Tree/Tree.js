@@ -39,9 +39,9 @@ class Tree extends Html {
 		// supply some defaults when not applied by callee
 
 		super(arg)
-		Html.mergeModDatas(this,{dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:true,editable:false,...arg})
+		Html.mergeModDatas(this,{dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:false,editable:false,...arg})
 
-		this.mapElData = new WeakMap();
+		this.nodeIdsState = new Map();
 		console.log('Tree:constructor')
 		this.icons = {
 			'selection': 'section',
@@ -57,8 +57,11 @@ class Tree extends Html {
 			'default' : 'location',
 			'none' : 'none'
 		}
-		this.nodeSelStates = ['unsel']
-		if (this.selectable) this.nodeSelStates.push('sel')
+		this.nodeSelStates = []
+		if (this.selectable) {
+			this.nodeSelStates.push('sel')
+			this.nodeSelStates.push('unsel')
+		}
 		if (this.editable) this.nodeSelStates.push('edit')
 		this.nodeExpStates = ['show','hide']
 		// const searchGroup = new Html({parent:{obj:this.containerObj},html:'div',css:'input-group',atts:{'role':'group','aria-label':'tree-search-group'}})
@@ -82,14 +85,14 @@ class Tree extends Html {
 		Obj.mergeModOverwrite(toolbarItems,this.extraBtns)
 		this.toolContainer = new Html({parent:{obj:this},html:'div'})
 		this.btns = new Toolbar({parent:{obj:this.toolContainer},items:toolbarItems})
-		if (this.data) this.update()
+		if (this.data) this.update(true)
 	}
-	update() {
+	update(initially) {
 		this.tree.removeChilds()
 		Obj.mergeModOverwrite(this,Html.mergeDatas.apply(null,arguments))
 		if (this.data) {
 			this.ids = new Ids('n_')
-			this.inflateLvl(this.tree,this.data,0,0) // iteratively develop all nodes of given tree in data
+			this.inflateLvl(this.tree,this.data,0,(initially)?0:undefined) // iteratively develop all nodes of given tree in data
 			if (this.selectable) this.selectNodeId(this.ids.first())
 			// TODO comissioning lines:
 			// this.nodeEditSet({el:document.getElementById(this.ids.first()),edit:true})
@@ -102,14 +105,25 @@ class Tree extends Html {
 	 * @param {Html} htmlObj holds element of parent
 	 * @param {object} data in specified form controlled by this convention, also defined by dataChildId, dataNameId
 	 * @param {number} lvl actual iterationLevel incrementing beginning at 0
+	 * @param {number} lvlToShow level to show initially, if undefined try to read open/hide state from nodeIdsState
 	 * @private
 	 */
-	inflateLvl(htmlObj,data,lvl,lvlToShow) {
+	inflateLvl(htmlObj,data,lvl,lvlToShow=undefined) {
 		if (data[this.dataNameId]) {
 			data.el = htmlObj.my.el
 			data.id = this.ids.next() // TODO is this necessary?
 
 			// check for initially open or close
+			// let ulShowState = 'hide'
+			// if (lvlToShow==undefined) {
+			// 	const nodeState = this.nodeIdsState.get(data.id)
+			// 	if (nodeState) {
+			// 		ulShowState = nodeState
+			// 	}
+			// } else {
+			// 	ulShowState = (lvl>=lvlToShow) ? 'hide' : 'show'
+			// }
+			
 			const ulShowState = (lvl>=lvlToShow) ? 'hide' : 'show'
 			let nodeType = 'none'
 			let collapsible = false
@@ -142,7 +156,7 @@ class Tree extends Html {
 			}
 			data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
 			let li_el = this.createNodeInt(htmlObj,data,nodeType,data.type,data.id,collapsible)
-			if (data[this.dataChildId]) {
+			if (data[this.dataChildId] && data[this.dataChildId].length>0) {
 				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul',css:[ulShowState,'lvl'+lvl]})
 				for (let ix = 0; ix < data[this.dataChildId].length; ix++) {
 					const dataChild = data[this.dataChildId][ix]
@@ -153,7 +167,7 @@ class Tree extends Html {
 	}
 	createNodeInt(parent_ul_el,data,nodeType,type,id,collapsible) {
 		const li_el = new Html({parent:{obj:parent_ul_el},html:'li',css:State.initial(this.nodeSelStates),atts:{id}})
-		this.mapElData.set(li_el,data)
+		// this.mapElData.set(li_el,data)
 		if (collapsible) {
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
@@ -169,6 +183,7 @@ class Tree extends Html {
 	itemCollapse(evt) {
 		console.log('itemCollapse')
 		const liEl = Elem.findParent(evt.target,undefined,1) // find parent of <i> icon, should be li
+		// const liElId = liEl.id
 		if (liEl==undefined) return
 		const ulEl = Elem.getChilds(liEl,'ul')[0]
 		const nodeTypeEl = Elem.getChilds(liEl,'img')[0] // clickable collapse btn or icon is first child in li
