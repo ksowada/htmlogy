@@ -41,7 +41,12 @@ class Tree extends Html {
 		super(arg)
 		Html.mergeModDatas(this,{dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:false,editable:false,...arg})
 
+		/** initially open to showlvl, afterwards at update, restore nodeIdState */
+		this.initially = true
+
+		/** remember for each node.id the nodeType to restore open/hide state */
 		this.nodeIdsState = new Map();
+
 		console.log('Tree:constructor')
 		this.icons = {
 			'selection': 'section',
@@ -73,6 +78,7 @@ class Tree extends Html {
 		// TODO use Ctrl+C etc as keys
 		// TODO btns for copy/paste
 		// TODO DBG lines
+
 		this.tree = new Html({parent:{obj:this},html:'ul',css:'node show root'}) // root is founded in ul
 		// deactivate if not possible
 		const toolbarItems = {} // TODO color them
@@ -85,19 +91,24 @@ class Tree extends Html {
 		Obj.mergeModOverwrite(toolbarItems,this.extraBtns)
 		this.toolContainer = new Html({parent:{obj:this},html:'div'})
 		this.btns = new Toolbar({parent:{obj:this.toolContainer},items:toolbarItems})
-		if (this.data) this.update(true)
+		if (this.data) this.update()
 	}
-	update(initially) {
+	/**
+	 * when data is ready update(),
+	 * @param {object} arguments as constructor
+	 */
+	update() {
 		this.tree.removeChilds()
 		Obj.mergeModOverwrite(this,Html.mergeDatas.apply(null,arguments))
 		if (this.data) {
 			this.ids = new Ids('n_')
-			this.inflateLvl(this.tree,this.data,0,(initially)?1:undefined) // iteratively develop all nodes of given tree in data
+			this.inflateLvl(this.tree,this.data,0,(this.initially==true)?1:undefined) // iteratively develop all nodes of given tree in data
 			if (this.selectable) this.selectNodeId(this.ids.first())
 			// TODO comissioning lines:
 			// this.nodeEditSet({el:document.getElementById(this.ids.first()),edit:true})
 			this.toolbarCare()
 		}
+		this.initially = false // only after 1st update, initially is done
 	}
 	/**
 	 * create DOM Elements out of data iterativelly,
@@ -130,8 +141,8 @@ class Tree extends Html {
 						nodeType = 'show'
 					}
 				}
+				this.nodeIdsState.set(data.id,nodeType)
 			}
-			this.nodeIdsState.set(data.id,nodeType)
 
 			// use custom nodeTypes for data.type icon by data attributes given from top
 			if (!data.type) {
