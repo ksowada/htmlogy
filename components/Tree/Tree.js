@@ -85,6 +85,7 @@ class Tree extends Html {
 		if (this.data) this.update()
 	}
 	update() {
+		this.tree.removeChilds()
 		Obj.mergeModOverwrite(this,Html.mergeDatas.apply(null,arguments))
 		if (this.data) {
 			this.ids = new Ids('n_')

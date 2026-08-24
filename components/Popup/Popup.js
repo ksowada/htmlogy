@@ -31,6 +31,9 @@ class Popup extends Html {
 			}
 		})
 	}
+	/**
+	 * Closes the popup by removing it from the DOM.
+	 */
 	close() {
 		this.remove()
 	}
