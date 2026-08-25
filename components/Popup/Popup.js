@@ -14,8 +14,7 @@ class Popup extends Html {
 		super(Html.mergeDatas(arg,{css:'popup'}))
 		if (items) {
 			items.forEach(item => {
-				this.add(Html.mergeDatas(item,{css:'popup-item'}))
-				console.log('Popup.constructor.item:',item.val)
+				this.add(item)
 			})
 		}
 		// Schließen bei Klick außerhalb, first click is from opening, therefore ignoreNextClick

@@ -1,7 +1,6 @@
 import Arr from '../../../logic/Arr/Arr.js'
 import Obj from '../../../logic/Obj/Obj.js'
 import Str from '../../../logic/Str/Str.js'
-import Vars from '../../../logic/Vars/Vars.js'
 import Elem from '../../Elem/Elem.js'
 import Html from '../../Html/Html.js'
 /**
@@ -39,7 +38,7 @@ class List extends Html {
 	// TODO select mode, none => cursor no pointer
 	// TODO att container focus , use key to autocomplete items
 	// TODO use processes to amplify speed when creating childs and wait for them
-	constructor(arg) {
+	constructor(arg={}) {
 		if (arg.container!==undefined) { // if container not given from arguments, dont install one
 			arg.container = Html.mergeDatas({container:{html:'span'}},arg.container,{container:{css:'list'}},{name:arg.name}) // add 'list' css-class when container is already given, and use span (when not given) for item wrap instead of div (is a block)
 		}
@@ -127,20 +126,6 @@ class List extends Html {
 		// refresh mirror
 		this.itemsMirrored.push(htmlObj)
 	}
-	edit(val,pos) {
-		if (pos==undefined) {
-			pos = this.getSelecteds()[0]
-			console.log(pos)
-		}
-	}
-	remove(pos) {
-		if (this.itemsMirrored.length==0) return // cannot delete if nothing inserted
-		pos = Arr.boundIx(pos,this.itemsMirrored)
-		this.itemsMirrored[pos].remove() // remove item from DOM
-		this.itemsMirrored.splice(pos,1) // change array
-		if (this.itemsMirroredNames!==undefined) this.itemsMirroredNames.splice(pos,1)
-		this.selectCare()
-	}
 	/** after items change, call me to select correct */
 	selectCare() {
 		if (this.inner && this.inner.select && this.inner.select.mode=='singleForce') {
@@ -150,10 +135,6 @@ class List extends Html {
 			}
 		}
 		if (this.selection) this.selection()
-	}
-	removeSelections() {
-		const selectedsIx = this.getSelecteds()
-		selectedsIx.forEach(ix => this.remove(ix))
 	}
 	/**
 	 * @param {number} leaveCnt if given leave the count of selection, for use when switch to single-
