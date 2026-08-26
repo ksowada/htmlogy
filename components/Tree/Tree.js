@@ -125,61 +125,66 @@ class Tree extends Html {
 	 */
 	inflateLvl(htmlObj,data,lvl,lvlToShow=undefined) {
 		if (data[this.dataNameId]) {
-			data.el = htmlObj.my.el
 			data.id = this.ids.next()
-
-			let nodeType = 'none'
-			let collapsible = false
-			if (lvlToShow==undefined) { // no initial routine, so check for open or close in map
-				nodeType = this.nodeIdsState.get(data.id)
-				collapsible = !(nodeType=='none')
-			} else {
-				if (!data[this.dataChildId] || data[this.dataChildId].length==0) {
-					nodeType = 'none'
-					collapsible = false
-				} else {
-					collapsible = true
-					if (lvl>=lvlToShow) {
-						nodeType = 'hide'
-					} else {
-						nodeType = 'show'
-					}
-				}
-				this.nodeIdsState.set(data.id,nodeType)
-			}
-
-			// use custom nodeTypes for data.type icon by data attributes given from top
-			if (!data.type) {
-				if (this.nodeTypes) {
-					Object.keys(this.nodeTypes).forEach((nodeType => {
-						const [key, value] = Object.entries(this.nodeTypes[nodeType])[0];
-						if (key in data && data[key] == value) {
-							data.type = nodeType
-						}
-					}))
-				}
-				if (!data.type) data.type = 'default'
-			}
-			data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
-			const li_el = new Html({parent:{obj:htmlObj},html:'li',css:['lvl'+lvl,nodeType,State.initial(this.nodeSelStates)],id:data.id})
-			if (collapsible) {
-				new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
-				new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[data.type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
-			} else {
-				new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'icon'})
-				new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[data.type]),draggable:'true'},css:'icon'})
-			}
-			new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.contextmenu.bind(this,data)}})
-			if (this.editable) new Html({parent:{obj:li_el},html:'input',val:data[this.dataNameId],css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
-
+			data.lvl = lvl
+			const li_Html = this.domNode(htmlObj,data,lvlToShow)
+			data.el = li_Html.el
 			if (data[this.dataChildId] && data[this.dataChildId].length>0) {
-				const ul_el = new Html({parent:{el:li_el.my.el},html:'ul'})
+				const ul_el = new Html({parent:{el:data.el},html:'ul'})
 				for (let ix = 0; ix < data[this.dataChildId].length; ix++) {
 					const dataChild = data[this.dataChildId][ix]
 					this.inflateLvl(ul_el,dataChild,lvl+1,lvlToShow)
 				}
 			}
 		}
+	}
+	domNode(htmlObj,data,lvlToShow) {
+		let nodeType = 'none'
+		let collapsible = false
+		if (lvlToShow==undefined) { // no initial routine, so check for open or close in map
+			nodeType = this.nodeIdsState.get(data.id)
+			if (!nodeType) nodeType = 'none' // when node fresh created, there is no stored nodeIdsState, so default to none
+			collapsible = !(nodeType=='none')
+		} else {
+			if (!data[this.dataChildId] || data[this.dataChildId].length==0) {
+				nodeType = 'none'
+				collapsible = false
+			} else {
+				collapsible = true
+				if (data.lvl>=lvlToShow) {
+					nodeType = 'hide'
+				} else {
+					nodeType = 'show'
+				}
+			}
+			this.nodeIdsState.set(data.id,nodeType)
+		}
+
+		// use custom nodeTypes for data.type icon by data attributes given from top
+		if (!data.type) {
+			if (this.nodeTypes) {
+				Object.keys(this.nodeTypes).forEach((nodeTypeInt => {
+					const [key, value] = Object.entries(this.nodeTypes[nodeTypeInt])[0];
+					if (key in data && data[key] == value) {
+						data.type = nodeTypeInt
+					}
+				}))
+			}
+			if (!data.type) data.type = 'default'
+		}
+		data.type = (data.type) ? data.type : 'default' // TODO is this necessary?
+
+		const li_el = new Html({parent:{obj:htmlObj},html:'li',css:['lvl'+data.lvl,nodeType,State.initial(this.nodeSelStates)],id:data.id})
+		if (collapsible) {
+			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[data.type]),draggable:'true'},css:'collapse-btn icon',evts:{'click':this.itemCollapse.bind(this)}})
+		} else {
+			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'icon'})
+			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[data.type]),draggable:'true'},css:'icon'})
+		}
+		new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.contextmenu.bind(this,data)}})
+		if (this.editable) new Html({parent:{obj:li_el},html:'input',val:data[this.dataNameId],css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
+		return li_el
 	}
 	itemCollapse(evt) {
 		console.log('itemCollapse')
@@ -194,6 +199,36 @@ class Tree extends Html {
 			Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons[showState])},css:['icon',this.icons.show,'collapse-btn']})
 			this.nodeIdsState.set(liEl.id,showState)
 		}
+	}
+	addNode(data,newName) {
+		console.log('addNode',data)
+
+		// add data
+		if (!data[this.dataChildId]) {
+			data[this.dataChildId] = []
+		}
+		const nodeData = {}
+		nodeData[this.dataNameId] = newName
+		data[this.dataChildId].push(nodeData)
+		const lastChildId = data[this.dataChildId].length-1
+
+		// create DOM
+		const htmlObj = new Html({my:{el:data.el}})
+
+		// create ul for nested li
+		const ulElems = Elem.getChilds(htmlObj.el,'ul')
+		let ulHtml = undefined
+		if (!ulElems.length) {
+			ulHtml = htmlObj.add({html:'ul'})
+		} else {
+			ulHtml = new Html({my:{el:ulElems[0]}})
+		}
+
+		// move actual data to already created children
+		data = data[this.dataChildId][lastChildId]
+		data.id = this.ids.next()
+
+		this.domNode(ulHtml,data)
 	}
 	itemClicked(evt) { // TODO use mode1 selected, mode2 edit (: achieve key < > v n)
 		console.log('itemClicked')
