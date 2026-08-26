@@ -100,14 +100,18 @@ class Tree extends Html {
 	update() {
 		this.tree.removeChilds()
 		Obj.mergeModOverwrite(this,Html.mergeDatas.apply(null,arguments))
-		if (this.data) {
-			this.ids = new Ids('n_')
-			this.inflateLvl(this.tree,this.data,0,(this.initially==true)?1:undefined) // iteratively develop all nodes of given tree in data
-			if (this.selectable) this.selectNodeId(this.ids.first())
-			// TODO comissioning lines:
-			// this.nodeEditSet({el:document.getElementById(this.ids.first()),edit:true})
-			this.toolbarCare()
+
+		// data is missing at update, add initial data
+		if (!this.data) {
+			this.data = {}
+			this.data[this.dataNameId] = 'empty'
 		}
+		this.ids = new Ids('n_')
+		this.inflateLvl(this.tree,this.data,0,(this.initially==true)?1:undefined) // iteratively develop all nodes of given tree in data
+		if (this.selectable) this.selectNodeId(this.ids.first())
+		// TODO comissioning lines:
+		// this.nodeEditSet({el:document.getElementById(this.ids.first()),edit:true})
+		this.toolbarCare()
 		this.initially = false // only after 1st update, initially is done
 	}
 	/**
