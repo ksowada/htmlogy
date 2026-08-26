@@ -173,7 +173,7 @@ class Html {
 		// find matching HTMLElement to operate
 		this.el = Html.getEl(arg.my)
 		this.elem = new Elem(this.el)
-		this.elem.removeChilds()
+		// this.elem.removeChilds()
 		this.my.el = this.el
 	}
 	/**
