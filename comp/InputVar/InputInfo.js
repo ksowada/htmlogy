@@ -121,7 +121,7 @@ class InputInfo extends InputVar {
 		}
 
 		if (this.get()!==undefined && props.val!==null) {
-			super.dom(parentHtml,args)
+			super.dom(parentHtml,Html.mergeDatas(args,{css:'InputVar'}))
 		}
 		/** @type string[] */
 		const actions = props.actions

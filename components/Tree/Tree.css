@@ -49,7 +49,7 @@ i {
 .node {
     border: 1px #ccc solid;
 }
-input, input:focus {
+.Tree input, .Tree input:focus {
     background-color: #cfc;        
     padding: 0px;
     margin: 0px;

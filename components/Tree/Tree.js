@@ -38,7 +38,7 @@ class Tree extends Html {
 	constructor(arg) {
 		// supply some defaults when not applied by callee
 
-		super(arg)
+		super(Html.mergeDatas(arg,{css:'Tree'}))
 		Html.mergeModDatas(this,{dataIxId:'id',dataChildId:'children',dataNameId:'text',selectable:false,editable:false,...arg})
 
 		/** initially open to showlvl, afterwards at update, restore nodeIdState */

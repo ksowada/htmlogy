@@ -32,3 +32,13 @@
 .InputInfo button {
 	height: stretch;
 }
+
+img.inline {
+	vertical-align: middle;
+	height: var(--b3);
+	min-width: var(--b3);
+}
+.InputInfo .InputVar,.InputInfo div {
+    vertical-align: middle;
+    height: stretch;
+}
