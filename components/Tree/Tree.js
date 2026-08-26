@@ -225,10 +225,13 @@ class Tree extends Html {
 		}
 
 		// move actual data to already created children
+		const dataLvl = data.lvl
 		data = data[this.dataChildId][lastChildId]
 		data.id = this.ids.next()
+		data.lvl = dataLvl+1
 
-		this.domNode(ulHtml,data)
+		const liHtml = this.domNode(ulHtml,data)
+		data.el = liHtml.el
 	}
 	itemClicked(evt) { // TODO use mode1 selected, mode2 edit (: achieve key < > v n)
 		console.log('itemClicked')
