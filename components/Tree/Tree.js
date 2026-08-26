@@ -64,8 +64,8 @@ class Tree extends Html {
 		}
 		this.nodeSelStates = []
 		if (this.selectable) {
-			this.nodeSelStates.push('sel')
 			this.nodeSelStates.push('unsel')
+			this.nodeSelStates.push('sel')
 		}
 		if (this.editable) this.nodeSelStates.push('edit')
 		this.nodeExpStates = ['show','hide','none']
@@ -182,7 +182,7 @@ class Tree extends Html {
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[nodeType]),draggable:'true'},css:'icon'})
 			new Html({parent:{obj:li_el},html:'img',atts:{src:icons(this.icons[data.type]),draggable:'true'},css:'icon'})
 		}
-		new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.contextmenu.bind(this,data)}})
+		new Html({parent:{obj:li_el},html:'span',val:data[this.dataNameId],css:'node-value',evts:{'click':this.itemClicked.bind(this),'dblclick':this.contextmenu.bind(this,data)}})
 		if (this.editable) new Html({parent:{obj:li_el},html:'input',val:data[this.dataNameId],css:'hide',evts:{'keyup':this.itemInput.bind(this),'focusout':this.itemInputFocusOut.bind(this)}})
 		return li_el
 	}
@@ -236,11 +236,12 @@ class Tree extends Html {
 	itemClicked(evt) { // TODO use mode1 selected, mode2 edit (: achieve key < > v n)
 		console.log('itemClicked')
 		const liEl = Elem.findParent(evt.target) // FIXME untesteted
-		if (liEl==undefined) return
-		const state = this.getNodeState(liEl)
-		const stateNew = State.forward(state,this.nodeSelStates)
-		Elem.classStateSet(liEl,stateNew,this.nodeSelStates)
-		if (stateNew == 'edit') this.nodeEditSet({el: liEl,edit: true})
+		this.selectNodeId(liEl.id)
+		// if (liEl==undefined) return
+		// const state = this.getNodeState(liEl)
+		// const stateNew = State.forward(state,this.nodeSelStates)
+		// Elem.classStateSet(liEl,stateNew,this.nodeSelStates)
+		// if (stateNew == 'edit') this.nodeEditSet({el: liEl,edit: true})
 	}
 	itemInput(evt) {
 		console.log('itemInput')
@@ -267,7 +268,7 @@ class Tree extends Html {
 		const states = Elem.classStateGet(el,this.nodeSelStates)
 		// eslint-disable-next-line no-undef
 		if (states.length != 1) throw new Exception('so many states found')
-		return states[0]
+		return states[0].name
 	}
 	saveNodeState(el,val) {
 		Elem.classStateSet(el,val,this.nodeSelStates)
@@ -314,25 +315,6 @@ class Tree extends Html {
 			this.setSelected(undefined)
 		}
 	}
-	// createNode(parent,text,type) {
-	// 	console.log('Tree: createNode')
-	// 	console.log(parent)
-	// 	if (type===undefined) type='default'
-	// 	const ulEl = Elem.getChildsAssured(parent,'ul',{el:parent,html:'ul',css:'node show'})[0]
-	// 	// TODO fetch into data to find parent, need to attach type
-	// 	const newId = this.ids.next()
-	// 	this.createNodeInt(ulEl,text,'leaf',type,newId)
-	// 	Trees.parse({
-	// 		action:'create',
-	// 		childsId:this.dataChildId,
-	// 		key:this.dataIxId,
-	// 		keyVal:parent.id,
-	// 		newNode:{name:text,type:type,id:newId}
-	// 	},this.data)
-	// 	this.selectNodeId(newId)
-	// 	// TODO open parent and change icon from leaf to caret
-	// 	this.handleChange()
-	// }
 	editNode(el) {
 		this.nodeEditSet({el:el,edit:true})
 	}
@@ -360,7 +342,7 @@ class Tree extends Html {
 	}
 	getSelectedId() {
 		const selected = this.getSelected()
-		if (!Obj.has(selected,'id')) return
+		if (!selected || !selected.id) return
 		return selected.id
 	}
 	getSelectedPos() {

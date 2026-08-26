@@ -61,3 +61,6 @@ i {
 .collapse-btn {
     cursor:pointer;
 }
+.sel > .node-value {
+    background-color: burlywood;
+}
