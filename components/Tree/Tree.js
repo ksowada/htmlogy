@@ -45,7 +45,7 @@ class Tree extends Html {
 		this.initially = true
 
 		/** remember for each node.id the nodeType to restore open/hide state */
-		this.nodeIdsState = new Map();
+		this.nodeIdsState = {}
 
 		console.log('Tree:constructor')
 		this.icons = {
@@ -108,7 +108,14 @@ class Tree extends Html {
 		}
 		this.ids = new Ids('n_')
 		this.inflateLvl(this.tree,this.data,0,(this.initially==true)?1:undefined) // iteratively develop all nodes of given tree in data
-		if (this.selectable) this.selectNodeId(this.ids.first())
+		if (this.selectable) {
+			const selectedEL = this.getSelected()
+			if (!selectedEL) {
+				this.selectNodeId(this.ids.first())
+			} else {
+				this.selectNodeId(selectedEL.id)
+			}
+		}
 		// TODO comissioning lines:
 		// this.nodeEditSet({el:document.getElementById(this.ids.first()),edit:true})
 		this.toolbarCare()
@@ -142,7 +149,7 @@ class Tree extends Html {
 		let nodeType = 'none'
 		let collapsible = false
 		if (lvlToShow==undefined) { // no initial routine, so check for open or close in map
-			nodeType = this.nodeIdsState.get(data.id)
+			nodeType = this.nodeIdsState[data.id]
 			if (!nodeType) nodeType = 'none' // when node fresh created, there is no stored nodeIdsState, so default to none
 			collapsible = !(nodeType=='none')
 		} else {
@@ -157,7 +164,7 @@ class Tree extends Html {
 					nodeType = 'show'
 				}
 			}
-			this.nodeIdsState.set(data.id,nodeType)
+			this.nodeIdsState[data.id] = nodeType
 		}
 
 		// use custom nodeTypes for data.type icon by data attributes given from top
@@ -197,10 +204,11 @@ class Tree extends Html {
 			const showState = liEl.classList.contains('show') ? 'hide' : 'show'
 			Elem.classStateSet(liEl,showState,this.nodeExpStates)
 			Html.changeEl(nodeTypeEl,{atts:{src:icons(this.icons[showState])},css:['icon',this.icons.show,'collapse-btn']})
-			this.nodeIdsState.set(liEl.id,showState)
+			this.nodeIdsState[liEl.id] = showState
 		}
 	}
 	addIntoNode(data,newData) {
+		this.nodeIdsState = this.nodeIdsStateInsert(data.id)
 		// add data
 		if (!data[this.dataChildId]) {
 			data[this.dataChildId] = []
@@ -221,10 +229,8 @@ class Tree extends Html {
 	}
 
 	appendNode(data,newData) {
-		// add data
-		// if (!data[this.dataChildId]) {
-		// 	data[this.dataChildId] = []
-		// }
+		this.nodeIdsState = this.nodeIdsStateInsert(data.id)
+
 		// write in all data
 		const nodeData = {}
 		Object.keys(newData).forEach(key => {
@@ -254,35 +260,29 @@ class Tree extends Html {
 		console.log('Tree.appendNode:dataParent',dataParent)
 		console.log('Tree.appendNode:dataPos',dataPos)
 		
-		// look for position of data in parent
-		// let posInParent = undefined
-		// data.parent[this.dataChildId].forEach((child,pos) => {
-		// 	if (child.id === data.id) posInParent = pos
-		// })
-
 		// // splice in nodeData
 		dataParent[this.dataChildId].splice(dataPos+1,0,nodeData)
-
-		// // create DOM
-		// const htmlObj = new Html({my:{el:data.el}})
-
-		// // create ul for nested li
-		// const ulElems = Elem.getChilds(htmlObj.el,'ul')
-		// let ulHtml = undefined
-		// if (!ulElems.length) {
-		// 	ulHtml = htmlObj.add({html:'ul'})
-		// } else {
-		// 	ulHtml = new Html({my:{el:ulElems[0]}})
-		// }
-
-		// // move actual data to already created children
-		// const dataLvl = data.lvl
-		// data = data[this.dataChildId][lastChildId]
-		// data.id = this.ids.next()
-		// data.lvl = dataLvl+1
-
-		// const liHtml = this.domNode(ulHtml,data)
-		// data.el = liHtml.el
+	}
+	/**
+	 * nodeIdsState insert empty element with none
+	 */
+	nodeIdsStateInsert(idToInsert) {
+		const ids = new Ids('n_')
+		let moveAhead = false
+		const nodeIdsStateNew = {}
+		Object.keys(this.nodeIdsState).forEach(id => {
+			const idCurrent = ids.next()
+			if (!moveAhead) {
+				nodeIdsStateNew[id] = this.nodeIdsState[id]
+			} else {
+				nodeIdsStateNew[idCurrent] = this.nodeIdsState[id]
+			}
+			if (id==idToInsert) {
+				moveAhead = true
+				nodeIdsStateNew[ids.next()] = 'none'
+			}
+		})
+		return nodeIdsStateNew
 	}
 	renameNode(data,newName) {
 		data[this.dataNameId] = newName
