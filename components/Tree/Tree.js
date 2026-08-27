@@ -210,29 +210,14 @@ class Tree extends Html {
 		Object.keys(newData).forEach(key => {
 			nodeData[key] = newData[key]
 		})
-		data[this.dataChildId].push(nodeData)
-		const lastChildId = data[this.dataChildId].length-1
-
-		// create DOM
-		const htmlObj = new Html({my:{el:data.el}})
-
-		// create ul for nested li
-		const ulElems = Elem.getChilds(htmlObj.el,'ul')
-		let ulHtml = undefined
-		if (!ulElems.length) {
-			ulHtml = htmlObj.add({html:'ul'})
-		} else {
-			ulHtml = new Html({my:{el:ulElems[0]}})
-		}
+		data[this.dataChildId].splice(0,0, nodeData)
+		const lastChildId = 0
 
 		// move actual data to already created children
 		const dataLvl = data.lvl
 		data = data[this.dataChildId][lastChildId]
 		data.id = this.ids.next()
 		data.lvl = dataLvl+1
-
-		const liHtml = this.domNode(ulHtml,data)
-		data.el = liHtml.el
 	}
 
 	appendNode(data,newData) {
