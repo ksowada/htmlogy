@@ -56,10 +56,6 @@ class InputInfo extends InputVar {
 		 */
 		this.props = props
 		/**
-		 * @type string[]
-		 */
-		this.renderSequence = ['en','label','this','actions','actionsUser']
-		/**
 		 * A map-like object that maps arbitrary `string` properties to `number`s.
 		 * @type {Object.<string, Action_props>}
 		 */

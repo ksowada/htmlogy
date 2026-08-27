@@ -199,6 +199,8 @@ class InputVar extends Model {
 			if (kind==='currency') val = val.toLocaleString(undefined,{style: 'currency',currency: 'EUR'})
 			const argType = {html:'input',atts:{type:kind},val}
 			myHtml = workHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
+		} else if (props.kind==='textarea') {
+			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'textarea',css:'textarea'}))
 		}
 		// other not implmented kind will be handled direct as <input type>
 		if (!myHtml) myHtml = workHtml.add(Html.mergeDatas(arg,{html:'input',val:this.val,atts:{type:props.kind},css:props.kind}))
