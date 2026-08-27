@@ -18,10 +18,13 @@ img.icon {
 li {
     list-style: none;
     min-height: var(--ui-height-text);
+    font-size: large; /** increase height of each node */
 }
 .node-value {
     display: inline;
     cursor: pointer;
+    padding: var(--b_5);
+    border-radius: var(--b1);
 }
 .unsel > .node-value {
     color: var(--col-back-accent)
@@ -62,5 +65,5 @@ i {
     cursor:pointer;
 }
 .sel > .node-value {
-    background-color: burlywood;
+    background-color:gold;
 }

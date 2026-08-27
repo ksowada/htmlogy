@@ -200,15 +200,16 @@ class Tree extends Html {
 			this.nodeIdsState.set(liEl.id,showState)
 		}
 	}
-	addNode(data,newName) {
-		console.log('addNode',data)
-
+	addIntoNode(data,newData) {
 		// add data
 		if (!data[this.dataChildId]) {
 			data[this.dataChildId] = []
 		}
+		// write in all data
 		const nodeData = {}
-		nodeData[this.dataNameId] = newName
+		Object.keys(newData).forEach(key => {
+			nodeData[key] = newData[key]
+		})
 		data[this.dataChildId].push(nodeData)
 		const lastChildId = data[this.dataChildId].length-1
 
@@ -233,15 +234,54 @@ class Tree extends Html {
 		const liHtml = this.domNode(ulHtml,data)
 		data.el = liHtml.el
 	}
-	renameNode(data,newName) {
-		console.log('renameNode',data)
 
+	appendNode(data,newData) {
+		// add data
+		// if (!data[this.dataChildId]) {
+		// 	data[this.dataChildId] = []
+		// }
+		// write in all data
+		const nodeData = {}
+		Object.keys(newData).forEach(key => {
+			nodeData[key] = newData[key]
+		})
+
+		// look for position of data in parent
+		// let posInParent = undefined
+		// data.parent[this.dataChildId].forEach((child,pos) => {
+		// 	if (child.id === data.id) posInParent = pos
+		// })
+
+		// // splice in nodeData
+		// data.parent[this.dataChildId].splice(posInParent,0,nodeData)
+
+		// // create DOM
+		// const htmlObj = new Html({my:{el:data.el}})
+
+		// // create ul for nested li
+		// const ulElems = Elem.getChilds(htmlObj.el,'ul')
+		// let ulHtml = undefined
+		// if (!ulElems.length) {
+		// 	ulHtml = htmlObj.add({html:'ul'})
+		// } else {
+		// 	ulHtml = new Html({my:{el:ulElems[0]}})
+		// }
+
+		// // move actual data to already created children
+		// const dataLvl = data.lvl
+		// data = data[this.dataChildId][lastChildId]
+		// data.id = this.ids.next()
+		// data.lvl = dataLvl+1
+
+		// const liHtml = this.domNode(ulHtml,data)
+		// data.el = liHtml.el
+	}
+	renameNode(data,newName) {
 		data[this.dataNameId] = newName
 
 		// create DOM
-		const htmlObj = new Html({my:{el:data.el}})
-
-		// move actual data to already created children
+		const spans = Elem.getChilds(data.el,'span') // get <span> textnode of <li> treenode
+		spans[0].innerText = newName
 	}
 	itemClicked(evt) { // TODO use mode1 selected, mode2 edit (: achieve key < > v n)
 		console.log('itemClicked')
@@ -382,6 +422,17 @@ class Tree extends Html {
 			}
 		}
 		return ret
+	}
+	getSelectedData() {
+		const selectedId = this.getSelectedId()
+		let dataObj = undefined
+		Obj.crawl(this.data,undefined,{
+			onObj: obj => {
+				if (!(obj instanceof HTMLElement) && obj.id===selectedId) {
+					if (!dataObj) dataObj = obj // if el is included, first found obj would be overwritten
+				}
+		}})
+		return dataObj
 	}
 	handleChange() {
 		console.log('Tree:handleChange')
