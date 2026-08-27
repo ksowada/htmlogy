@@ -59,7 +59,7 @@ class Tree extends Html {
 			'directory' : 'folder-closed',
 			'file': 'file',
 			'string': 'font',
-			'default' : 'location',
+			'default' : 'none',
 			'none' : 'none'
 		}
 		this.nodeSelStates = []
@@ -232,6 +232,16 @@ class Tree extends Html {
 
 		const liHtml = this.domNode(ulHtml,data)
 		data.el = liHtml.el
+	}
+	renameNode(data,newName) {
+		console.log('renameNode',data)
+
+		data[this.dataNameId] = newName
+
+		// create DOM
+		const htmlObj = new Html({my:{el:data.el}})
+
+		// move actual data to already created children
 	}
 	itemClicked(evt) { // TODO use mode1 selected, mode2 edit (: achieve key < > v n)
 		console.log('itemClicked')

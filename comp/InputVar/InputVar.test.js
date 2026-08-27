@@ -15,7 +15,7 @@ describe('InputVar',() => {
 		inputVar.dom(parentHtml,{css:'someclass'})
 
 		// have to store vars here in it, it was another content from HtmlSelectTest
-		const itemFirstHtml = inputVar.htmls[0]
+		const itemFirstHtml = inputVar.html
 
 		it('value of DOM',() => {
 			expect(itemFirstHtml.el.value).to.eql('2')
@@ -39,7 +39,7 @@ describe('InputVar',() => {
 		inputVar.dom(parentHtml,{css:'someclass'})
 
 		// have to store vars here in it, it was another content from HtmlSelectTest
-		const itemFirstHtml = inputVar.htmls[0]
+		const itemFirstHtml = inputVar.html
 
 		inputVar.change({max:1})
 		it('value of DOM',() => {
@@ -67,7 +67,7 @@ describe('InputVar',() => {
 		inputVar.dom(parentHtml)
 
 		// have to store vars here in it, it was another content from HtmlSelectTest
-		const itemFirstHtml = inputVar.htmls[0]
+		const itemFirstHtml = inputVar.html
 
 		inputVar.val = ''
 		it('value of DOM',() => {
@@ -93,14 +93,14 @@ describe('InputVar',() => {
 			it('inputVar.lists[0].val show selected',() => {
 				expect(inputVar.lists[0].val).to.eql('house')
 			})
-			it('inputVar.htmls[0].val show selected',() => {
-				expect(inputVar.htmls[0].val).to.eql('house')
+			it('inputVar.html.val show selected',() => {
+				expect(inputVar.html.val).to.eql('house')
 			})
-			it('inputVar.htmls[0].el.value show selected',() => {
-				expect(inputVar.htmls[0].el.value).to.eql('house')
+			it('inputVar.html.el.value show selected',() => {
+				expect(inputVar.html.el.value).to.eql('house')
 			})
-			it('inputVar.htmls[0].el.outerHTML as expected',() => {
-				expect(inputVar.htmls[0].el.outerHTML).to.eql('<select><option>house</option><option>garden</option><option>fence</option></select>')
+			it('inputVar.html.el.outerHTML as expected',() => {
+				expect(inputVar.html.el.outerHTML).to.eql('<select><option>house</option><option>garden</option><option>fence</option></select>')
 			})
 		})
 		describe('state after list populate and set other item',() => {
@@ -119,11 +119,11 @@ describe('InputVar',() => {
 			it('inputVar.lists[0].val show selected',() => {
 				expect(inputVar.lists[0].val).to.eql('garden')
 			})
-			it('inputVar.htmls[0].val show selected',() => {
-				expect(inputVar.htmls[0].val).to.eql('garden')
+			it('inputVar.html.val show selected',() => {
+				expect(inputVar.html.val).to.eql('garden')
 			})
-			it('inputVar.htmls[0].el.value show selected',() => {
-				expect(inputVar.htmls[0].el.value).to.eql('garden')
+			it('inputVar.html.el.value show selected',() => {
+				expect(inputVar.html.el.value).to.eql('garden')
 			})
 		})
 		describe('select with label',() => {
@@ -141,14 +141,14 @@ describe('InputVar',() => {
 			it('inputVar.lists[0].val show selected',() => {
 				expect(inputVar.lists[0].val).to.eql('house')
 			})
-			it('inputVar.htmls[0].val show selected',() => {
-				expect(inputVar.htmls[0].val).to.eql('house')
+			it('inputVar.html.val show selected',() => {
+				expect(inputVar.html.val).to.eql('house')
 			})
-			it('inputVar.htmls[0].el.value show selected',() => {
-				expect(inputVar.htmls[0].el.value).to.eql('house')
+			it('inputVar.html.el.value show selected',() => {
+				expect(inputVar.html.el.value).to.eql('house')
 			})
-			it('inputVar.htmls[0].el.outerHTML as expected',() => {
-				expect(inputVar.htmls[0].el.outerHTML).to.eql('<select><option>house</option><option>garden</option><option>fence</option></select>')
+			it('inputVar.html.el.outerHTML as expected',() => {
+				expect(inputVar.html.el.outerHTML).to.eql('<select><option>house</option><option>garden</option><option>fence</option></select>')
 			})
 			it('parentHtml.el.innerHTML as expected',() => {
 				expect(parentHtml.el.innerHTML).to.eql('<div><span>choose</span><select><option>house</option><option>garden</option><option>fence</option></select></div>')
@@ -162,7 +162,7 @@ describe('InputVar',() => {
 			input.dom(parentHtml,{css:'someclass'})
 	
 			// have to store vars here in it, it was another content from HtmlSelectTest
-			const domed = input.htmls[0]
+			const domed = input.html
 	
 			it('value of DOM',() => {
 				expect(domed.el.value).to.eql('')

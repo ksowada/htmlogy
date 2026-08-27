@@ -39,7 +39,7 @@ class InputVarsArr extends Listener {
 		this.argCreate = {}
 
 		this.varsName = []
-		Obj.crawl(struct,{
+		Obj.crawl(struct,undefined,{
 			onObj: obj => {
 				if (obj.kind) {
 					const varName = obj._id

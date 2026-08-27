@@ -15,7 +15,7 @@ describe('InputInfo',() => {
 		input.dom(parentHtml,{css:'someclass'})
 
 		// have to store vars here in it, it was another content from HtmlSelectTest
-		const domed = input.htmls[0]
+		const domed = input.html
 
 		it('value of DOM',() => {
 			expect(domed.el.value).to.eql('house')
@@ -40,7 +40,7 @@ describe('InputInfo',() => {
 		input.dom(parentHtml,{css:'someclass'})
 
 		// have to store vars here in it, it was another content from HtmlSelectTest
-		const domed = input.htmls[0]
+		const domed = input.html
 
 		it('value of DOM',() => {
 			expect(domed.el.value).to.eql('house')

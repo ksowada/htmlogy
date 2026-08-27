@@ -17,7 +17,7 @@ import Str from '../../../logic/Str/Str.js'
  * @prop {boolean} [resize] resize input to containing text
  * @prop {string} [listen] dom event to change model , f.e. change,input,...
  * @prop {Function} [callback] called after set at onChange with parameter(val)
- * @property {object} [tooltip] optional object containing Html args @see {@link Html~createarg}, you may find it in .htmls[ix].tooltip for access and manipulation, and there is function set(val) implemented
+ * @property {object} [tooltip] optional object containing Html args @see {@link Html~createarg}, you may find it in .html.tooltip for access and manipulation, and there is function set(val) implemented
  * @property {any[]} [vals] default values, for list items as select option
  * @property {any} [val] default value, when no storage value is available
  * @property {string} [label] label for input, or button, (distinct from val, which is the val of this)
@@ -75,11 +75,10 @@ class InputVar extends Model {
 		this.props = Obj.copy(props) // Obj.defaults(props,{kind:InputVar.kindGuess(props)})
 
 		/**
-		 * all DOM implementations of this
-		 * as label,tooltip,icon, etc produce surrounding elements, here may be only the inner fucntion element as input, select, button, etc
-		 * @type {Html[]}
+		 * DOM implementations of this
+		 * @type {Html}
 		 */
-		this.htmls = []
+		this.html = undefined
 
 		/**
 		 * optional field when HtmlState is used
@@ -229,7 +228,7 @@ class InputVar extends Model {
 
 		/** the generated Html attached here */
 		// remember dom implementation, ⚠️ forget propsAdd
-		this.htmls.push(myHtml)
+		this.html = myHtml
 
 		this.props = props // remember kind and other props
 		return this
@@ -255,7 +254,7 @@ class InputVar extends Model {
 		}
 
 		/** changes the html element with the filtered properties */
-		this.htmls.forEach(html => html.change(arg))
+		this.html.change(arg)
 		// eslint-disable-next-line no-self-assign
 		this.val = this.val // call set val for boundcheck
 	}
@@ -293,9 +292,7 @@ class InputVar extends Model {
 	 * @private
 	 */
 	setDoms(val) {
-		this.htmls.forEach(html => {
-			html.el.value = val
-		})
+		this.html.el.value = val
 	}
 	/**
 	 * props that are also args, are setted in arg
@@ -326,9 +323,7 @@ class InputVar extends Model {
 		if (html) {
 			disable(deactivate,html)
 		} else {
-			this.htmls.forEach(htmlInt => {
-				disable(deactivate,htmlInt)
-			})
+			disable(deactivate,this.html)
 		}
 	}
 	/**

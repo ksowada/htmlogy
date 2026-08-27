@@ -165,6 +165,7 @@ class InputInfo extends InputVar {
 	async inputsPaste() {
 		const val = await navigator.clipboard.readText()
 		this.val = val
+		this.onEnter()
 	}
 	/**
 	 * Clears the input value.
@@ -176,7 +177,7 @@ class InputInfo extends InputVar {
 	 * Resets the input value.
 	 */
 	inputsReset() {
-		this.reset() // this.reset('is')
+		this.reset()
 	}
 	/**
 	 * set main InputInfo, from sub vars, f.e. actions and subs
@@ -188,6 +189,20 @@ class InputInfo extends InputVar {
 	enChanged() {
 		if (this.ui.form) { // maybe closed at startup
 			Elem.classStateSet(this.ui.form.el,this.vars['en'].val,['hidden',''])
+		}
+	}
+	/**
+	 * react on inputLine Change by enter, focus leave, and paste
+	 */
+	watchEnter(callback) {
+		this.callbackEnter = callback
+		this.html.change({evts:{keydown:this.onEnter.bind(this),blur:this.onEnter.bind(this)}})
+	}
+	onEnter(event) {
+		if (this.callbackEnter) { // only use when outer callback is there
+			if (event == undefined || event.key == undefined || event.key === 'Enter') { // event at inputPaste call origins from other source, therefore event may be undefined
+				this.callbackEnter(this.val)
+			}
 		}
 	}
 }
