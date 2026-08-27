@@ -231,6 +231,29 @@ class Tree extends Html {
 			nodeData[key] = newData[key]
 		})
 
+		// find parent 
+		let actParent = undefined
+		let dataParent = undefined
+		let dataPos = undefined
+		Obj.crawl(this.data,undefined,{
+			onArr: (obj,key) => {
+				if (key === this.dataChildId) {
+					obj.forEach((subObj,pos) => {
+						if (subObj.id === data.id) {
+							dataParent = actParent
+							dataPos = pos
+						}
+					})
+				}
+			},
+			onObj: obj => {
+				if (!(obj instanceof HTMLElement)) {
+					actParent = obj
+				}
+		}})
+		console.log('Tree.appendNode:dataParent',dataParent)
+		console.log('Tree.appendNode:dataPos',dataPos)
+		
 		// look for position of data in parent
 		// let posInParent = undefined
 		// data.parent[this.dataChildId].forEach((child,pos) => {
@@ -238,7 +261,7 @@ class Tree extends Html {
 		// })
 
 		// // splice in nodeData
-		// data.parent[this.dataChildId].splice(posInParent,0,nodeData)
+		dataParent[this.dataChildId].splice(dataPos+1,0,nodeData)
 
 		// // create DOM
 		// const htmlObj = new Html({my:{el:data.el}})
