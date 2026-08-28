@@ -12,8 +12,9 @@ class TreeEditor {
   /**
    * @param {HTMLElement} container - Element, in das der Baum gerendert wird
    * @param {Array} data - Anfangsdaten (Array von Knoten)
+   * @param {Function} renderCallback - call at each change of tree, that implies that it render to update server tree data
    */
-  constructor(container, data = []) {
+  constructor(container, data = [], renderCallback) {
     this.container = container;
     this.data = [];
     this.idCounter = 1;
@@ -25,6 +26,8 @@ class TreeEditor {
     this.collapsedIds = new Set();
 
     this.setData(data);
+
+    this.renderCallback = renderCallback // set it after setData to prohibit data update at renderCallback
   }
 
   // ---- Datenverwaltung ----
@@ -52,7 +55,7 @@ class TreeEditor {
     return this.data;
   }
 
-  makeNode(name = "Neuer Knoten", extra = {}) {
+  makeNode(name = "new node", extra = {}) {
     return { id: this.idCounter++, name, children: [], ...extra };
   }
 
@@ -99,15 +102,33 @@ class TreeEditor {
     this.render();
   }
 
-  addChildNode(parentId) {
+  addChildNode(parentId, nodeData) {
     const res = this._findParentArray(this.data, parentId);
     const parent = res ? res.node : null;
     const target = parent || this.data.find(n => n.id === parentId);
     if (target) {
-      target.children.push(this.makeNode());
+      if (nodeData) {
+        target.children.splice(0,0,this.makeNode(nodeData.name,nodeData));
+      } else {
+        target.children.splice(0,0,this.makeNode());
+      }
       this.render();
     }
   }
+
+  // appendNode(parentId, nodeData) {
+  //   const res = this._findParentArray(this.data, parentId);
+  //   const parent = res ? res.node : null;
+  //   const target = parent || this.data.find(n => n.id === parentId);
+  //   if (target) {
+  //     if (nodeData) {
+  //       target.push(this.makeNode(nodeData.name,nodeData));
+  //     } else {
+  //       target.push(this.makeNode());
+  //     }
+  //     this.render();
+  //   }
+  // }
 
   deleteNode(id) {
     this._removeNode(id);
@@ -174,6 +195,7 @@ class TreeEditor {
     this.container.innerHTML = "";
     this.container.appendChild(this._renderList(this.data));
     this._refreshSelectionClasses();
+    if (this.renderCallback) this.renderCallback()
   }
 
   _renderList(nodes) {
