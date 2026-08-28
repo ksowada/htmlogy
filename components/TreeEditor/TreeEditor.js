@@ -19,14 +19,31 @@ class TreeEditor {
     this.idCounter = 1;
     this.draggedId = null;
 
+    // Bleiben über setData() hinweg erhalten (z.B. bei erneutem JSON-Import),
+    // da sie unabhängig vom Datenmodell auf der Instanz gehalten werden.
+    this.selectedId = null;
+    this.collapsedIds = new Set();
+
     this.setData(data);
   }
 
   // ---- Datenverwaltung ----
 
-  /** Ersetzt den kompletten Baum, z.B. nach JSON-Import. */
+  /**
+   * Ersetzt den kompletten Baum, z.B. nach JSON-Import.
+   * Selektion und aufgeklappte/eingeklappte Knoten bleiben (anhand der id)
+   * erhalten, sofern die entsprechende id im neuen Baum noch existiert.
+   */
   setData(nodes) {
     this.data = this._normalize(nodes);
+
+    if (this.selectedId !== null && !this._findParentArray(this.data, this.selectedId)) {
+      this.selectedId = null;
+    }
+    for (const id of this.collapsedIds) {
+      if (!this._findParentArray(this.data, id)) this.collapsedIds.delete(id);
+    }
+
     this.render();
   }
 
@@ -107,6 +124,28 @@ class TreeEditor {
     if (res) res.node.description = text;
   }
 
+  /** Wählt einen Knoten aus (oder hebt die Auswahl mit null auf). */
+  selectNode(id) {
+    this.selectedId = id;
+    this._refreshSelectionClasses();
+  }
+
+  getSelectedId() {
+    return this.selectedId;
+  }
+
+  getSelectedNode() {
+    if (this.selectedId === null) return null;
+    const res = this._findParentArray(this.data, this.selectedId);
+    return res ? res.node : null;
+  }
+
+  _refreshSelectionClasses() {
+    this.container.querySelectorAll(".node").forEach(el => {
+      el.classList.toggle("selected", el.dataset.id === String(this.selectedId));
+    });
+  }
+
   moveNode(draggedId, targetId, mode) {
     if (draggedId === targetId) return;
     const draggedRes = this._findParentArray(this.data, draggedId);
@@ -134,6 +173,7 @@ class TreeEditor {
   render() {
     this.container.innerHTML = "";
     this.container.appendChild(this._renderList(this.data));
+    this._refreshSelectionClasses();
   }
 
   _renderList(nodes) {
@@ -150,10 +190,19 @@ class TreeEditor {
     row.draggable = true;
     row.dataset.id = node.id;
 
+    const isCollapsed = this.collapsedIds.has(node.id);
+    if (isCollapsed) li.classList.add("collapsed");
+
     const toggle = document.createElement("span");
     toggle.className = "toggle" + (node.children.length ? "" : " empty");
-    toggle.textContent = node.children.length ? "▾" : "•";
-    toggle.onclick = () => {
+    toggle.textContent = node.children.length ? (isCollapsed ? "▸" : "▾") : "•";
+    toggle.onclick = e => {
+      e.stopPropagation();
+      if (this.collapsedIds.has(node.id)) {
+        this.collapsedIds.delete(node.id);
+      } else {
+        this.collapsedIds.add(node.id);
+      }
       li.classList.toggle("collapsed");
       toggle.textContent = li.classList.contains("collapsed") ? "▸" : "▾";
     };
@@ -171,6 +220,7 @@ class TreeEditor {
     addBtn.title = "Kind-Knoten hinzufügen";
     addBtn.onclick = () => {
       li.classList.remove("collapsed");
+      this.collapsedIds.delete(node.id);
       this.addChildNode(node.id);
     };
 
@@ -181,6 +231,10 @@ class TreeEditor {
     delBtn.onclick = () => this.deleteNode(node.id);
 
     row.append(toggle, label, addBtn, delBtn);
+    row.addEventListener("click", e => {
+      if (e.target.closest("button")) return;
+      this.selectNode(node.id);
+    });
     li.appendChild(row);
 
     const desc = document.createElement("div");
@@ -240,4 +294,5 @@ class TreeEditor {
     });
   }
 }
+
 export default TreeEditor
