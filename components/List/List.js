@@ -48,6 +48,8 @@ class List extends Html {
 		this.selectModes = ['none','single','singleForce','multi']
 		
 		this.update(arg)
+
+		if (arg.selection) this.selection = arg.selection
 	}
 	/**
 	 * update given items, when not already added don't change or create
@@ -59,9 +61,8 @@ class List extends Html {
 		Html.mergeModDatas(this,arg) // remember changes
 		this.removeChilds() // remove all items, because we don't know if they are still valid, f.e. when valsObj is given and some keys are removed^
 
-		/** need objects of List in itemsMirrored for add and remove */
-		this.itemsMirrored = []
-		this.itemsMirroredNames = []
+		/** need objects of List in htmls for add and remove */
+		this.htmls = []
 		if (this.inner) {
 			if (this.inner.select) {
 				if (!this.inner.select.mode) this.inner.select.mode = this.selectModes[0]
@@ -98,7 +99,7 @@ class List extends Html {
 	 */
 	addNext(item,name) {
 		if (item==undefined) return
-		const pos=this.itemsMirrored.length
+		const pos=this.htmls.length
 		// merge inner and use optional select for further atts
 		// const inner = Html.mergeDatas(this.inner)
 		Obj.assure(this.inner,'atts',{})
@@ -124,7 +125,7 @@ class List extends Html {
 			htmlObj = this.add({...this.inner,val:item})
 		}
 		// refresh mirror
-		this.itemsMirrored.push(htmlObj)
+		this.htmls.push(htmlObj)
 	}
 	/** after items change, call me to select correct */
 	selectCare() {
@@ -146,7 +147,7 @@ class List extends Html {
 		for (let ix = 0; ix < selecteds.length; ix++) {
 			if (ix>=leaveCnt) {
 				const id = selecteds[ix]
-				const itemMirrored = this.itemsMirrored[id]
+				const itemMirrored = this.htmls[id]
 				if (el==undefined || !el.isSameNode(itemMirrored.my.el)) {
 					Elem.classStateSet(itemMirrored.my.el,'deselected',this.selectStates)
 				}
@@ -158,12 +159,17 @@ class List extends Html {
 	 */
 	getSelecteds() {
 		const selectedsIx = []
-		this.itemsMirrored.forEach((item,ix) => {
-			const selectState = Elem.classStateGet(this.itemsMirrored[ix].el,this.selectStates)[0].name
+		this.htmls.forEach((item,ix) => {
+			const selectState = Elem.classStateGet(this.htmls[ix].el,this.selectStates)[0].name
 			if (selectState=='selected') selectedsIx.push(ix)
 		})
 		selectedsIx.sort((a,b) => b - a) // sort from behind to top
 		return selectedsIx
+	}
+	getSelectedVal() {
+		const selecteds = this.getSelecteds()
+		const selected0text = this.htmls[selecteds[0]].el.textContent
+		return selected0text
 	}
 	/**
 	 * set selected index
@@ -171,11 +177,12 @@ class List extends Html {
 	 */
 	setSelectedIx(ix) {
 		if (ix==undefined) ix=0
-		if (ix>this.itemsMirrored.length-1) return
+		if (ix>this.htmls.length-1) return
 		if (this.inner.select==undefined) return
 		if (this.inner.select.mode=='none') return
 		if (this.inner.select.mode=='single') this.removeSelection()
-		Elem.classStateSet(this.itemsMirrored[ix].el,'selected',this.selectStates)
+		Elem.classStateSet(this.htmls[ix].el,'selected',this.selectStates)
+		if (this.selection) this.selection()
 	}
 	// eslint-disable-next-line jsdoc/require-param
 	/**
