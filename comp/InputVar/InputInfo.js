@@ -3,6 +3,7 @@ import InputVar from './InputVar.js'
 import Obj from '../../../logic/Obj/Obj.js'
 import Elem from '../../Elem/Elem.js'
 import Html from '../../Html/Html.js'
+import './InputInfo.css'
 
 /**
  * @typedef InputInfo_props
