@@ -232,8 +232,13 @@ class TreeEditor {
 
     const row = document.createElement("div");
     row.className = "node";
-    row.draggable = true;
     row.dataset.id = node.id;
+
+    const handle = document.createElement("span");
+    handle.className = "drag-handle";
+    handle.draggable = true;
+    handle.title = "Ziehen zum Umsortieren";
+    handle.textContent = "⠿";
 
     const isCollapsed = this.collapsedIds.has(node.id);
     if (isCollapsed) li.classList.add("collapsed");
@@ -252,14 +257,19 @@ class TreeEditor {
       toggle.textContent = li.classList.contains("collapsed") ? "▸" : "▾";
     };
 
-    const label = document.createElement("span");
+    const labelWrap = document.createElement("div");
+    labelWrap.className = "label-wrap";
+
+    const label = document.createElement("div");
     label.className = "label";
     label.contentEditable = "true";
     label.textContent = node.name;
     label.oninput = () => this.renameNode(node.id, label.textContent);
     label.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); label.blur(); } };
+    labelWrap.appendChild(label);
 
     const addBtn = document.createElement("button");
+    addBtn.type = "button";
     addBtn.className = "btn";
     addBtn.textContent = "+";
     addBtn.title = "Kind-Knoten hinzufügen";
@@ -270,12 +280,13 @@ class TreeEditor {
     };
 
     const delBtn = document.createElement("button");
+    delBtn.type = "button";
     delBtn.className = "btn del";
     delBtn.textContent = "✕";
     delBtn.title = "Knoten löschen";
     delBtn.onclick = () => this.deleteNode(node.id);
 
-    row.append(toggle, label, addBtn, delBtn);
+    row.append(handle, toggle, labelWrap, addBtn, delBtn);
     row.addEventListener("click", e => {
       if (e.target.closest("button")) return;
       this.selectNode(node.id);
@@ -287,26 +298,25 @@ class TreeEditor {
     desc.contentEditable = "true";
     desc.textContent = node.description || "";
     desc.oninput = () => this.setDescription(node.id, desc.textContent);
-    desc.onblur = () => this.setDescriptionFinish(node.id, desc.textContent);
     li.appendChild(desc);
 
     if (node.children.length) {
       li.appendChild(this._renderList(node.children));
     }
 
-    this._attachDragHandlers(row, node);
+    this._attachDragHandlers(row, handle, node);
 
     return li;
   }
 
-  _attachDragHandlers(row, node) {
-    row.addEventListener("dragstart", e => {
+  _attachDragHandlers(row, handle, node) {
+    handle.addEventListener("dragstart", e => {
       this.draggedId = node.id;
       row.classList.add("dragging");
       e.dataTransfer.effectAllowed = "move";
     });
 
-    row.addEventListener("dragend", () => {
+    handle.addEventListener("dragend", () => {
       row.classList.remove("dragging");
       this.container.querySelectorAll(".node").forEach(el =>
         el.classList.remove("drag-over-inside", "drag-over-above", "drag-over-below")
