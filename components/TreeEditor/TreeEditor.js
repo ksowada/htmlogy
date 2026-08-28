@@ -97,11 +97,23 @@ class TreeEditor {
 
   // ---- Öffentliche Aktionen ----
 
-  addRootNode() {
-    this.data.push(this.makeNode());
+  addRootNode(nodeName) {
+    const newNode = this.makeNode(nodeName)
+    this.data.splice(0,0,newNode);
     this.render();
+    return newNode.id
   }
 
+  addRootNodeIfNotExist(nodeName) {
+    const dataExisting = this.data.find(n => n.name === nodeName)
+    if (!dataExisting) {
+      const newNode = this.makeNode(nodeName)
+      this.data.splice(0,0,newNode);
+      this.render();
+      return newNode.id
+    }
+    return dataExisting.id
+  }
   addChildNode(parentId, nodeData) {
     const res = this._findParentArray(this.data, parentId);
     const parent = res ? res.node : null;
