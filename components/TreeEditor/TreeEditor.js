@@ -12,9 +12,9 @@ class TreeEditor {
   /**
    * @param {HTMLElement} container - Element, in das der Baum gerendert wird
    * @param {Array} data - Anfangsdaten (Array von Knoten)
-   * @param {Function} renderCallback - call at each change of tree, that implies that it render to update server tree data
+   * @param {Function} onRender - call at each change of tree, that implies that it render to update server tree data
    */
-  constructor(container, data = [], renderCallback) {
+  constructor(container, data = [], onRender, onSelect) {
     this.container = container;
     this.data = [];
     this.idCounter = 1;
@@ -25,9 +25,10 @@ class TreeEditor {
     this.selectedId = null;
     this.collapsedIds = new Set();
 
-    this.setData(data);
+    if (data) this.setData(data);
 
-    this.renderCallback = renderCallback // set it after setData to prohibit data update at renderCallback
+    this.onRender = onRender // set it after setData to prohibit data update at onRender
+    this.onSelect = onSelect
   }
 
   // ---- Datenverwaltung ----
@@ -47,7 +48,7 @@ class TreeEditor {
       if (!this._findParentArray(this.data, id)) this.collapsedIds.delete(id);
     }
 
-    this.render();
+    this.render(true);
   }
 
   /** Gibt den Baum als reines JSON-taugliches Array zurück. */
@@ -155,12 +156,19 @@ class TreeEditor {
   setDescription(id, text) {
     const res = this._findParentArray(this.data, id);
     if (res) res.node.description = text;
+    // if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
+  }
+  setDescriptionFinish(id, text) {
+    const res = this._findParentArray(this.data, id);
+    if (res) res.node.description = text;
+    if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
   }
 
   /** Wählt einen Knoten aus (oder hebt die Auswahl mit null auf). */
   selectNode(id) {
     this.selectedId = id;
     this._refreshSelectionClasses();
+    if (this.onSelect) this.onSelect(id)
   }
 
   getSelectedId() {
@@ -202,12 +210,15 @@ class TreeEditor {
   }
 
   // ---- Rendering ----
-
-  render() {
+/**
+ * 
+ * @param {boolean} setData at this flag no onRender, only at internal changes on nodes 
+ */
+  render(setData=false) {
     this.container.innerHTML = "";
     this.container.appendChild(this._renderList(this.data));
     this._refreshSelectionClasses();
-    if (this.renderCallback) this.renderCallback()
+    if (!setData && this.onRender) this.onRender()
   }
 
   _renderList(nodes) {
@@ -276,6 +287,7 @@ class TreeEditor {
     desc.contentEditable = "true";
     desc.textContent = node.description || "";
     desc.oninput = () => this.setDescription(node.id, desc.textContent);
+    desc.onblur = () => this.setDescriptionFinish(node.id, desc.textContent);
     li.appendChild(desc);
 
     if (node.children.length) {
