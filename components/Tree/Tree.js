@@ -106,7 +106,7 @@ class Tree extends Html {
 			this.data = {}
 			this.data[this.dataNameId] = 'empty'
 		}
-		this.ids = new Ids('n_')
+		this.ids = new Ids()
 		this.inflateLvl(this.tree,this.data,0,(this.initially==true)?1:undefined) // iteratively develop all nodes of given tree in data
 		if (this.selectable) {
 			const selectedEL = this.getSelected()
@@ -132,7 +132,11 @@ class Tree extends Html {
 	 */
 	inflateLvl(htmlObj,data,lvl,lvlToShow=undefined) {
 		if (data[this.dataNameId]) {
-			data.id = this.ids.next()
+			if (!data.id) {
+				data.id = this.ids.next()
+			} else {
+				this.ids.occupy(data.id)
+			}
 			data.lvl = lvl
 			const li_Html = this.domNode(htmlObj,data,lvlToShow)
 			data.el = li_Html.el
@@ -208,7 +212,6 @@ class Tree extends Html {
 		}
 	}
 	addIntoNode(data,newData) {
-		this.nodeIdsState = this.nodeIdsStateInsert(data.id)
 		// add data
 		if (!data[this.dataChildId]) {
 			data[this.dataChildId] = []
@@ -229,15 +232,22 @@ class Tree extends Html {
 	}
 
 	appendNode(data,newData) {
-		this.nodeIdsState = this.nodeIdsStateInsert(data.id)
-
 		// write in all data
 		const nodeData = {}
 		Object.keys(newData).forEach(key => {
 			nodeData[key] = newData[key]
 		})
+		if (!nodeData.id) nodeData.id = this.ids.next()
 
 		// find parent 
+		const {dataParent, dataPos} = this.findId(data.id)
+		dataParent[this.dataChildId].splice(dataPos+1,0,nodeData)
+	}
+	removeNode(data) {
+		const {dataParent, dataPos} = this.findId(data.id)
+		dataParent[this.dataChildId].splice(dataPos,1)
+	}
+	findId(idToFind) {
 		let actParent = undefined
 		let dataParent = undefined
 		let dataPos = undefined
@@ -245,7 +255,7 @@ class Tree extends Html {
 			onArr: (obj,key) => {
 				if (key === this.dataChildId) {
 					obj.forEach((subObj,pos) => {
-						if (subObj.id === data.id) {
+						if (subObj.id === idToFind) {
 							dataParent = actParent
 							dataPos = pos
 						}
@@ -257,32 +267,7 @@ class Tree extends Html {
 					actParent = obj
 				}
 		}})
-		console.log('Tree.appendNode:dataParent',dataParent)
-		console.log('Tree.appendNode:dataPos',dataPos)
-		
-		// // splice in nodeData
-		dataParent[this.dataChildId].splice(dataPos+1,0,nodeData)
-	}
-	/**
-	 * nodeIdsState insert empty element with none
-	 */
-	nodeIdsStateInsert(idToInsert) {
-		const ids = new Ids('n_')
-		let moveAhead = false
-		const nodeIdsStateNew = {}
-		Object.keys(this.nodeIdsState).forEach(id => {
-			const idCurrent = ids.next()
-			if (!moveAhead) {
-				nodeIdsStateNew[id] = this.nodeIdsState[id]
-			} else {
-				nodeIdsStateNew[idCurrent] = this.nodeIdsState[id]
-			}
-			if (id==idToInsert) {
-				moveAhead = true
-				nodeIdsStateNew[ids.next()] = 'none'
-			}
-		})
-		return nodeIdsStateNew
+		return {dataParent, dataPos}
 	}
 	renameNode(data,newName) {
 		data[this.dataNameId] = newName
