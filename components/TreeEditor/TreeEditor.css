@@ -1,4 +1,4 @@
-#tree {
+.TreeEditor {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -6,21 +6,21 @@
   max-width: 520px;
 }
 
-ul {
+.TreeEditor ul {
   list-style: none;
   margin: 0;
   padding-left: 20px;
 }
 
-#tree>ul {
+.TreeEditor>ul {
   padding-left: 0;
 }
 
-li {
+.TreeEditor li {
   position: relative;
 }
 
-.node {
+.TreeEditor .node {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -30,33 +30,33 @@ li {
   user-select: none;
 }
 
-.node:hover {
+.TreeEditor .node:hover {
   background: var(--accent-dim);
 }
 
-.node.selected {
+.TreeEditor .node.selected {
   background: var(--accent-dim);
   box-shadow: inset 3px 0 0 0 var(--accent);
 }
 
-.node.dragging {
+.TreeEditor .node.dragging {
   opacity: 0.4;
 }
 
-.node.drag-over-inside {
+.TreeEditor .node.drag-over-inside {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
 
-.node.drag-over-above {
+.TreeEditor .node.drag-over-above {
   box-shadow: 0 -2px 0 0 var(--accent);
 }
 
-.node.drag-over-below {
+.TreeEditor .node.drag-over-below {
   box-shadow: 0 2px 0 0 var(--accent);
 }
 
-.toggle {
+.TreeEditor .toggle {
   width: 16px;
   text-align: center;
   color: var(--muted);
@@ -64,23 +64,23 @@ li {
   cursor: pointer;
 }
 
-.toggle.empty {
+.TreeEditor .toggle.empty {
   visibility: hidden;
 }
 
-.label {
+.TreeEditor .label {
   flex: 1;
   padding: 2px 4px;
   border-radius: 4px;
   outline: none;
 }
 
-.label:focus {
+.TreeEditor .label:focus {
   background: var(--bg);
   box-shadow: 0 0 0 1px var(--accent);
 }
 
-.description {
+.TreeEditor .description {
   display: block;
   font-size: 11px;
   color: var(--muted);
@@ -88,16 +88,16 @@ li {
   outline: none;
 }
 
-.description:focus {
+.TreeEditor .description:focus {
   color: var(--text);
 }
 
-.description:empty::before {
+.TreeEditor .description:empty::before {
   content: "Beschreibung hinzufügen…";
   color: #a9abb4;
 }
 
-.btn {
+.TreeEditor .btn {
   background: none;
   border: none;
   color: var(--muted);
@@ -108,15 +108,15 @@ li {
   line-height: 1;
 }
 
-.btn:hover {
+.TreeEditor .btn:hover {
   background: var(--line);
   color: var(--text);
 }
 
-.btn.del:hover {
+.TreeEditor .btn.del:hover {
   color: var(--danger);
 }
 
-.collapsed>ul {
+.TreeEditor .collapsed>ul {
   display: none;
 }
