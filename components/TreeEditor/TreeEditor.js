@@ -62,6 +62,12 @@ class TreeEditor {
     return this.data;
   }
 
+  /**
+   * creates data for a node
+   * @param {String} name name for node
+   * @param {object} extra data for node
+   * @returns {object} buildes node, with id, name, children und extra
+   */
   makeNode(name = "new node", extra = {}) {
     return { id: this.idCounter++, name, children: [], ...extra };
   }
@@ -145,14 +151,18 @@ class TreeEditor {
     const res = this._findParentArray(this.data, parentId);
     const parent = res ? res.node : null;
     const target = parent || this.data.find(n => n.id === parentId);
+    let node = undefined
     if (target) {
       if (nodeData) {
-        target.children.splice(0,0,this.makeNode(nodeData.name,nodeData));
+        node = this.makeNode(nodeData.name,nodeData)
+        target.children.splice(0,0,node);
       } else {
-        target.children.splice(0,0,this.makeNode());
+        node = this.makeNode()
+        target.children.splice(0,0,node);
       }
       this.render();
     }
+    return node
   }
 
   // appendNode(parentId, nodeData) {
