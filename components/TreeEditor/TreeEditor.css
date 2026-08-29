@@ -32,7 +32,6 @@
 .TreeEditor .drag-handle {
   cursor: grab;
   color: var(--muted);
-  font-size: 13px;
   padding: 0 2px;
   line-height: 1;
 }
@@ -67,7 +66,6 @@
   width: 16px;
   text-align: center;
   color: var(--muted);
-  font-size: 12px;
   cursor: pointer;
 }
 
@@ -95,7 +93,7 @@
 
 .TreeEditor .description {
   display: block;
-  font-size: 11px;
+  font-size: var(--font-size-small);
   color: var(--muted);
   padding: 0 4px 2px 26px;
   outline: none;
@@ -117,7 +115,6 @@
   border: none;
   color: var(--muted);
   cursor: pointer;
-  font-size: 13px;
   padding: 2px 5px;
   border-radius: 4px;
   line-height: 1;

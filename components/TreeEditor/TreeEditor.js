@@ -24,8 +24,10 @@ class TreeEditor {
 
     // Bleiben über setData() hinweg erhalten (z.B. bei erneutem JSON-Import),
     // da sie unabhängig vom Datenmodell auf der Instanz gehalten werden.
+    // expandedIds statt collapsedIds: Standardzustand ist zugeklappt,
+    // nur explizit aufgeklappte Knoten (per id) merken sich das über setData hinweg.
     this.selectedId = null;
-    this.collapsedIds = new Set();
+    this.expandedIds = new Set();
 
     if (data && data.length) this.setData(data);
 
@@ -37,8 +39,9 @@ class TreeEditor {
 
   /**
    * Ersetzt den kompletten Baum, z.B. nach JSON-Import.
-   * Selektion und aufgeklappte/eingeklappte Knoten bleiben (anhand der id)
-   * erhalten, sofern die entsprechende id im neuen Baum noch existiert.
+   * Selektion bleibt erhalten (anhand der id), sofern sie im neuen Baum
+   * noch existiert. Neue/erstmals geladene Knoten starten zugeklappt;
+   * zuvor aufgeklappte Knoten bleiben aufgeklappt, sofern ihre id noch existiert.
    */
   setData(nodes) {
     this.setDataDone = true
@@ -47,8 +50,8 @@ class TreeEditor {
     if (this.selectedId !== null && !this._findParentArray(this.data, this.selectedId)) {
       this.selectedId = null;
     }
-    for (const id of this.collapsedIds) {
-      if (!this._findParentArray(this.data, id)) this.collapsedIds.delete(id);
+    for (const id of this.expandedIds) {
+      if (!this._findParentArray(this.data, id)) this.expandedIds.delete(id);
     }
 
     this.render(true);
@@ -244,7 +247,7 @@ class TreeEditor {
     handle.title = "Ziehen zum Umsortieren";
     handle.textContent = "⠿";
 
-    const isCollapsed = this.collapsedIds.has(node.id);
+    const isCollapsed = node.children.length > 0 && !this.expandedIds.has(node.id);
     if (isCollapsed) li.classList.add("collapsed");
 
     const toggle = document.createElement("span");
@@ -252,10 +255,10 @@ class TreeEditor {
     toggle.textContent = node.children.length ? (isCollapsed ? "▸" : "▾") : "•";
     toggle.onclick = e => {
       e.stopPropagation();
-      if (this.collapsedIds.has(node.id)) {
-        this.collapsedIds.delete(node.id);
+      if (this.expandedIds.has(node.id)) {
+        this.expandedIds.delete(node.id);
       } else {
-        this.collapsedIds.add(node.id);
+        this.expandedIds.add(node.id);
       }
       li.classList.toggle("collapsed");
       toggle.textContent = li.classList.contains("collapsed") ? "▸" : "▾";
@@ -280,7 +283,7 @@ class TreeEditor {
     addBtn.title = "Kind-Knoten hinzufügen";
     addBtn.onclick = () => {
       li.classList.remove("collapsed");
-      this.collapsedIds.delete(node.id);
+      this.expandedIds.add(node.id);
       this.addChildNode(node.id);
     };
 
