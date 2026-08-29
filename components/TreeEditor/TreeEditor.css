@@ -29,7 +29,14 @@
   cursor: grab;
   user-select: none;
 }
-
+.TreeEditor .drag-handle {
+  cursor: grab;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 0 2px;
+  line-height: 1;
+}
+.TreeEditor .drag-handle:active { cursor: grabbing; }
 .TreeEditor .node:hover {
   background: var(--accent-dim);
 }
@@ -68,11 +75,17 @@
   visibility: hidden;
 }
 
-.TreeEditor .label {
+.TreeEditor .label-wrap {
   flex: 1;
+  min-width: 0;
+}
+
+.TreeEditor .label {
   padding: 2px 4px;
   border-radius: 4px;
   outline: none;
+  user-select: text;
+  cursor: text;
 }
 
 .TreeEditor .label:focus {
@@ -86,6 +99,8 @@
   color: var(--muted);
   padding: 0 4px 2px 26px;
   outline: none;
+  user-select: text;
+  cursor: text;
 }
 
 .TreeEditor .description:focus {
