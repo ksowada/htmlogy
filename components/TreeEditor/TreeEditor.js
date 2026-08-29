@@ -13,19 +13,21 @@ class TreeEditor {
    * @param {HTMLElement} container - Element, in das der Baum gerendert wird
    * @param {Array} data - Anfangsdaten (Array von Knoten)
    * @param {Function} onRender - call at each change of tree, that implies that it render to update server tree data
+   * @param {Function} onSelect - call at select of treenode
    */
   constructor(container, data = [], onRender, onSelect) {
     this.container = container;
     this.data = [];
     this.idCounter = 1;
     this.draggedId = null;
+    this.setDataDone = false
 
     // Bleiben über setData() hinweg erhalten (z.B. bei erneutem JSON-Import),
     // da sie unabhängig vom Datenmodell auf der Instanz gehalten werden.
     this.selectedId = null;
     this.collapsedIds = new Set();
 
-    if (data) this.setData(data);
+    if (data && data.length) this.setData(data);
 
     this.onRender = onRender // set it after setData to prohibit data update at onRender
     this.onSelect = onSelect
@@ -39,6 +41,7 @@ class TreeEditor {
    * erhalten, sofern die entsprechende id im neuen Baum noch existiert.
    */
   setData(nodes) {
+    this.setDataDone = true
     this.data = this._normalize(nodes);
 
     if (this.selectedId !== null && !this._findParentArray(this.data, this.selectedId)) {
