@@ -42,6 +42,8 @@ class TreeEditor {
    * Selektion bleibt erhalten (anhand der id), sofern sie im neuen Baum
    * noch existiert. Neue/erstmals geladene Knoten starten zugeklappt;
    * zuvor aufgeklappte Knoten bleiben aufgeklappt, sofern ihre id noch existiert.
+   * 
+   * later call render()
    */
   setData(nodes) {
     this.setDataDone = true
@@ -53,8 +55,6 @@ class TreeEditor {
     for (const id of this.expandedIds) {
       if (!this._findParentArray(this.data, id)) this.expandedIds.delete(id);
     }
-
-    this.render(true);
   }
 
   /** Gibt den Baum als reines JSON-taugliches Array zurück. */
@@ -89,6 +89,16 @@ class TreeEditor {
     return null;
   }
 
+  findNodes(nodes, arr=undefined, key, val) {
+    if (!nodes) nodes = this.data
+    if (!arr) arr = []
+    for (const n of nodes) {
+      if (n[key] === val) arr.push( { arr: nodes, node: n })
+      this.findNodes(n.children, arr, key, val)
+    }
+    return arr;
+  }
+
   _removeNode(id) {
     const res = this._findParentArray(this.data, id);
     if (!res) return null;
@@ -100,6 +110,16 @@ class TreeEditor {
   _containsId(node, id) {
     if (node.id === id) return true;
     return node.children.some(c => this._containsId(c, id));
+  }
+
+  /** Liefert die id-Kette der Vorfahren von id (ohne id selbst), oder null wenn nicht gefunden. */
+  _findAncestorIds(nodes, id, path = []) {
+    for (const n of nodes) {
+      if (n.id === id) return path;
+      const found = this._findAncestorIds(n.children, id, [...path, n.id]);
+      if (found) return found;
+    }
+    return null;
   }
 
   // ---- Öffentliche Aktionen ----
@@ -171,11 +191,29 @@ class TreeEditor {
     if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
   }
 
+  /**
+   * Klappt bei Bedarf alle Elternknoten von id auf, damit der Knoten sichtbar
+   * wird, wählt ihn aus und scrollt ihn in den sichtbaren Bereich.
+   * Nützlich z.B. nach Suche oder externem Verweis auf eine bestimmte id.
+   */
+  revealAndSelect(id) {
+    const ancestorIds = this._findAncestorIds(this.data, id);
+    if (ancestorIds === null) return false; // id existiert nicht im aktuellen Baum
+
+    ancestorIds.forEach(ancestorId => this.expandedIds.add(ancestorId));
+    this.selectedId = id;
+    this.render();
+
+    const rowEl = this.container.querySelector(`.node[data-id="${id}"]`);
+    if (rowEl) rowEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+
+    return true;
+  }
+
   /** Wählt einen Knoten aus (oder hebt die Auswahl mit null auf). */
   selectNode(id) {
     this.selectedId = id;
     this._refreshSelectionClasses();
-    if (this.onSelect) this.onSelect(id)
   }
 
   getSelectedId() {
@@ -296,8 +334,15 @@ class TreeEditor {
 
     row.append(handle, toggle, labelWrap, addBtn, delBtn);
     row.addEventListener("click", e => {
+      console.log('row:click')
       if (e.target.closest("button")) return;
       this.selectNode(node.id);
+    });
+    row.addEventListener("dblclick", e => {
+      console.log('row:dblclick')
+      if (e.target.closest("button")) return;
+      // this.selectNode(node.id);
+      if (this.onSelect) this.onSelect(node.id)
     });
     li.appendChild(row);
 

@@ -168,7 +168,7 @@ class List extends Html {
 	}
 	getSelectedVal() {
 		const selecteds = this.getSelecteds()
-		const selected0text = this.htmls[selecteds[0]].el.textContent
+		const selected0text = this.htmls[selecteds[0]].el.childNodes[0].textContent
 		return selected0text
 	}
 	/**
