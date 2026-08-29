@@ -81,6 +81,17 @@ class TreeEditor {
     return { id: this.idCounter++, name, children: [], ...extra };
   }
 
+  /** Leitet aus einem beliebigen Link die Favicon-URL der Domain ab. */
+  _faviconUrl(link) {
+    if (!link) return null;
+    try {
+      const { hostname } = new URL(link);
+      return `https://www.google.com/s2/favicons?sz=32&domain=${hostname}`;
+    } catch {
+      return null; // link war keine gültige URL
+    }
+  }
+
   /** Stellt sicher, dass alle Knoten eine id und ein children-Array haben. */
   _normalize(nodes) {
     return nodes.map(raw => {
@@ -146,10 +157,10 @@ class TreeEditor {
     return newNode.id
   }
 
-  addRootNodeIfNotExist(nodeName) {
+  addRootNodeIfNotExist(nodeName, extra) {
     const dataExisting = this.data.find(n => n.name === nodeName)
     if (!dataExisting) {
-      const newNode = this.makeNode(nodeName)
+      const newNode = this.makeNode(nodeName, extra)
       this.data.splice(0,0,newNode);
       this.render();
       return newNode.id
@@ -321,6 +332,16 @@ class TreeEditor {
       toggle.textContent = li.classList.contains("collapsed") ? "▸" : "▾";
     };
 
+    const favicon = document.createElement("img");
+    favicon.className = "favicon";
+    favicon.alt = "";
+    const faviconUrl = this._faviconUrl(node.link);
+    if (faviconUrl) {
+      favicon.src = faviconUrl;
+    } else {
+      favicon.classList.add("favicon-empty");
+    }
+
     const labelWrap = document.createElement("div");
     labelWrap.className = "label-wrap";
 
@@ -351,7 +372,7 @@ class TreeEditor {
     delBtn.title = "Knoten löschen";
     delBtn.onclick = () => this.deleteNode(node.id);
 
-    row.append(handle, toggle, labelWrap, addBtn, delBtn);
+    row.append(handle, toggle, favicon, labelWrap, addBtn, delBtn);
     row.addEventListener("click", e => {
       console.log('row:click')
       if (e.target.closest("button")) return;
