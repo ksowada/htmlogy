@@ -152,15 +152,16 @@ class TreeEditor {
     const res = this._findParentArray(this.data, id);
     if (res) res.node.name = newName;
   }
+  renameNodeFinish(id, newName) {
+    if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
+  }
+  
 
   setDescription(id, text) {
     const res = this._findParentArray(this.data, id);
     if (res) res.node.description = text;
-    // if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
   }
   setDescriptionFinish(id, text) {
-    const res = this._findParentArray(this.data, id);
-    if (res) res.node.description = text;
     if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
   }
 
@@ -265,6 +266,7 @@ class TreeEditor {
     label.contentEditable = "true";
     label.textContent = node.name;
     label.oninput = () => this.renameNode(node.id, label.textContent);
+    label.onblur = () => this.renameNodeFinish(node.id, label.textContent);
     label.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); label.blur(); } };
     labelWrap.appendChild(label);
 
@@ -298,6 +300,7 @@ class TreeEditor {
     desc.contentEditable = "true";
     desc.textContent = node.description || "";
     desc.oninput = () => this.setDescription(node.id, desc.textContent);
+    desc.onblur = () => this.setDescriptionFinish(node.id, desc.textContent); 
     li.appendChild(desc);
 
     if (node.children.length) {

@@ -46,7 +46,7 @@ class InputInfo extends InputVar {
 		/**
 		 * @type InputInfo_props
 		 */
-		let _props = Obj.defaults(props,{kind:'text'})
+		let _props = Obj.defaults(props,{kind:'text',storeEn:false})
 		super(Obj.omit(_props,InputInfo.propsMine),undefined,...ids)
 		/**
 		 * @type string[]
@@ -104,8 +104,8 @@ class InputInfo extends InputVar {
 		 * @type InputVar
 		 */
 		const enVal = (!props.en || props.en.val)
-		const en = Obj.defaults(props.en,{en:'bit',val:enVal})
-		this.vars.en = new InputVar(en,this,[this.ids,'en'])
+		const enProps = Obj.defaults(props.en,{en:'bit',val:enVal,storeEn:this.props.storeEn})
+		this.vars.en = new InputVar(enProps,this,[this.ids,'en'])
 		this.vars.en.on(undefined,this.enChanged.bind(this))
 
 		let args = Obj.copy(props)
@@ -124,7 +124,7 @@ class InputInfo extends InputVar {
 		const actions = props.actions
 		if (actions) {
 			actions.forEach(key => {
-				this.vars_actions[key] = (new InputVar({},this,[this.ids,key]).dom(parentHtml,this.action_subs[key]))
+				this.vars_actions[key] = (new InputVar({storeEn:this.props.storeEn},this,[this.ids,key]).dom(parentHtml,this.action_subs[key]))
 			})
 		}
 
@@ -132,7 +132,7 @@ class InputInfo extends InputVar {
 		const subs = props.subs
 		for (var key in subs) {
 			if (Object.hasOwn(subs,key)) {
-				this.vars_subs[key] = (new InputVar({},this,[this.ids,key]).dom(parentHtml,props.subs[key]))
+				this.vars_subs[key] = (new InputVar({storeEn:this.props.storeEn},this,[this.ids,key]).dom(parentHtml,props.subs[key]))
 			}
 		}
 
@@ -161,14 +161,15 @@ class InputInfo extends InputVar {
 	 */
 	async inputsPaste() {
 		const val = await navigator.clipboard.readText()
-		this.val = val
-		this.onEnter()
+		this.val = String(val)
+  		this.onEnter()
 	}
 	/**
 	 * Clears the input value.
 	 */
 	inputsClear() {
 		this.val = ''
+		this.html.el.focus()
 	}
 	/**
 	 * Resets the input value.
