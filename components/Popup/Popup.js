@@ -28,7 +28,6 @@ class Popup extends Html {
 		// Schließen bei Klick außerhalb, first click is from opening, therefore ignoreNextClick
 		this.ignoreFirstClick = true
 		document.addEventListener('click',evt => {
-			console.log('document.click:',evt)
 			if (this.ignoreFirstClick) {
 				this.ignoreFirstClick = false
 				return // Öffnungs-Klick ignorieren

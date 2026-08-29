@@ -9,6 +9,14 @@ import './TreeEditor.css'
  * gemacht; alle anderen unbekannten Felder werden nur mitgeschleift (JSON-Export).
  */
 class TreeEditor {
+  	static INITIAL_DATA = [
+		{
+			id: 1,
+			name: 'empty',
+			description: '',
+			children: [ ]
+		}
+		]
   /**
    * @param {HTMLElement} container - Element, in das der Baum gerendert wird
    * @param {Array} data - Anfangsdaten (Array von Knoten)
@@ -45,7 +53,8 @@ class TreeEditor {
    * 
    * later call render()
    */
-  setData(nodes) {
+  setData(nodes=[]) {
+    if (!nodes || nodes.length==0) nodes=TreeEditor.INITIAL_DATA
     this.setDataDone = true
     this.data = this._normalize(nodes);
 
