@@ -23,7 +23,7 @@ class TreeEditor {
    * @param {Function} onRender - call at each change of tree, that implies that it render to update server tree data
    * @param {Function} onSelect - call at select of treenode
    */
-  constructor(container, data = [], onRender, onSelect) {
+  constructor(container, data = [], onRender, onSelect, onDblClick) {
     this.container = container;
     this.data = [];
     this.idCounter = 1;
@@ -41,6 +41,7 @@ class TreeEditor {
 
     this.onRender = onRender // set it after setData to prohibit data update at onRender
     this.onSelect = onSelect
+    this.onDblClick = onDblClick
   }
 
   // ---- Datenverwaltung ----
@@ -290,6 +291,7 @@ class TreeEditor {
  * @param {boolean} setData at this flag no onRender, only at internal changes on nodes 
  */
   render(setData=false) {
+    if (!this.data.length) this.setData()
     this.container.innerHTML = "";
     this.container.appendChild(this._renderList(this.data));
     this._refreshSelectionClasses();
@@ -377,22 +379,26 @@ class TreeEditor {
       console.log('row:click')
       if (e.target.closest("button")) return;
       this.selectNode(node.id);
+      if (this.onSelect) this.onSelect(node.id)
     });
     row.addEventListener("dblclick", e => {
       console.log('row:dblclick')
       if (e.target.closest("button")) return;
       // this.selectNode(node.id);
-      if (this.onSelect) this.onSelect(node.id)
+      if (this.onDblClick) this.onDblClick(node.id)
     });
     li.appendChild(row);
 
-    const desc = document.createElement("div");
-    desc.className = "description";
-    desc.contentEditable = "true";
-    desc.textContent = node.description || "";
-    desc.oninput = () => this.setDescription(node.id, desc.textContent);
-    desc.onblur = () => this.setDescriptionFinish(node.id, desc.textContent); 
-    li.appendChild(desc);
+    if (node.description) {
+      const desc = document.createElement("div");
+      desc.className = "description";
+      desc.contentEditable = "true";
+      desc.textContent = node.description || "";
+      desc.oninput = () => this.setDescription(node.id, desc.textContent);
+      desc.onblur = () => this.setDescriptionFinish(node.id, desc.textContent); 
+      li.appendChild(desc);      
+    }
+
 
     if (node.children.length) {
       li.appendChild(this._renderList(node.children));
