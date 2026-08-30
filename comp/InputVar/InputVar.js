@@ -211,7 +211,7 @@ class InputVar extends Model {
 		case 'evt':
 		case 'bit': eventType='click'; break
 		case 'range': eventType='input'; break
-		default: eventType='change'; break
+		default: eventType='input'; break
 		}
 		eventType = props.listen?props.listen:eventType
 		const evts = {}
