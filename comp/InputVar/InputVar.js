@@ -157,7 +157,7 @@ class InputVar extends Model {
 		// create html according to kind
 		// evt (button)
 		if (props.kind==='evt'||props.kind==='bit') {
-			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'button',val:'',atts:{'value':props.val}})) // val is overwritten because of val
+			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'button',atts:{'value':props.val}})) // val is overwritten because of val
 			if (props.icon) myHtml.add({h:`<img class="inline" src=${props.icon} />`})
 			if (props.label) myHtml.add({h:`<span>${props.label}</span>`})
 

@@ -34,7 +34,7 @@ class List extends Html {
 	 * @param {Function} arg.selection optional: called when selection in List changes, or when list items removed or added
 	 * - you may add it after dom(), because it may need this list getSelecteds implementation
 	 * - call it yourself after dom()
-	 */
+		 */
 	// TODO select mode, none => cursor no pointer
 	// TODO att container focus , use key to autocomplete items
 	// TODO use processes to amplify speed when creating childs and wait for them
@@ -46,7 +46,7 @@ class List extends Html {
 		this.inner = (arg.inner!==undefined) ? arg.inner : {} // clone to keep original data
 		this.selectStates = ['deselected','selected']
 		this.selectModes = ['none','single','singleForce','multi']
-		
+
 		this.update(arg)
 
 		if (arg.selection) this.selection = arg.selection
@@ -89,8 +89,57 @@ class List extends Html {
 				}
 			}
 		}
-
 	}	
+	dragEnable(callback) {
+		const list = this.el
+		let draggedButton = undefined
+		let draggedButtonIx = undefined
+		list.addEventListener('dragstart', (e) => {
+			draggedButton = e.target;
+			draggedButtonIx = [...list.children].indexOf(e.target)
+			draggedButton.classList.add('dragging');
+		});
+
+		list.addEventListener('dragend', (e) => {
+			e.target.classList.remove('dragging');
+			draggedButton = null;
+			const vals = []
+			list.childNodes.forEach(item => {
+				vals.push(item.childNodes[0].textContent)
+			})
+			console.log('dragend:',vals)
+			this.inner.vals = vals
+			callback(vals)
+		});
+
+		list.addEventListener('dragover', (e) => {
+			e.preventDefault();
+
+			const target = e.target.closest('button');
+
+			if (!target || target === draggedButton) {
+				return;
+			}
+			const targetIx = [...list.children].indexOf(target)
+
+			const rect = target.getBoundingClientRect();
+			const middle = rect.left + rect.width / 2;
+
+			if (e.clientX < middle) {
+				// Vor den Button
+				list.insertBefore(draggedButton, target);
+				// this.inner.vals.splice(targetIx,0,draggedButtonVal)
+				// this.inner.vals.splice(draggedButtonIx,1)
+				// console.log('after drag before:',this.inner.vals)
+			} else {
+				// Nach den Button
+				list.insertBefore(draggedButton, target.nextSibling);
+				// this.inner.vals.splice(targetIx+1,0,draggedButtonVal)
+				// this.inner.vals.splice(draggedButtonIx,1)
+				// console.log('after drag after:',this.inner.vals)
+			}
+		});
+	}
 	/**
 	 * iterate over one item in list
 	 * @param {object|HtmlComp} item an Object considered to be 1 list item
