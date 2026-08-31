@@ -1,4 +1,6 @@
 import './TreeEditor.css'
+import {icons} from '../../../global'
+
 /**
  * TreeEditor
  * Zeigt einen Baum aus Knoten { id, name, children, ...beliebigeZusatzfelder }
@@ -88,7 +90,8 @@ class TreeEditor {
     try {
       const { hostname } = new URL(link);
       return `https://www.google.com/s2/favicons?sz=32&domain=${hostname}`;
-    } catch {
+    } catch (err) {
+      if (link.startsWith('/')) return icons('file') // local file in linux, when paste file into link-field
       return null; // link war keine gültige URL
     }
   }
@@ -220,7 +223,6 @@ class TreeEditor {
   }
   setDescriptionFinish(id, text) {
     this.render(); // to remove description line after manual change
-    if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
   }
 
   setNodeData(id, extra) {
