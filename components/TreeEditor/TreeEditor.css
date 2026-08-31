@@ -1,5 +1,6 @@
 .TreeEditor {
-  max-width: 520px;
+  overflow-x: hidden; /* horizontales Scrollen im Baum unterbinden, siehe .label unten */
+  width: 100%;
 }
 
 .TreeEditor ul {
@@ -30,6 +31,7 @@
   color: var(--muted);
   padding: 0 2px;
   line-height: 1;
+  flex-shrink: 0;
 }
 .TreeEditor .drag-handle:active { cursor: grabbing; }
 .TreeEditor .node:hover {
@@ -63,6 +65,7 @@
   text-align: center;
   color: var(--muted);
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .TreeEditor .toggle.empty {
@@ -101,11 +104,17 @@
   outline: none;
   user-select: text;
   cursor: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .TreeEditor .label:focus {
   background: var(--bg);
   box-shadow: 0 0 0 1px var(--accent);
+  white-space: normal;   /* beim Bearbeiten vollen Text zeigen, ggf. mehrzeilig */
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .TreeEditor .description {
@@ -116,10 +125,16 @@
   outline: none;
   user-select: text;
   cursor: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .TreeEditor .description:focus {
   color: var(--text);
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .TreeEditor .description:empty::before {
@@ -135,6 +150,7 @@
   padding: 2px 5px;
   border-radius: 4px;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .TreeEditor .btn:hover {
