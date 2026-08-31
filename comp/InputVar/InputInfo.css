@@ -2,10 +2,11 @@
 	/* display: flex;
 	padding:var(--b1); */
 
+	align-items: stretch;
+	margin-bottom: var(--b1);
+  	gap: 3px;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-	margin-bottom: var(--b1);
 }
 .InputInfo .title {
 	min-width: 8rem
@@ -26,7 +27,7 @@
 .InputInfo .label {
 	padding: 0.4rem;
 }
-.InputInfo input , .InputInfo select {
+.InputInfo input , .InputInfo select , .InputInfo textarea{
 	border-radius: var(--b1);
 }
 .InputInfo button {

@@ -425,7 +425,7 @@ class TreeEditor {
       const desc = document.createElement("div");
       desc.className = "description";
       desc.contentEditable = "true";
-      desc.textContent = Str.shorten(node.description,TreeEditor.DESCRIPTION_CHAR_LEN,'...') || "";
+      desc.textContent = node.description || "";
       desc.oninput = () => this.setDescription(node.id, desc.textContent);
       desc.onblur = () => this.setDescriptionFinish(node.id, desc.textContent); 
       li.appendChild(desc);      
