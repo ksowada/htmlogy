@@ -1,5 +1,6 @@
 import './TreeEditor.css'
 import {icons} from '../../../global'
+import Str from '../../../logic/Str/Str';
 
 /**
  * TreeEditor
@@ -11,14 +12,13 @@ import {icons} from '../../../global'
  * gemacht; alle anderen unbekannten Felder werden nur mitgeschleift (JSON-Export).
  */
 class TreeEditor {
-  	static INITIAL_DATA = [
-		{
+  	static INITIAL_DATA = [	{
 			id: 1,
 			name: 'empty',
 			description: '',
 			children: [ ]
-		}
-		]
+		} ]
+    static DESCRIPTION_CHAR_LEN = 70
   /**
    * @param {HTMLElement} container - Element, in das der Baum gerendert wird
    * @param {Array} data - Anfangsdaten (Array von Knoten)
@@ -86,7 +86,7 @@ class TreeEditor {
 
   /** Leitet aus einem beliebigen Link die Favicon-URL der Domain ab. */
   _faviconUrl(link) {
-    if (!link) return null;
+    if (!link) return icons('pen-to-square');
     try {
       const { hostname } = new URL(link);
       return `https://www.google.com/s2/favicons?sz=32&domain=${hostname}`;
@@ -140,6 +140,15 @@ class TreeEditor {
   _containsId(node, id) {
     if (node.id === id) return true;
     return node.children.some(c => this._containsId(c, id));
+  }
+
+  /** Zählt alle Nachfahren (nicht nur direkte Kinder) eines Knotens. */
+  _countDescendants(node) {
+    let count = node.children.length;
+    for (const child of node.children) {
+      count += this._countDescendants(child);
+    }
+    return count;
   }
 
   /** Liefert die id-Kette der Vorfahren von id (ohne id selbst), oder null wenn nicht gefunden. */
@@ -367,6 +376,15 @@ class TreeEditor {
     label.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); label.blur(); } };
     labelWrap.appendChild(label);
 
+    const countBadge = document.createElement("span");
+    countBadge.className = "node-count";
+    const count = this._countDescendants(node);
+    if (count > 0) {
+      countBadge.textContent = `(${count})`;
+    } else {
+      countBadge.classList.add("node-count-empty");
+    }
+
     const addBtn = document.createElement("button");
     addBtn.type = "button";
     addBtn.className = "btn";
@@ -385,7 +403,7 @@ class TreeEditor {
     delBtn.title = "Knoten löschen";
     delBtn.onclick = () => this.deleteNode(node.id);
 
-    row.append(handle, toggle, favicon, labelWrap, addBtn, delBtn);
+    row.append(handle, toggle, favicon, labelWrap, countBadge, addBtn, delBtn);
     row.addEventListener("click", e => {
       console.log('row:click')
       if (e.target.closest("button")) return;
@@ -407,7 +425,7 @@ class TreeEditor {
       const desc = document.createElement("div");
       desc.className = "description";
       desc.contentEditable = "true";
-      desc.textContent = node.description || "";
+      desc.textContent = Str.shorten(node.description,TreeEditor.DESCRIPTION_CHAR_LEN,'...') || "";
       desc.oninput = () => this.setDescription(node.id, desc.textContent);
       desc.onblur = () => this.setDescriptionFinish(node.id, desc.textContent); 
       li.appendChild(desc);      
