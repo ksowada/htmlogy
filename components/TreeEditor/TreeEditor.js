@@ -219,6 +219,7 @@ class TreeEditor {
     if (res) res.node.description = text;
   }
   setDescriptionFinish(id, text) {
+    this.render(); // to remove description line after manual change
     if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
   }
 
@@ -384,12 +385,15 @@ class TreeEditor {
     row.addEventListener("dblclick", e => {
       console.log('row:dblclick')
       if (e.target.closest("button")) return;
+      if (e.target===labelWrap) return // dblclick at label might be for selection
+      if (e.target===label) return // dblclick at label might be for selection
+
       // this.selectNode(node.id);
       if (this.onDblClick) this.onDblClick(node.id)
     });
     li.appendChild(row);
 
-    if (node.description) {
+    if (node.description && node.description.length) { // only show descriptions with content
       const desc = document.createElement("div");
       desc.className = "description";
       desc.contentEditable = "true";
