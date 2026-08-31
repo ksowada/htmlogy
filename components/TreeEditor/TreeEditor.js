@@ -151,24 +151,24 @@ class TreeEditor {
 
   // ---- Öffentliche Aktionen ----
 
-  addRootNode(nodeName) {
-    const newNode = this.makeNode(nodeName)
+  addRootNode(nodeName,extra, noRender=false) {
+    const newNode = this.makeNode(nodeName,extra)
     this.data.splice(0,0,newNode);
-    this.render();
+    if (!noRender) this.render();
     return newNode.id
   }
 
-  addRootNodeIfNotExist(nodeName, extra) {
+  addRootNodeIfNotExist(nodeName, extra, noRender=false) {
     const dataExisting = this.data.find(n => n.name === nodeName)
     if (!dataExisting) {
       const newNode = this.makeNode(nodeName, extra)
       this.data.splice(0,0,newNode);
-      this.render();
+      if (!noRender) this.render();
       return newNode.id
     }
     return dataExisting.id
   }
-  addChildNode(parentId, nodeData) {
+  addChildNode(parentId, nodeData, noRender=false) {
     const res = this._findParentArray(this.data, parentId);
     const parent = res ? res.node : null;
     const target = parent || this.data.find(n => n.id === parentId);
@@ -181,7 +181,7 @@ class TreeEditor {
         node = this.makeNode()
         target.children.splice(0,0,node);
       }
-      this.render();
+      if (!noRender) this.render();
     }
     return node
   }
@@ -200,9 +200,9 @@ class TreeEditor {
   //   }
   // }
 
-  deleteNode(id) {
+  deleteNode(id, noRender=false) {
     this._removeNode(id);
-    this.render();
+    if (!noRender) this.render();
   }
 
   renameNode(id, newName) {
@@ -223,6 +223,14 @@ class TreeEditor {
     if (this.onRender) this.onRender() // when description changes call onRender, even when render is unnecessary
   }
 
+  setNodeData(id, extra) {
+    const res = this._findParentArray(this.data, id);
+    if (res) {
+      Object.keys(extra).forEach(key => {
+        res.node[key] = extra[key]
+      })
+    }
+  }
   /**
    * Klappt bei Bedarf alle Elternknoten von id auf, damit der Knoten sichtbar
    * wird, wählt ihn aus und scrollt ihn in den sichtbaren Bereich.
@@ -234,7 +242,7 @@ class TreeEditor {
 
     ancestorIds.forEach(ancestorId => this.expandedIds.add(ancestorId));
     this.selectedId = id;
-    this.render();
+    this.render(true);
 
     const rowEl = this.container.querySelector(`.node[data-id="${id}"]`);
     if (rowEl) rowEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
@@ -291,12 +299,12 @@ class TreeEditor {
  * 
  * @param {boolean} setData at this flag no onRender, only at internal changes on nodes 
  */
-  render(setData=false) {
+  render(noOnRender=false) {
     if (!this.data.length) this.setData()
     this.container.innerHTML = "";
     this.container.appendChild(this._renderList(this.data));
     this._refreshSelectionClasses();
-    if (!setData && this.onRender) this.onRender()
+    if (!noOnRender && this.onRender) this.onRender()
   }
 
   _renderList(nodes) {
