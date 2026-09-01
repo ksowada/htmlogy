@@ -29,6 +29,8 @@
 }
 .InputInfo input , .InputInfo select , .InputInfo textarea{
 	border-radius: var(--b1);
+  	resize: none; /* Verhindert manuelles Vergrößern über den Parent hinaus */
+
 }
 .InputInfo button {
 	height: stretch;

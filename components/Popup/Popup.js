@@ -18,24 +18,26 @@ class Popup extends Html {
 	 * @param {object} arg Popup configuration.
 	 * @param {Array} items Html attributes for each item
 	 */
-	constructor(arg,items) {
+	constructor(arg,items,clickOuter=true) {
 		super(Html.mergeDatas(arg,{css:'popup'}))
 		if (items) {
 			items.forEach(item => {
 				this.add(item)
 			})
 		}
-		// Schließen bei Klick außerhalb, first click is from opening, therefore ignoreNextClick
-		this.ignoreFirstClick = true
-		document.addEventListener('click',evt => {
-			if (this.ignoreFirstClick) {
-				this.ignoreFirstClick = false
-				return // Öffnungs-Klick ignorieren
-			}
-			if (!this.el.contains(evt.target)) {
-				this.close()
-			}
-		})
+		if (clickOuter) {
+			// Schließen bei Klick außerhalb, first click is from opening, therefore ignoreNextClick
+			this.ignoreFirstClick = true
+			document.addEventListener('click',evt => {
+				if (this.ignoreFirstClick) {
+					this.ignoreFirstClick = false
+					return // Öffnungs-Klick ignorieren
+				}
+				if (!this.el.contains(evt.target)) {
+					this.close()
+				}
+			})
+		}
 	}
 	/**
 	 * Closes the popup by removing it from the DOM.

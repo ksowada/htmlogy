@@ -1,7 +1,6 @@
   .popup {
     position: absolute;
-    background: #222;
-    color: #fff;
+    background: var(--panel);
     padding: 8px;
     border-radius: 6px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
@@ -16,5 +15,5 @@
     cursor: pointer;
   }
   .popup-item:hover {
-    background: #444;
+    background: var(--hover);
   }
