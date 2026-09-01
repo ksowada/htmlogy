@@ -421,7 +421,7 @@ class TreeEditor {
     });
     li.appendChild(row);
 
-    if (node.description && node.description.length) { // only show descriptions with content
+    if (false && node.description && node.description.length) { // only show descriptions with content
       const desc = document.createElement("div");
       desc.className = "description";
       desc.contentEditable = "true";

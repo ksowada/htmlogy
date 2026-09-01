@@ -121,6 +121,7 @@
 
 .TreeEditor .description {
   display: block;
+  width: 100%;
   font-size: var(--font-size-small);
   color: var(--muted);
   padding: 0 4px 2px 26px;
