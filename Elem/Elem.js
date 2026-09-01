@@ -545,5 +545,14 @@ class Elem {
 		if (evtParentsEl[evtParentsEl.length-1]===null) return undefined // avoid null
 		return evtParentsEl[evtParentsEl.length-1]
 	}
+	static getElementPageCoordinates(element) {
+		const rect = element.getBoundingClientRect();
+		return {
+			Xleft: rect.left + window.scrollX,
+			Xright: rect.right + window.scrollX,
+			Ytop: rect.top + window.scrollY,
+			Ybottom: rect.bottom + window.scrollY,
+		};
+	}
 }
 export default Elem
