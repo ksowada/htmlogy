@@ -18,7 +18,9 @@
 }
 
 .TreeEditor .node {
-  display: flex;
+  display: grid;
+  /* Griff, Pfeil, Favicon, Titel (schrumpft bis auf 0), Anzahl, +, x */
+  grid-template-columns: auto auto auto minmax(0, 1fr) auto auto auto;
   align-items: center;
   gap: 6px;
   padding: 5px 6px;
@@ -94,8 +96,8 @@
 
 
 .TreeEditor .label-wrap {
-  flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .TreeEditor .label {
