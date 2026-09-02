@@ -223,15 +223,16 @@ class List extends Html {
 	/**
 	 * set selected index
 	 * @param {number} ix when not given select first
+	 * @param {boolean} [noCallback=false] set it to true, if you want to prevent callback
 	 */
-	setSelectedIx(ix) {
+	setSelectedIx(ix,noCallback=false) {
 		if (ix==undefined) ix=0
 		if (ix>this.htmls.length-1) return
 		if (this.inner.select==undefined) return
 		if (this.inner.select.mode=='none') return
-		if (this.inner.select.mode=='single') this.removeSelection()
+		if (this.inner.select.mode=='single'||this.inner.select.mode=='singleForce') this.removeSelection()
 		Elem.classStateSet(this.htmls[ix].el,'selected',this.selectStates)
-		if (this.selection) this.selection()
+		if (!noCallback && this.selection) this.selection()
 	}
 	// eslint-disable-next-line jsdoc/require-param
 	/**
