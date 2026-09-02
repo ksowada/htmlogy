@@ -363,6 +363,7 @@ class Html {
 			child.remove()
 		})
 		if (this.elem) this.elem.removeChilds()
+		if (this.el) this.el.replaceChildren() // really remove all childrens from el, if necessary after manual works without Html
 	}
 	// TODO at id make auto atts to appreviate and overwrite defined from atts
 	// TODO remove not implemented for any item, just css
