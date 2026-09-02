@@ -277,6 +277,32 @@ class TreeEditor {
     return res ? res.node : null;
   }
 
+  /**
+   * Durchsucht name und description (Groß-/Kleinschreibung wird ignoriert)
+   * aller Knoten im Baum und liefert ein Array der gefundenen Knoten zurück.
+   * Bei leerem/fehlendem Suchbegriff wird ein leeres Array geliefert.
+   */
+  findContainedContent(term) {
+    const needle = (term || "").trim().toLowerCase();
+    if (!needle) return [];
+
+    const results = [];
+    this._searchNodes(this.data, needle, results);
+    return results;
+  }
+
+  _searchNodes(nodes, needle, results) {
+    for (const node of nodes) {
+      const name = (node.name || "").toLowerCase();
+      const description = (node.description || "").toLowerCase();
+      if (name.includes(needle) || description.includes(needle)) {
+        results.push(node);
+      }
+      this._searchNodes(node.children, needle, results);
+    }
+  }
+
+
   _refreshSelectionClasses() {
     this.container.querySelectorAll(".node").forEach(el => {
       el.classList.toggle("selected", el.dataset.id === String(this.selectedId));
