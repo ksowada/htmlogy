@@ -35,7 +35,7 @@ class TagsList extends List {
 		this.onBadgeClick = onBadgeClick
 	}
 	prepare(listArr) {
-		this.listData = listArr
+		if (listArr) this.listData = listArr // may be left off, when nothing has changed
 		this.update({inner:{vals:this.listData}})
 
 		// push a + button at the end of the List, without influence other List entries
@@ -61,6 +61,7 @@ class TagsList extends List {
 	}
 	itemAddGiven(name) {
 		this.listData.push(name)
+		this.prepare()
 		if (this.onChange) this.onChange(this.listData)
 	}
 	itemRemove(ix,evt) {
@@ -68,6 +69,9 @@ class TagsList extends List {
 		console.log('TagsList:_removeItem ix:',ix)
 		if (!this.confirmOnRemove || confirm('Do you really want ro remove tree: '+this.listData[ix])) {
 			this.listData.splice(ix,1)
+			const lastSelectedVal = this.getSelectedVal()
+			if (!this.listData.includes(lastSelectedVal)) this.setSelectedIx()
+			this.prepare()
 			if (this.onChange) this.onChange(this.listData)
 		}
 	}

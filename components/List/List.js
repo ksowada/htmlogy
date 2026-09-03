@@ -85,7 +85,8 @@ class List extends Html {
 			}
 			if (this.inner.select) {
 				if (this.inner.select.mode=='singleForce') {
-					this.setSelectedIx(this.inner.select.ix)
+					if (!this.selectedIxLast) this.selectedIxLast = this.inner.select.ix
+					this.setSelectedIx(this.selectedIxLast)
 				}
 			}
 		}
@@ -153,7 +154,7 @@ class List extends Html {
 		// const inner = Html.mergeDatas(this.inner)
 		Obj.assure(this.inner,'atts',{})
 		if (this.inner.select && this.inner.select.atts) {
-			if (pos==this.inner.select.ix) {
+			if (pos==this.selectedIxLast) {
 				Html.mergeModDatas(this.inner,{atts:this.inner.select.atts,css:'selected'})
 			} else {
 				Html.mergeModDatas(this.inner,{css:'deselected'})
@@ -222,15 +223,16 @@ class List extends Html {
 	}
 	/**
 	 * set selected index
-	 * @param {number} ix when not given select first
+	 * @param {number} ix when not given select given default
 	 * @param {boolean} [noCallback=false] set it to true, if you want to prevent callback
 	 */
 	setSelectedIx(ix,noCallback=false) {
-		if (ix==undefined) ix=0
+		if (ix==undefined) ix=this.inner.select.ix
 		if (ix>this.htmls.length-1) return
 		if (this.inner.select==undefined) return
 		if (this.inner.select.mode=='none') return
 		if (this.inner.select.mode=='single'||this.inner.select.mode=='singleForce') this.removeSelection()
+		if (this.inner.select.mode=='single'||this.inner.select.mode=='singleForce') this.selectedIxLast = ix
 		Elem.classStateSet(this.htmls[ix].el,'selected',this.selectStates)
 		if (!noCallback && this.selection) this.selection()
 	}
@@ -249,6 +251,9 @@ class List extends Html {
 		} else if (this.inner.select.mode=='single' && selectState=='selected') {
 			Elem.classStateSet(el,'deselected',this.selectStates)
 		}
+		const selectedText = el.childNodes[0].textContent
+		const ix = this.inner.vals.indexOf(selectedText)
+		if (this.inner.select.mode=='single'||this.inner.select.mode=='singleForce') this.selectedIxLast = ix
 		if (this.selection) this.selection()
 	}
 }
