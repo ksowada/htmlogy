@@ -73,9 +73,24 @@ class HtmlApp {
 	}
 	static queryREST() {
 		const rest = HtmlUtils.searchParamToJson()
-		Times.log('rest:') // dont show compile-time twice, thus preciding date attach
-		Times.log(rest)
+		// Times.log('rest:') // dont show compile-time twice, thus preciding date attach
+		// Times.log(rest)
 		return rest
+	}
+	/**
+	 * set query parameters in URL
+	 * @param {object} parameters an object that contains the query parameters
+	 */
+	static setQueryParams(parameters) {
+		const url = new URL(window.location.href)
+
+		// set parameters
+		Object.keys(parameters).forEach(key => {
+			url.searchParams.set(key, parameters[key])
+		})
+
+		// set URL (without reload)
+		window.history.pushState({},'',url)
 	}
 }
 export default HtmlApp
