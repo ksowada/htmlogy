@@ -36,6 +36,7 @@
   flex-shrink: 0;
 }
 .TreeEditor .drag-handle:active { cursor: grabbing; }
+.TreeEditor .drag-handle-disabled { visibility: hidden; }
 .TreeEditor .node:hover {
   background: var(--accent-dim);
 }
@@ -164,6 +165,8 @@
 .TreeEditor .btn.del:hover {
   color: var(--danger);
 }
+
+.TreeEditor .btn-disabled { visibility: hidden; }
 
 .TreeEditor .collapsed>ul {
   display: none;

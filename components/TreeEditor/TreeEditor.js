@@ -25,12 +25,13 @@ class TreeEditor {
    * @param {Function} onRender - call at each change of tree, that implies that it render to update server tree data
    * @param {Function} onSelect - call at select of treenode
    */
-  constructor(container, data = [], onRender, onSelect, onDblClick) {
+  constructor(container, data = [], onRender, onSelect, onDblClick, readOnly=false) {
     this.container = container;
     this.data = [];
     this.idCounter = 1;
     this.draggedId = null;
     this.setDataDone = false
+    this.readOnly = readOnly;
 
     // Bleiben über setData() hinweg erhalten (z.B. bei erneutem JSON-Import),
     // da sie unabhängig vom Datenmodell auf der Instanz gehalten werden.
@@ -164,6 +165,7 @@ class TreeEditor {
   // ---- Öffentliche Aktionen ----
 
   addRootNode(nodeName,extra, noRender=false) {
+    if (this.readOnly) return;
     const newNode = this.makeNode(nodeName,extra)
     this.data.splice(0,0,newNode);
     if (!noRender) this.render();
@@ -171,6 +173,7 @@ class TreeEditor {
   }
 
   addRootNodeIfNotExist(nodeName, extra, noRender=false) {
+    if (this.readOnly) return;
     const dataExisting = this.data.find(n => n.name === nodeName)
     if (!dataExisting) {
       const newNode = this.makeNode(nodeName, extra)
@@ -181,6 +184,7 @@ class TreeEditor {
     return dataExisting.id
   }
   addChildNode(parentId, nodeData, noRender=false) {
+    if (this.readOnly) return;
     const res = this._findParentArray(this.data, parentId);
     const parent = res ? res.node : null;
     const target = parent || this.data.find(n => n.id === parentId);
@@ -213,6 +217,7 @@ class TreeEditor {
   // }
 
   deleteNode(id, noRender=false) {
+    if (this.readOnly) return;
     this._removeNode(id);
     if (!noRender) this.render();
   }
@@ -310,6 +315,7 @@ class TreeEditor {
   }
 
   moveNode(draggedId, targetId, mode) {
+    if (this.readOnly) return;
     if (draggedId === targetId) return;
     const draggedRes = this._findParentArray(this.data, draggedId);
     if (!draggedRes) return;
@@ -344,6 +350,26 @@ class TreeEditor {
     if (!noOnRender && this.onRender) this.onRender()
   }
 
+  _renderEmptyState() {
+    const wrap = document.createElement("div");
+    wrap.className = "empty-state";
+
+    const text = document.createElement("span");
+    text.textContent = "Noch keine Knoten vorhanden.";
+    wrap.appendChild(text);
+
+    if (!this.readOnly) {
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "empty-add-btn";
+      addBtn.textContent = "+ Ersten Knoten anlegen";
+      addBtn.onclick = () => this.addRootNode();
+      wrap.appendChild(addBtn);
+    }
+
+    return wrap;
+  }
+
   _renderList(nodes) {
     const ul = document.createElement("ul");
     nodes.forEach(n => ul.appendChild(this._renderNode(n)));
@@ -359,8 +385,12 @@ class TreeEditor {
 
     const handle = document.createElement("span");
     handle.className = "drag-handle";
-    handle.draggable = true;
-    handle.title = "Ziehen zum Umsortieren";
+    if (this.readOnly) {
+      handle.classList.add("drag-handle-disabled");
+    } else {
+      handle.draggable = true;
+      handle.title = "Ziehen zum Umsortieren";
+    }
     handle.textContent = "⠿";
 
     const isCollapsed = node.children.length > 0 && !this.expandedIds.has(node.id);
@@ -410,26 +440,31 @@ class TreeEditor {
     } else {
       countBadge.classList.add("node-count-empty");
     }
+    let addBtn = null;
+    let delBtn = null;
 
-    const addBtn = document.createElement("button");
-    addBtn.type = "button";
-    addBtn.className = "btn";
-    addBtn.textContent = "+";
-    addBtn.title = "Kind-Knoten hinzufügen";
-    addBtn.onclick = () => {
-      li.classList.remove("collapsed");
-      this.expandedIds.add(node.id);
-      this.addChildNode(node.id);
-    };
+    if (!this.readOnly) {
+      addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.className = "btn";
+      addBtn.textContent = "+";
+      addBtn.title = "Kind-Knoten hinzufügen";
+      addBtn.onclick = () => {
+        li.classList.remove("collapsed");
+        this.expandedIds.add(node.id);
+        this.addChildNode(node.id);
+      };
 
-    const delBtn = document.createElement("button");
-    delBtn.type = "button";
-    delBtn.className = "btn del";
-    delBtn.textContent = "✕";
-    delBtn.title = "Knoten löschen";
-    delBtn.onclick = () => this.deleteNode(node.id);
+      delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "btn del";
+      delBtn.textContent = "✕";
+      delBtn.title = "Knoten löschen";
+      delBtn.onclick = () => this.deleteNode(node.id);
+    }
 
-    row.append(handle, toggle, favicon, labelWrap, countBadge, addBtn, delBtn);
+    row.append(handle, toggle, favicon, labelWrap, countBadge);
+    if (addBtn) row.append(addBtn, delBtn);
     row.addEventListener("click", e => {
       console.log('row:click')
       if (e.target.closest("button")) return;
@@ -462,7 +497,9 @@ class TreeEditor {
       li.appendChild(this._renderList(node.children));
     }
 
-    this._attachDragHandlers(row, handle, node);
+    if (!this.readOnly) {
+      this._attachDragHandlers(row, handle, node);
+    }
 
     return li;
   }
