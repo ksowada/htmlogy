@@ -34,6 +34,9 @@ class TagsList extends List {
 		this.badgeEn = true
 		this.onBadgeClick = onBadgeClick
 	}
+	enFirstFix() {
+		this.firstFixEn = true
+	}
 	prepare(listArr) {
 		if (listArr) this.listData = listArr // may be left off, when nothing has changed
 		this.update({inner:{vals:this.listData}})
@@ -52,7 +55,7 @@ class TagsList extends List {
 		// add empty badges for each dimension
 		this.badges = []
 		this.listData.forEach((dimension,ix) => {
-			this.htmls[ix].add({html:'span',css:'btn',val:'x',evts:{click:this.itemRemove.bind(this,ix)}})
+			if (!this.firstFixEn || (this.firstFixEn && ix!==0)) this.htmls[ix].add({html:'span',css:'btn',val:'x',evts:{click:this.itemRemove.bind(this,ix)}})
 			if (this.badgeEn) this.badges[ix] = this.htmls[ix].add({html:'span',css:'badge',val:'0',evts:{click:this.onBadgeClick.bind(this,ix)}})
 		})
 	}

@@ -91,7 +91,7 @@ class List extends Html {
 			}
 		}
 	}	
-	dragEnable(callback) {
+	enDrag(callback) {
 		const list = this.el
 		let draggedButton = undefined
 		let draggedButtonIx = undefined
