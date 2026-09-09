@@ -25,7 +25,7 @@ class TreeEditor {
    * @param {Function} onRender - call at each change of tree, that implies that it render to update server tree data
    * @param {Function} onSelect - call at select of treenode
    */
-  constructor(container, data = [], onRender, onSelect, onDblClick, readOnly=false) {
+  constructor(container, data = [], onRender, onSelect, onDblClick, onOpen, readOnly=false) {
     this.container = container;
     this.data = [];
     this.idCounter = 1;
@@ -45,6 +45,7 @@ class TreeEditor {
     this.onRender = onRender // set it after setData to prohibit data update at onRender
     this.onSelect = onSelect
     this.onDblClick = onDblClick
+    this.onOpen = onOpen
   }
 
   // ---- Datenverwaltung ----
@@ -86,13 +87,14 @@ class TreeEditor {
   }
 
   /** Leitet aus einem beliebigen Link die Favicon-URL der Domain ab. */
-  _faviconUrl(link) {
-    if (!link) return icons('pen-to-square');
+  _faviconUrl(node) {
+    if (!node.link) return icons('pen-to-square');
     try {
-      const { hostname } = new URL(link);
+      const { hostname } = new URL(node.link);
       return `https://www.google.com/s2/favicons?sz=32&domain=${hostname}`;
     } catch (err) {
-      if (link.startsWith('/')) return icons('file') // local file in linux, when paste file into link-field
+      if (node.isDirectory) return icons('folder-closed')
+      if (node.link.startsWith('/')) return icons('file') // local file in linux, when paste file into link-field
       return null; // link war keine gültige URL
     }
   }
@@ -413,12 +415,13 @@ class TreeEditor {
     const favicon = document.createElement("img");
     favicon.className = "favicon";
     favicon.alt = "";
-    const faviconUrl = this._faviconUrl(node.link);
+    const faviconUrl = this._faviconUrl(node);
     if (faviconUrl) {
       favicon.src = faviconUrl;
     } else {
       favicon.classList.add("favicon-empty");
     }
+    favicon.ondblclick = () => this.onOpen(node.link)
 
     const labelWrap = document.createElement("div");
     labelWrap.className = "label-wrap";
