@@ -46,7 +46,7 @@ class InputInfo extends InputVar {
 		/**
 		 * @type InputInfo_props
 		 */
-		let _props = Obj.defaults(props,{kind:'text',storeEn:false})
+		let _props = Obj.defaults(props,{kind:'text',storeEn:true})
 		super(Obj.omit(_props,InputInfo.propsMine),undefined,...ids)
 		/**
 		 * @type string[]

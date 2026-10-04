@@ -110,8 +110,22 @@ class InputVar extends Model {
 		let valIntern = val
 		if (InputVar.typeIsNumber(this.props.kind)) valIntern = Number.parseFloat(val)
 		valIntern = this.checkBound(valIntern)
-		super.set(valIntern,undefined,setOpts)
-		this.setDoms(valIntern)
+		if (this.props.kind==='select') {
+			if (Arr.is(valIntern)) {
+				this.setDom(valIntern)
+				const preVal = this.val
+				if (preVal) this.html.el.value = preVal
+				const setVal = this.html.el.value
+				super.set(setVal,undefined,setOpts)
+			} else {
+				super.set(valIntern,undefined,setOpts)
+				this.setDom(valIntern)
+			}
+		} else {
+			super.set(valIntern,undefined,setOpts)
+			this.setDom(valIntern)
+		}
+
 		if (this.states && this.states.length) {
 			this.states.forEach(state => state.set_state_ix(valIntern))
 		}
@@ -190,9 +204,7 @@ class InputVar extends Model {
 				} else {
 					this.val = myHtml.el.value
 				}
-			} else {
-				this.set_disabled(true,myHtml)
-			}
+			} 
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
 			const kind = (props.kind==='int'||props.kind==='float')?'number':'text'
 			let val = this.val
@@ -294,8 +306,17 @@ class InputVar extends Model {
 	 * @param {any} val a value to set in DOM element
 	 * @private
 	 */
-	setDoms(val) {
-		this.html.el.value = val
+	setDom(val) {
+		if (this.html) {
+			if (this.props.kind === 'select' && Arr.is(val)) {
+				this.html.removeChilds()
+				val.forEach(valItem => {
+					this.html.add({html:'option',val:valItem})
+				})
+			} else {
+				this.html.el.value = val
+			}
+		}
 	}
 	/**
 	 * props that are also args, are setted in arg

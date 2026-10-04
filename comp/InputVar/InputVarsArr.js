@@ -24,13 +24,13 @@ class InputVarsArr extends Listener {
 		 * contains all variables
 		 * @type {Object.<string, object>}
 		 */
-		this.vars = {}
+		// this.vars = {}
 
 		/**
 		 * contains all variables, in structured object
 		 * @type any
 		 */
-		this.varsStruct = {}
+		// this.varsStruct = {}
 
 		/**
 		 * contains all props of each object
@@ -40,11 +40,11 @@ class InputVarsArr extends Listener {
 
 		this.varsName = []
 		Obj.crawl(struct,undefined,{
-			onObj: obj => {
+			onObj: (obj,keyLast) => {
 				if (obj.kind) {
-					const varName = obj._id
+					const varName = keyLast
 					this.varsName.push(varName)
-					this.vars[varName] = []
+					this[varName] = []
 					this.argCreate[varName] = obj
 				}
 			}
@@ -63,13 +63,13 @@ class InputVarsArr extends Listener {
 	 */
 	set len(len) {
 		this.varsName.forEach(varName => {
-			while (this.vars[varName].length > len) { this.vars[varName].pop() }
-			while (this.vars[varName].length < len) {
-				this.vars[varName].push(InputVars.getInstance(this.argCreate[varName].kind,Obj.omit(this.argCreate[varName],Match.startsWith('_')),[this.id,varName,this.vars[varName].length]))
-				const _var = this.vars[varName][this.vars[varName].length - 1]
-				Obj.put(this.varsStruct,this.argCreate[varName]._ids,_var)
+			while (this[varName].length > len) { this[varName].pop() }
+			while (this[varName].length < len) {
+				this[varName].push(InputVars.getInstance(this.argCreate[varName].kind,Obj.omit(this.argCreate[varName],Match.startsWith('_')),[this.id,varName,this[varName].length]))
+				const _var = this[varName][this[varName].length - 1]
+				// Obj.put(this.varsStruct,this.argCreate[varName]._ids,_var)
 				this.argCreate[varName].var = _var // maps the inputVar into original struct
-				_var.on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this.vars[varName].length - 1))
+				_var.on(Model.DEFAULT_KEY,this.onChange.bind(this,varName,this[varName].length - 1))
 			}
 		})
 		this.size = len
@@ -89,7 +89,7 @@ class InputVarsArr extends Listener {
 	 */
 	dom(html,ix) {
 		this.varsName.forEach(varName => {
-			if (this.vars[varName][ix].dom) this.vars[varName][ix].dom(html) // some InputVars may have no dom as HtmlSelect
+			if (this[varName][ix].dom) this[varName][ix].dom(html) // some InputVars may have no dom as HtmlSelect
 		})
 	}
 }
