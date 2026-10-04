@@ -71,6 +71,13 @@ class HtmlApp {
 		// TODO some metas missing ask twitter or facebook here a hint: https://www.vioma.de/de/wiki/online-marketing/seo/meta-tags/#Meta%20Keywords
 		// TODO https://web.dev/learn/pwa/web-app-manifest/ and show it in html
 	}
+	static addHeadElem(arg) {
+		// get the <head> element
+		const headEl = Elem.getElByNameFirst('head')
+
+		// add keywords meta tag
+		new Html({...arg,parent:{el:headEl}})
+	}
 	static queryREST() {
 		const rest = HtmlUtils.searchParamToJson()
 		// Times.log('rest:') // dont show compile-time twice, thus preciding date attach
