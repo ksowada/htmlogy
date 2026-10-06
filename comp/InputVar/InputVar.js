@@ -22,6 +22,7 @@ import Str from '../../../logic/Str/Str.js'
  * @property {any} [val] default value, when no storage value is available
  * @property {string} [label] label for input, or button, (distinct from val, which is the val of this)
  * @property {string} [kind] kind of element, important for dom(), also used as CSS-class, if not given it is adapted to .val attribute or defaults to text
+ * @property {boolean} [emptyElement] for select, insert an empty element for invalid select
  *
  * supported:
  * - text
@@ -194,9 +195,13 @@ class InputVar extends Model {
 
 			// if vals are defined, build list as set <select>/<option>
 			if (props.vals) {
+				if (props.emptyElement) {
+					myHtml.add({html:'option',val:''})
+				}
 				props.vals.forEach(valItem => {
 					myHtml.add({html:'option',val:valItem})
 				})
+				
 
 				// set <select value="">
 				if (this.val) {
@@ -310,6 +315,9 @@ class InputVar extends Model {
 		if (this.html) {
 			if (this.props.kind === 'select' && Arr.is(val)) {
 				this.html.removeChilds()
+				if (this.props.emptyElement) {
+					this.html.add({html:'option',val:''})
+				}
 				val.forEach(valItem => {
 					this.html.add({html:'option',val:valItem})
 				})
