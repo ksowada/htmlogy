@@ -59,7 +59,7 @@ describe('InputInfo',() => {
 	})
 	describe('dom for evt with label',() => {
 		create_dom(domContent)
-		const input = new InputInfo({kind:'evt',label:'reset!',change:callback,css:'btn btn-active btn-secondary'})
+		const input = new InputInfo({kind:'evt',label:'reset!',change:undefined,css:'btn btn-active btn-secondary'})
 		const parentHtml = new Html({parent:{id:myId},html:'div'})
 		input.dom(parentHtml,{css:'someclass'})
 

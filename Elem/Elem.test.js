@@ -167,6 +167,18 @@ describe('Elem',() => {
 				expect(Elem.getChildsFirstVal(headEl,'title')).to.eql('test')
 			})
 		})
+		describe('findActions replace existing element',() => {
+			create_dom(domContent)
+			const headEl = document.head // implicitly created
+			const search = {html:'title'}
+			const edit = {val:'test'}
+
+			new Html({parent:{el:headEl},html:'title',val:'old title'})
+			Elem.findActions(headEl,{html:'title'},{val:'new title'})
+			it('title shall be replaced',() => {
+				expect(Elem.getChildsFirstVal(headEl,'title')).to.eql('new title')
+			})
+		})
 		describe('findActions',() => {
 			describe('create a new element, as no existing found',() => {
 				create_dom(domContent)
@@ -183,7 +195,7 @@ describe('Elem',() => {
 			describe('create a new element, 1 existing tag found, but not further atts found',() => {
 				create_dom(domContent)
 				const headEl = Elem.getElByNameFirst('head')
-				new Html({parent:headEl,html:'meta',atts: {name: 'keywords'}})
+				new Html({parent:{el:headEl},html:'meta',atts: {name: 'keywords'}})
 				const id = 'desc1'
 				const description = 'a description'
 				Elem.findActions(headEl,{html: 'meta',atts: {name: 'description'}},{atts: {content: description},id:id})
@@ -196,7 +208,7 @@ describe('Elem',() => {
 			describe('create a new element, but 1 existing tag with further serached att found, shall be replaced',() => {
 				create_dom(domContent)
 				const headEl = Elem.getElByNameFirst('head')
-				new Html({parent:headEl,html:'meta',atts: {name: 'description',content: 'old description'}})
+				new Html({parent:{el:headEl},html:'meta',atts: {name: 'description',content: 'old description'}})
 				const id = 'desc1'
 				const description = 'a description'
 				Elem.findActions(headEl,{html: 'meta',atts: {name: 'description'}},{atts: {content: description},id:id})

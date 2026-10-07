@@ -274,7 +274,7 @@ class Elem {
 				})
 			}
 			if (found_atts==search_atts_len) {
-				Html.edit(undefined,{el:foundEl},edit,'change') // TODO shall change el, but static change is deleted
+				Html.edit(undefined,{el:foundEl},edit,{change:true}) // TODO shall change el, but static change is deleted
 				changeCnt++
 			}
 		}
@@ -371,10 +371,12 @@ class Elem {
 		const childNodes = el.childNodes
 		if (childNodes==undefined) return childs
 		childNodes.forEach(e => {
-			if (e instanceof HTMLElement) {
-				if (tag==undefined || e.localName==tag) childs.push(e)
+			if (e.nodeType === Node.ELEMENT_NODE) {
+				if (tag === undefined || e.localName === tag.toLowerCase()) {
+					childs.push(e);
+				}
 			}
-		})
+		});
 		return childs
 	}
 	/**
