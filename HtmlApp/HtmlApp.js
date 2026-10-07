@@ -93,11 +93,39 @@ class HtmlApp {
 
 		// set parameters
 		Object.keys(parameters).forEach(key => {
-			url.searchParams.set(key, parameters[key])
+			url.searchParams.set(key,parameters[key])
 		})
 
 		// set URL (without reload)
 		window.history.pushState({},'',url)
+	}
+	/**
+	 * delivers search parameters for hash navigation
+	 * f.e. http://localhost:1234/#/gameday?leagueName=Bundesliga
+	 * @returns {URLSearchParams} search parameters for reading, at manipulation use later setSearchParams
+	 */
+	static getSearchParams() {
+		const rawHash = window.location.hash.slice(1) // "/gameday?country=Germany"
+		const queryString = rawHash.split('?')[1] || ''
+		const params = new URLSearchParams(queryString)
+		return params
+		// 	const url = new URL(window.location.href)
+		// 	return url.searchParams
+	}
+	/**
+	 * for search parameters at hash navigation
+	 * f.e. http://localhost:1234/#/gameday?leagueName=Bundesliga
+	 * requires window.router
+	 * @param {URLSearchParams} searchParams to set in URL
+	 */
+	static setSearchParams(searchParams) {
+		const rawHash = window.location.hash.slice(1) // "/gameday?country=Germany"
+		const path = rawHash.split('?')[0]
+
+		const query = searchParams.toString()
+		const newHash = query ? `#${path}?${query}` : `#${path}`
+
+		window.router.setHash(newHash,false)
 	}
 }
 export default HtmlApp
