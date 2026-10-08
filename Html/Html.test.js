@@ -480,11 +480,11 @@ describe('Html',() => {
 		// })
 	})
 	describe('equalEl',() => {
-		it('compare identic Element with Html',() => {
+		it('compare identic Element with itself',() => {
 			create_dom(domContent)
 			const testEl = document.getElementById(myId)
 			const createdEl = new Html({parent:{el: testEl},container:{},html:'div',val:'citrone',atts:{id:'oneId'}})
-			const equalEl = Elem.equalEl(createdEl.my.el,createdEl)
+			const equalEl = Elem.equalEl(createdEl.el,createdEl.el)
 			expect(equalEl).to.be(true)
 		})
 		it('escalate when adressing could not found Element',() => {
@@ -527,7 +527,7 @@ describe('Html',() => {
 			const subEl = new Html({parent:{obj: createdEl},html:'div',val:'citrone'})
 			const retEl = Elem.findParent(subEl.my.el)
 			it('returns its parent',() => {
-				expect(Elem.equalEl(retEl,createdEl)).to.be(true)
+				expect(Elem.equalEl(retEl,createdEl.el)).to.be(true)
 			})
 		})
 		describe('call with only el when el has no parent',() => {
@@ -546,7 +546,7 @@ describe('Html',() => {
 			const el3 = new Html({parent:{obj: el2},html:'div',val:'limette'})
 			const retEl = Elem.findParent(el3.my.el,el1.my.el)
 			it('returns the given parent',() => {
-				expect(Elem.equalEl(retEl,el1)).to.be(true)
+				expect(Elem.equalEl(retEl,el1.el)).to.be(true)
 			})
 		})
 		describe('call with parentStop, but parentEl is el',() => {
@@ -555,7 +555,7 @@ describe('Html',() => {
 			const el1 = new Html({parent:{el: testEl},html:'div',val:'grapefruit'})
 			const retEl = Elem.findParent(el1.my.el,el1.my.el)
 			it('returns itself',() => {
-				expect(Elem.equalEl(retEl,el1)).to.be(true) // TODO not right
+				expect(Elem.equalEl(retEl,el1.el)).to.be(true) // TODO not right
 			})
 		})
 		describe('call with parentStop, but parentEl is not valid parent of el',() => {
@@ -577,7 +577,7 @@ describe('Html',() => {
 			const subEl = new Html({parent:{obj: createdEl},html:'div',val:'citrone'})
 			const retEl = Elem.findParent(createdEl.my.el,undefined,0)
 			it('returns itself',() => {
-				expect(Elem.equalEl(retEl,createdEl)).to.be(true)
+				expect(Elem.equalEl(retEl,createdEl.el)).to.be(true)
 			})
 		})
 		describe('call with parentDepth:1',() => {

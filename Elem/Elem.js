@@ -208,26 +208,25 @@ class Elem {
 	}
 	/**
 	 * compare may compare 2 or more element
-	 * use getEl internally
-	 * @param {object[]} objs must have at least 1 argument to comply and then accept unity and return true,
+	 * @param {Element[]} els must have at least 1 argument to comply and then accept unity and return true,
 	 * use same parameter as @see {@link this.Elem}
 	 * @returns {boolean} true, when all arguments are the same Element, or anything is undefined
-	 * - undefined, when one address cannot be detected by getEl
+	 * - undefined, when no argument is given or argument 0 or 1 is undefined
 	 * - false, when 1 or more of valid arguments are different
 	 */
-	static equalEl(objs) {
+	static equalEl(els) {
 		if (arguments.length==0) return undefined
 		// if (arguments[0]==undefined) return // when not defined
 		if (arguments.length==1) return true
 		let argIx = 0
 		let matchCnt = 0
 		// let undefinedCnt = 0
-		let el1 = Html.getEl(arguments[0])
+		let el1 = arguments[0]
 		if (el1==undefined) return // not valid adress given so forget output
 		// if (arguments[0]==undefined) undefinedCnt++ // if not given, no problem will not influence equalness
 		for (argIx = 1; argIx < arguments.length; argIx++) {
 			// if (arguments[argIx]==undefined) undefinedCnt++
-			let el2 = Html.getEl(arguments[argIx])
+			let el2 = arguments[argIx]
 			if (el2==undefined) return // not valid adress given so forget output
 			if (el1.isSameNode(el2)) matchCnt++
 			el1 = el2 // prepare next iteration
