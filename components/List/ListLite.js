@@ -2,6 +2,7 @@ import Obj from '../../../logic/Obj/Obj.js'
 import Str from '../../../logic/Str/Str.js'
 import Vars from '../../../logic/Vars/Vars.js'
 import Html from '../../Html/Html.js'
+import HtmlComp from '../../HtmlComp/HtmlComp.js'
 import HtmlElComp from '../../HtmlComp/HtmlElComp.js'
 import './List.scss'
 /**
@@ -95,7 +96,7 @@ class ListLite extends HtmlElComp {
 		inner.css = Str.enrichList(' ',inner.css,'list-item')
 		Obj.assure(inner,'evts',{})
 		let htmlObj = undefined
-		if (itemClassHier instanceof HtmlComp)) {
+		if (item instanceof HtmlComp) {
 			item.dom(inner,item,{parent:{el:this.div}})
 			htmlObj = item
 		} else {

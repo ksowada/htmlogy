@@ -47,6 +47,7 @@ class HtmlSelect extends Bits {
 		 */
 		this.subs = []
 
+		// this.on(undefined,this.renderState.bind(this))
 		this.on('on',this.onSet.bind(this))
 		this.on('off',this.onReset.bind(this))
 	}
@@ -88,6 +89,18 @@ class HtmlSelect extends Bits {
 		}
 		// set bits and care for mode, by the way HtmlStates will be triggered at bit change, via .onSet() and .onReset()
 		super.refreshBits(htmlArr.length,setOpts)
+	}
+	/**
+	 * used to show the state of newly set value
+	 */
+	setDom() {
+		console.log('HtmlSelect:renderState')
+		const bitVals = this.val
+		for (let ix=0; ix<this.htmlStates.length; ix++) {
+			// get first key of array-item
+			// const htmlItem = Object.values(htmlArr[ix])
+			this.htmlStates[ix].set_state_ix(bitVals[ix])
+		}
 	}
 	/**
 	 * click on child which is self a HtmlState
