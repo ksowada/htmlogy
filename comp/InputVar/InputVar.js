@@ -10,13 +10,13 @@ import Str from '../../../logic/Str/Str.js'
 
 /**
  * @typedef InputVar~props common ways to address HTMLElement in DOM, choose only 1 of those, parameter; all attributes of Html are directly inherited @see {@link Html~createarg}
- * @prop {string} [storeEn] f.e. write: prohibit store and disable models listener, default is true
- * @prop {number} [min] minimum value to bound
- * @prop {number} [max] maximum value to bound
- * @prop {object} [states] supply Html create arg array @see {@link HtmlState~props}, implemented for kind:bit
- * @prop {boolean} [resize] resize input to containing text
  * @prop {string} [listen] dom event to change model , f.e. change,input,...
  * @prop {Function} [callback] called after set at onChange with parameter(val)
+ * @property {boolean} [resize] resize input to containing text
+ * @property {object} [states] supply Html create arg array @see {@link HtmlState~props}, implemented for kind:bit
+ * @property {number} [max] maximum value to bound
+ * @property {number} [min] minimum value to bound
+ * @property {string} [storeEn] f.e. write: prohibit store and disable models listener, default is true
  * @property {object} [tooltip] optional object containing Html args @see {@link Html~createarg}, you may find it in .html.tooltip for access and manipulation, and there is function set(val) implemented
  * @property {any[]} [vals] default values, for list items as select option
  * @property {any} [val] default value, when no storage value is available
@@ -86,7 +86,7 @@ class InputVar extends Model {
 		 * @type {HtmlSelect[]}
 		 */
 		this.states = []
-	}	
+	}
 	/**
 	 * get actual value
 	 * @returns {any}	actual value
@@ -140,16 +140,17 @@ class InputVar extends Model {
 	 * @returns {InputVar} this for chaining dom when wished
 	 * @throws {Error} if kind is not implemented
 	 */
-	dom(parentHtml,propsAdd) {
-		// const props = Html.mergeDatas(this.props,propsAdd)
-		const props = (propsAdd!==undefined)?propsAdd:{} //Html.mergeDatas(this.props,propsAdd)
-		props.val = this.val // value comes from constructor and store
+	dom(parentHtml,propsAdd={}) {
+		const props = Html.mergeDatas(this.props,propsAdd)
+		console.log('InputVar:dom:props:',props)
+
 		// first set val, for every mode
-		if (propsAdd && propsAdd.val) {
+		let val = (this.val) ? this.val : props.val
+		if (val) {
 			if (props.kind==='bit') {
-				this.val = Boolean(propsAdd.val)
+				this.set(Boolean(val),{prevent:'all'})
 			} else {
-				this.val = propsAdd.val
+				this.set(val,{prevent:'all'})
 			}
 		}
 		// prepare html arg
@@ -201,7 +202,6 @@ class InputVar extends Model {
 				props.vals.forEach(valItem => {
 					myHtml.add({html:'option',val:valItem})
 				})
-				
 
 				// set <select value="">
 				if (this.val) {
@@ -209,10 +209,10 @@ class InputVar extends Model {
 				} else {
 					this.val = myHtml.el.value
 				}
-			} 
+			}
 		} else if (props.kind==='int'||props.kind==='float'|| props.kind==='currency'|| props.kind==='text') {
 			const kind = (props.kind==='int'||props.kind==='float')?'number':'text'
-			let val = this.val
+			val = this.val
 			if (kind==='currency') val = val.toLocaleString(undefined,{style: 'currency',currency: 'EUR'})
 			const argType = {html:'input',atts:{type:kind},val}
 			myHtml = workHtml.add(Html.mergeDatas(arg,argType,{html:'input',css:'input input-bordered'}))
@@ -249,7 +249,7 @@ class InputVar extends Model {
 		// remember dom implementation, ⚠️ forget propsAdd
 		this.html = myHtml
 
-		this.props = props // remember kind and other props
+		// this.props = props // remember kind and other props // dont do that, it will affect data of initialization
 		return this
 	}
 	/**

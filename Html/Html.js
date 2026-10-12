@@ -132,10 +132,9 @@ class Html {
 		 */
 		this.domLater = undefined
 
-
 		/**
 		 * name is used to attach parent object the new object, so remember it
-		 * @type {String}
+		 * @type {string}
 		 */
 		this.name = arg.name
 
@@ -253,7 +252,7 @@ class Html {
 			this.htmlNamespace = 'http://www.w3.org/2000/svg' // will also inherit to child elements
 		}
 		this.createEl(this.my,arg,this.htmlNamespace)
-		
+
 		if (arg.el) {
 			arg.el.appendChild(this.my.el)
 		}
@@ -768,12 +767,12 @@ class Html {
 	 */
 	static mergeAvailable(arg) {
 		if (typeof arg === 'function') {
-			return true;
+			return true
 		}
 		if (arg === null || typeof arg !== 'object') {
-			return false;
+			return false
 		}
-		return Object.getPrototypeOf(arg) === Object.prototype;
+		return Object.getPrototypeOf(arg) === Object.prototype
 	}
 }
 export default Html
