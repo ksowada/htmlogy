@@ -41,7 +41,7 @@ class Html {
 	 * @property {string} arg.val input|select will set value, otherwise set innerText
 	 * @property {string} arg.valhtml optional subelement with and instead for val, f.e. use to center with val in grid use extra div
 	 * @property {object} arg.atts attributes of HTMLElement
-	 * @property {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered)
+	 * @property {object} arg.evts events of HTMLElelement (an element must be on DOM to be triggered), Object key is event type, val is the function to be called; val might be an array of functions
 	 */
 	/**
 	 * creates dynamic HTMLElement
@@ -344,7 +344,13 @@ class Html {
 				this.domed = false
 				// remove given events manually, because old browsers may get memory leaks when removing element
 				this.my.evts.forEach(evt => {
-					this.my.el.removeEventListener(evt.key,evt.cbk)
+					if (Arr.is(evt.cbk)) {
+						evt.cbk.forEach(cbk => {
+							this.my.el.removeEventListener(evt.key,cbk)
+						})
+					} else {
+						this.my.el.removeEventListener(evt.key,evt.cbk)
+					}
 				})
 				this.my.evts = [] // empty array at once
 
@@ -469,9 +475,29 @@ class Html {
 			for (const key in arg.evts) {
 				if (Object.hasOwnProperty.call(arg.evts,key)) {
 					const cbk = arg.evts[key]
-					if (inDOM) elem.el.addEventListener(key,cbk)
 					Obj.assure(elem.obj.arg,'evts',{}) // assure evts array exists
-					elem.obj.arg.evts[key] = cbk
+					if (Arr.is(cbk)) {
+						cbk.forEach(cbkSingle => {
+							if (inDOM) {
+								elem.el.addEventListener(key,cbkSingle)
+								if (elem.evts[key] === undefined) elem.evts[key] = []
+								elem.evts[key].push(cbkSingle)
+							}
+							if (elem.obj.arg.evts[key] === undefined) elem.obj.arg.evts[key] = []
+							elem.obj.arg.evts[key].push(cbkSingle)
+						})
+					} else {
+						if (inDOM) {
+							elem.el.addEventListener(key,cbk)
+							if (elem.evts[key] === undefined) elem.evts[key] = []
+							elem.evts[key].push(cbk)
+						}
+						if (elem.obj.arg.evts[key] === undefined) elem.obj.arg.evts[key] = []
+						if (!Arr.is(elem.obj.arg.evts[key])) {
+							elem.obj.arg.evts[key] = [elem.obj.arg.evts[key]]
+						}
+						elem.obj.arg.evts[key].push(cbk)
+					}
 				}
 			}
 		}
@@ -590,13 +616,6 @@ class Html {
 			this[arg.name].push(htmlObj)
 		}
 		return htmlObj
-	}
-	/**
-	 * value of input or textContent of other element types @see {@link Elem.val}
-	 * @returns {string} value
-	 */
-	get val() {
-		return this.elem.val
 	}
 	/**
 	 * get id from DOM, and write it to .my.atts (only if defined) and .my.id
