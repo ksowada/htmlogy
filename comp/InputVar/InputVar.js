@@ -142,7 +142,6 @@ class InputVar extends Model {
 	 */
 	dom(parentHtml,propsAdd={}) {
 		const props = Html.mergeDatas(this.props,propsAdd)
-		console.log('InputVar:dom:props:',props)
 
 		// first set val, for every mode
 		let val = (this.val) ? this.val : props.val

@@ -94,7 +94,6 @@ class HtmlSelect extends Bits {
 	 * used to show the state of newly set value
 	 */
 	setDom() {
-		console.log('HtmlSelect:renderState')
 		const bitVals = this.val
 		for (let ix=0; ix<this.htmlStates.length; ix++) {
 			// get first key of array-item

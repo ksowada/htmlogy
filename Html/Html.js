@@ -578,7 +578,7 @@ class Html {
 	/**
 	 * add introduce child, automatically sets parent with this and construct it
 	 * @param {object|Html} [arg] supply create()-like arg or already created Html
-	 * @param {string} arg.name name of class member, if given it generate it, so you can use this child as .[name]
+	 * @param {string} arg.name name of class member, if given it generate it, so you can use this child as .[name], dont use div
 	 * @returns {Html} new produced child of this
 	 */
 	add(arg) {
@@ -721,6 +721,7 @@ class Html {
 	 * @param {...object} objs multiple to merge, the last dominates
 	 * @returns {object} result of merging
 	 */
+	// eslint-disable-next-line no-unused-vars
 	static mergeDatas(...objs) {
 		const ret = {}
 		for (let i = 0; i < arguments.length; i++) {
@@ -754,6 +755,7 @@ class Html {
 	 * @param {object[]} objs multiple to merge, the last dominates
 	 * @returns {object} result of merging, optional as first arg is also modified
 	 */
+	// eslint-disable-next-line no-unused-vars
 	static mergeModDatas(objs) { //  TODO use mergeJoin
 		if (!Vars.is(arguments[0])) return undefined
 		for (let i = 1; i < arguments.length; i++) {
