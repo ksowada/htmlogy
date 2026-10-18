@@ -5,6 +5,7 @@ import Html from '../../Html/Html'
  * ButtonSwitch is a regular Button that switch content when clicked
  */
 export default class ButtonSwitch extends Html {
+
 	#callback
 
 	/**
@@ -12,8 +13,9 @@ export default class ButtonSwitch extends Html {
 	 * @param {object} args Html args
 	 * @param {string[]} vals values to switch through
 	 * @param {Function} callback is called with parameters(val, ix); callback is called at constructor
+	 * @param {string} [logo] contains the src of img
 	 */
-	constructor(args,vals,callback) {
+	constructor(args,vals,logo,callback) {
 		const arg = Html.mergeDatas({html:'button',val:vals[0]},args)
 		super(arg)
 		this.append({evts:{click:this.#buttonEvt.bind(this)}})
@@ -24,6 +26,9 @@ export default class ButtonSwitch extends Html {
 		/** {string} value of selected entry */
 		this.val = vals[this.index]
 		this.vals = vals
+
+		if (logo) this.add({html:'img',css:'icon',atts:{src:logo}})
+
 		this.#callback = callback
 		if (this.#callback) queueMicrotask(() => {
 			this.#callback(this.val,this.index)
