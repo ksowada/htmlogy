@@ -1,3 +1,4 @@
+import Arr from '../../../logic/Arr/Arr'
 import Html from '../../Html/Html'
 
 /**
@@ -7,18 +8,28 @@ import Html from '../../Html/Html'
 export default class ButtonSwitch extends Html {
 
 	#callback
+	#ixEn
 
 	/**
 	 * create a Button with value change by click
 	 * @param {object} args Html args
 	 * @param {string[]} vals values to switch through
+	 * @param {object} options additonal options
+	 * @param {string} [options.icon] contains the src of img
+	 * @param {boolean} [options.ixEn=false] controls optional ix
 	 * @param {Function} callback is called with parameters(val, ix); callback is called at constructor
-	 * @param {string} [logo] contains the src of img
 	 */
-	constructor(args,vals,logo,callback) {
-		const val = vals?vals[0]:''
+	constructor(args,vals,options={},callback) {
+		let val = vals?vals[0]:''
+		const ixEn = options.ixEn ? options.ixEn : false
+		val = val + (ixEn?` (0)`:'')
 		const arg = Html.mergeDatas({html:'button',val},args)
+
 		super(arg)
+
+		const icon = options.icon
+		this.#ixEn = ixEn
+
 		this.append({evts:{click:this.#buttonEvt.bind(this)}})
 
 		/** {number} index of selected entry */
@@ -30,7 +41,7 @@ export default class ButtonSwitch extends Html {
 		/** {string} value of selected entry */
 		this.val = val
 
-		if (logo) this.add({html:'img',css:'icon',atts:{src:logo}})
+		if (icon) this.add({html:'img',css:'icon',atts:{src:icon}})
 
 		this.#callback = callback
 		if (this.#callback && vals) queueMicrotask(() => {
@@ -38,14 +49,16 @@ export default class ButtonSwitch extends Html {
 		})
 	}
 	/**
-	 * sets vals, choose 1st index and render it	 
+	 * sets vals, choose 1st index and render it
 	 * @param {string[]} vals values to switch through
 	 */
 	setVals(vals) {
+		if (Arr.equals(vals,this.vals)) return
 		this.vals = vals
 		this.index = 0
 		this.val = this.vals[this.index]
-		this.change({val:this.val})
+		const val = this.val + (this.#ixEn?` (${this.index})`:'')
+		this.change({val})
 		if (this.#callback) this.#callback(this.val,this.index)
 	}
 	#buttonEvt() {
@@ -55,7 +68,8 @@ export default class ButtonSwitch extends Html {
 		}
 		this.index = ixIsState
 		this.val = this.vals[this.index]
-		this.change({val:this.val})
+		const val = this.val + (this.#ixEn?` (${this.index})`:'')
+		this.change({val})
 		if (this.#callback) this.#callback(this.val,this.index)
 	}
 }
