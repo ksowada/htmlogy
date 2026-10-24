@@ -24,7 +24,7 @@ class HtmlSelect extends Bits {
 	 */
 
 	/**
-	 * create a new instance
+	 * create a new instance, you may attach a callback to model through onAll()
 	 * @param {HtmlSelect~props} props instance properties
 	 * @param {string[]} names names to inherit to Model and Storage, keep unique
 	 */
@@ -110,6 +110,7 @@ class HtmlSelect extends Bits {
 	 * @private
 	 */
 	elementClick(ix,evt) {
+		evt.stopPropagation()
 		if (evt.detail === this.props.reactOnClick) { // single or double click
 		// toggle evt.ix in select-logic & in there handle sub specific
 			this.toggle(ix) // will fire multiple on & off-events
