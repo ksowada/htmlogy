@@ -110,6 +110,7 @@ class HtmlSelect extends Bits {
 	 * @private
 	 */
 	elementClick(ix,evt) {
+		evt.stopPropagation()
 		if (evt.detail === this.props.reactOnClick) { // single or double click
 		// toggle evt.ix in select-logic & in there handle sub specific
 			this.toggle(ix) // will fire multiple on & off-events
