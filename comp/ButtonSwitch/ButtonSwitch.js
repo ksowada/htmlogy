@@ -9,6 +9,7 @@ export default class ButtonSwitch extends Html {
 
 	#callback
 	#ixEn
+	#callOnlyAtClick
 
 	/**
 	 * create a Button with value change by click
@@ -17,9 +18,10 @@ export default class ButtonSwitch extends Html {
 	 * @param {object} options additonal options
 	 * @param {string} [options.icon] contains the src of img
 	 * @param {boolean} [options.ixEn=false] controls optional ix
+	 * @param {boolean} [callOnlyAtClick=false] when given true it calls callvack not at set and constructor with vals
 	 * @param {Function} callback is called with parameters(val, ix); callback is called at constructor
 	 */
-	constructor(args,vals,options={},callback) {
+	constructor(args,vals,options={},callOnlyAtClick=false,callback) {
 		let val = vals?vals[0]:''
 		const ixEn = options.ixEn ? options.ixEn : false
 		val = val + (ixEn?` (0)`:'')
@@ -29,6 +31,7 @@ export default class ButtonSwitch extends Html {
 
 		const icon = options.icon
 		this.#ixEn = ixEn
+		this.#callOnlyAtClick = callOnlyAtClick
 
 		this.append({evts:{click:this.#buttonEvt.bind(this)}})
 
@@ -44,7 +47,7 @@ export default class ButtonSwitch extends Html {
 		if (icon) this.add({html:'img',css:'icon',atts:{src:icon}})
 
 		this.#callback = callback
-		if (this.#callback && vals) queueMicrotask(() => {
+		if (!this.#callOnlyAtClick && this.#callback && vals) queueMicrotask(() => {
 			this.#callback(this.val,this.index)
 		})
 	}
@@ -59,7 +62,7 @@ export default class ButtonSwitch extends Html {
 		this.val = this.vals[this.index]
 		const val = this.val + (this.#ixEn?` (${this.index})`:'')
 		this.change({val})
-		if (this.#callback) this.#callback(this.val,this.index)
+		if (!this.#callOnlyAtClick && this.#callback) this.#callback(this.val,this.index)
 	}
 	#buttonEvt() {
 		let ixIsState = this.vals.indexOf(this.val)
