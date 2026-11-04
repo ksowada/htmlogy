@@ -114,7 +114,8 @@ class InputInfo extends InputVar {
 			if (props.en == false) btnAtts = {atts:{disabled:'true'}}
 			this.vars.en.dom(parentHtml,{kind:'bit',label:props.label,...props.en,...btnAtts})
 			parentHtml = this.ui.form = parentHtml.add({html:'span',css:'enableble'})
-			args = Obj.omit(args, 'label') // label is already mounted here
+			args.label = '' // label is already mounted on the enable button
+			this.props.label = ''
 		}
 
 		if (this.get()!==undefined && props.val!==null) {
