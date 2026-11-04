@@ -115,8 +115,8 @@ class InputVar extends Model {
 			if (Arr.is(valIntern)) {
 				this.setDom(valIntern)
 				const preVal = this.val
-				if (preVal) this.html.el.value = preVal
-				const setVal = this.html.el.value
+				if (preVal && this.html) this.html.el.value = preVal
+				const setVal = this.html ? this.html.el.value : preVal
 				super.set(setVal,undefined,setOpts)
 			} else {
 				super.set(valIntern,undefined,setOpts)
@@ -142,10 +142,13 @@ class InputVar extends Model {
 	 */
 	dom(parentHtml,propsAdd={}) {
 		const props = Html.mergeDatas(this.props,propsAdd)
+		if (props.kind) this.props.kind = props.kind
+		if (props.callback) this.props.callback = props.callback
+		if (props.tooltip) this.props.tooltip = props.tooltip
 
 		// first set val, for every mode
-		let val = (this.val) ? this.val : props.val
-		if (val) {
+		let val = (this.val !== undefined && this.val !== '') ? this.val : props.val
+		if (val !== undefined && val !== '') {
 			if (props.kind==='bit') {
 				this.set(Boolean(val),{prevent:'all'})
 			} else {
@@ -172,7 +175,9 @@ class InputVar extends Model {
 		// create html according to kind
 		// evt (button)
 		if (props.kind==='evt'||props.kind==='bit') {
-			myHtml = workHtml.add(Html.mergeDatas(arg,{html:'button',atts:{'value':props.val}})) // val is overwritten because of val
+			const argBtn = Obj.omit(arg,'val')
+			const btnVal = this.val !== undefined ? this.val : props.val
+			myHtml = workHtml.add(Html.mergeDatas(argBtn,{html:'button',atts:{'value':btnVal}})) // val is overwritten because of val
 			if (props.icon) myHtml.add({h:`<img class="inline" src=${props.icon} />`})
 			if (props.label) myHtml.add({h:`<span>${props.label}</span>`})
 
@@ -227,11 +232,17 @@ class InputVar extends Model {
 		case 'evt':
 		case 'bit': eventType='click'; break
 		case 'range': eventType='input'; break
+		case 'select': eventType='change'; break
 		default: eventType='input'; break
 		}
-		eventType = props.listen?props.listen:eventType
+		if (props.kind !== 'select' && props.kind !== 'evt' && props.kind !== 'bit') {
+			eventType = props.listen ? props.listen : eventType
+		}
 		const evts = {}
 		evts[eventType] = this.onChange.bind(this)
+		if (props.kind === 'select') {
+			evts['input'] = this.onChange.bind(this)
+		}
 		myHtml.append({evts})
 
 		// attach optional tooltip to Html object
@@ -272,7 +283,7 @@ class InputVar extends Model {
 		}
 
 		/** changes the html element with the filtered properties */
-		this.html.change(arg)
+		if (this.html) this.html.change(arg)
 		// eslint-disable-next-line no-self-assign
 		this.val = this.val // call set val for boundcheck
 	}
@@ -285,19 +296,20 @@ class InputVar extends Model {
 	 */
 	onChange(event) {
 		event.stopPropagation()
-		let val = event.target.value
+		const target = event.currentTarget || event.target
+		let val = target ? target.value : undefined
 		if (this.props.kind==='int'||this.props.kind==='float') {
 			if (this.props.kind==='int') val = Number.parseInt(val)
 			if (this.props.kind==='float') val = Number.parseFloat(val)
 			const valBound = this.checkBound(val,this.props)
-			if (val!==valBound) event.target.value = valBound
+			if (val!==valBound && target) target.value = valBound
 			val = valBound
 		} else if (this.props.kind === 'bit') {
 			val = !this.val
 		}
 		if (this.props.kind === 'evt') {
 			this.changed() // trigger listeners
-		} else {
+		} else if (val !== undefined) {
 			this.val = val
 		}
 		if (this.props.callback) {
@@ -310,7 +322,7 @@ class InputVar extends Model {
 	 * @param {any} val a value to set in DOM element
 	 * @private
 	 */
-	setDom(val) {
+	setDom(val = this.val) {
 		if (this.html) {
 			if (this.props.kind === 'select' && Arr.is(val)) {
 				this.html.removeChilds()
@@ -322,6 +334,9 @@ class InputVar extends Model {
 				})
 			} else {
 				this.html.el.value = val
+				if (this.props.kind === 'bit' || this.props.kind === 'evt' || (this.html.el && this.html.el.tagName === 'BUTTON')) {
+					this.html.el.setAttribute('value', val)
+				}
 			}
 		}
 	}
@@ -345,6 +360,7 @@ class InputVar extends Model {
 		// eslint-disable-next-line jsdoc/require-param
 		/** change 1 Html */
 		const disable = (_deactivate,_html) => {
+			if (!_html) return
 			if (_deactivate) {
 				_html.change({atts:{disabled:'true'}})
 			} else {
@@ -353,7 +369,7 @@ class InputVar extends Model {
 		}
 		if (html) {
 			disable(deactivate,html)
-		} else {
+		} else if (this.html) {
 			disable(deactivate,this.html)
 		}
 	}

@@ -1,8 +1,7 @@
-// @ts-ignore
-import InputInfo from './InputInfo'
-import HtmlSelect from '../../HtmlSelect/HtmlSelect'
-import Tags from '../Tags/Tags'
-import Arr from '../../../logic/Arr/Arr'
+import InputInfo from './InputInfo.js'
+import HtmlSelect from '../../HtmlSelect/HtmlSelect.js'
+import Tags from '../Tags/Tags.js'
+import Arr from '../../../logic/Arr/Arr.js'
 
 /**
  * represents multiple variables
@@ -54,7 +53,13 @@ class InputVars {
 	 */
 	set(key,val,modelKey) {
 		if (modelKey===undefined) return this.vars[key] && this.vars[key].set(val)
-		return this.vars[key] && this.vars[key].vars[modelKey].set(val)
+		if (this.vars[key] && this.vars[key].vars && this.vars[key].vars[modelKey]) {
+			return this.vars[key].vars[modelKey].set(val)
+		}
+		if (this.vars[key] && this.vars[key].vars_subs && this.vars[key].vars_subs[modelKey]) {
+			return this.vars[key].vars_subs[modelKey].set(val)
+		}
+		return false
 	}
 	/**
 	 * set multiple values of one keyed info, only when info is available, and val is not invalid
@@ -92,9 +97,21 @@ class InputVars {
 				this.vars[key].onAll(callback) // dont listen to disabled inputs
 
 				// also sub vars of InputInfo
-				Object.keys(this.vars[key].vars).forEach(modelKey => {
-					this.vars[key].vars[modelKey].onAll(callback)
-				})
+				if (this.vars[key].vars) {
+					Object.keys(this.vars[key].vars).forEach(modelKey => {
+						this.vars[key].vars[modelKey].onAll(callback)
+					})
+				}
+				if (this.vars[key].vars_subs) {
+					Object.keys(this.vars[key].vars_subs).forEach(modelKey => {
+						this.vars[key].vars_subs[modelKey].onAll(callback)
+					})
+				}
+				if (this.vars[key].vars_actions) {
+					Object.keys(this.vars[key].vars_actions).forEach(modelKey => {
+						this.vars[key].vars_actions[modelKey].onAll(callback)
+					})
+				}
 			}
 		})
 	}

@@ -788,7 +788,7 @@ class Html {
 	 */
 	static mergeAvailable(arg) {
 		if (typeof arg === 'function') {
-			return true
+			return false
 		}
 		if (arg === null || typeof arg !== 'object') {
 			return false

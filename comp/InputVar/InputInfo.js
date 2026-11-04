@@ -104,7 +104,7 @@ class InputInfo extends InputVar {
 		 * @type InputVar
 		 */
 		const enVal = (!props.en || props.en.val)
-		const enProps = Obj.defaults(props.en,{en:'bit',val:enVal,storeEn:this.props.storeEn})
+		const enProps = Obj.defaults(props.en,{kind:'bit',val:enVal,storeEn:this.props.storeEn})
 		this.vars.en = new InputVar(enProps,this,[this.ids,'en'])
 		this.vars.en.on(undefined,this.enChanged.bind(this))
 
@@ -124,7 +124,7 @@ class InputInfo extends InputVar {
 		const actions = props.actions
 		if (actions) {
 			actions.forEach(key => {
-				this.vars_actions[key] = (new InputVar({storeEn:this.props.storeEn},this,[this.ids,key]).dom(parentHtml,this.action_subs[key]))
+				this.vars[key] = this.vars_actions[key] = (new InputVar({storeEn:this.props.storeEn,...this.action_subs[key]},this,[this.ids,key]).dom(parentHtml,this.action_subs[key]))
 			})
 		}
 
@@ -132,7 +132,7 @@ class InputInfo extends InputVar {
 		const subs = props.subs
 		for (var key in subs) {
 			if (Object.hasOwn(subs,key)) {
-				this.vars_subs[key] = (new InputVar({storeEn:this.props.storeEn},this,[this.ids,key]).dom(parentHtml,props.subs[key]))
+				this.vars[key] = this.vars_subs[key] = (new InputVar({storeEn:this.props.storeEn,...props.subs[key]},this,[this.ids,key]).dom(parentHtml,props.subs[key]))
 			}
 		}
 
@@ -146,6 +146,7 @@ class InputInfo extends InputVar {
 	getSubVal(key) {
 		if (Object.hasOwn(this.vars_actions, key)) return this.vars_actions[key].get()
 		if (Object.hasOwn(this.vars_subs, key)) return this.vars_subs[key].get()
+		if (this.vars && Object.hasOwn(this.vars, key)) return this.vars[key].get()
 		if (key=='en') return this.vars['en'].get()
 		return this.get(key)
 	}
